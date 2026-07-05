@@ -52,7 +52,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                 'cart.*.uniform_stock_id' => ['required', 'integer', 'exists:uniform_stocks,id'],
                 'cart.*.size' => ['nullable', 'string', Rule::in(['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'])],
                 'cart.*.quantity' => ['required', 'integer', 'min:1'],
-                'cart.*.price_at_sale' => ['required', 'numeric', 'min:0'],
+                'cart.*.price_at_sale' => ['required', 'numeric', 'min:0.01'],
             ],
             [
                 'paymentType.required' => 'Please choose a payment type.',
@@ -68,7 +68,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                 'cart.*.quantity.min' => 'Quantity must be at least 1.',
                 'cart.*.price_at_sale.required' => 'Please enter unit price for each selected item.',
                 'cart.*.price_at_sale.numeric' => 'Unit price must be a valid number.',
-                'cart.*.price_at_sale.min' => 'Unit price cannot be negative.',
+                'cart.*.price_at_sale.min' => 'Unit price must be greater than zero.',
             ],
             [
                 'paymentType' => 'payment type',
@@ -121,9 +121,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
 
             <div class="w-full max-w-sm">
                 <select id="paymentType" wire:model="paymentType" class="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 shadow-sm focus:border-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#1F2937]/10">
-                    <option value="cash">Cash</option>
-                    <option value="gcash">GCash</option>
-                    <option value="card">Card</option>
+                    <option value="cash">Cash</option>     
                 </select>
                 <br>
                 <br>
@@ -238,6 +236,18 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
              get hasOverstock() {
                  return this.cart.some(item => item.uniform_stock_id && item.quantity > item.max_available_stock)
              },
+             get canCompleteSale() {
+                 if (this.hasOverstock || this.loading) return false
+                 if (this.orderTotal <= 0) return false
+
+                 // Every row must be a complete, priced line — no empty rows and
+                 // no zero-subtotal (free) items may be recorded as a sale.
+                 return this.cart.every(item => {
+                     if (!item.uniform_stock_id) return false
+                     if (!this.isBook(item.uniform_stock_id) && !item.selected_size) return false
+                     return this.normalizeQty(item.quantity) >= 1 && this.normalizePrice(item.unit_price) > 0
+                 })
+             },
              fmt(val) {
                  const n = parseFloat(val || 0).toFixed(2)
                  const parts = n.split('.')
@@ -248,7 +258,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                  this.showSuccessModal = false
              },
              async submit() {
-                 if (this.hasOverstock || this.loading) return
+                 if (!this.canCompleteSale) return
                  this.loading = true
                  try {
                      const completedTotal = this.orderTotal
@@ -377,8 +387,8 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
             <button
                 type="button"
                 x-on:click="submit()"
-                :disabled="hasOverstock || loading"
-                :class="(hasOverstock || loading) ? 'opacity-60 cursor-not-allowed' : ''"
+                :disabled="!canCompleteSale"
+                :class="!canCompleteSale ? 'opacity-60 cursor-not-allowed' : ''"
                 class="btn btn-green"
                 style="padding: 11px 24px;"
             >
@@ -396,12 +406,12 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
             x-transition:leave-start="opacity-100"
             x-transition:leave-end="opacity-0"
             x-cloak
-            class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-sm"
+            class="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-sm"
             role="dialog"
             aria-modal="true"
             aria-labelledby="checkout-success-title"
-            x-on:click.self="closeSuccessModal()"
         >
+          <div class="flex items-center justify-center p-4" style="min-height: 100%;" x-on:click.self="closeSuccessModal()">
             <div
                 x-show="showSuccessModal"
                 x-transition:enter="transition ease-out duration-300"
@@ -411,6 +421,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                 x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
                 x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 class="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-2xl transition-all"
+                style="margin-top: 2rem; margin-bottom: 2rem;"
             >
                 <div class="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                     <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" aria-hidden="true">
@@ -434,12 +445,14 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                     <button
                         type="button"
                         x-on:click="closeSuccessModal()"
-                        class="inline-flex w-full justify-center rounded-lg bg-[#1F2937] px-4 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-[#1F2937] focus:ring-offset-2"
-                    >
+                         class="inline-flex w-full justify-center btn-green rounded-lg bg-[#1F2937] px-
+                            4 py-3 text-base font-semibold text-[#1F2937]" shadow-sm transition hover:bg-[#111827] focus:outline-n
+                            one focus:ring-2 focus:ring-[#1F2937] focus:ring-offset-2 btn-green>
                         Close & Continue
                     </button>
                 </div>
             </div>
+          </div>
         </div>
         </template>
     </div>

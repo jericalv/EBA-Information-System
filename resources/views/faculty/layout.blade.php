@@ -14,6 +14,7 @@
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        [x-cloak] { display: none !important; }
         :root {
             --green: #1F2937;
             --green-dark: #111827;
