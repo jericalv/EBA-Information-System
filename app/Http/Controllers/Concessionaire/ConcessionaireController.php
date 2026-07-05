@@ -13,6 +13,7 @@ use App\Models\User;
 use App\Services\WordFilterService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -957,6 +958,61 @@ class ConcessionaireController extends Controller
             ->values()
             ->all();
 
+        // Sparkline trend data for the stat cards (monthly, same 6-month window)
+        $sparklineMonths = collect(range(0, 5))
+            ->map(fn (int $offset) => $trendStart->copy()->addMonths($offset));
+
+        $ratingSparkline = $sparklineMonths
+            ->map(function (CarbonInterface $month) use ($customerReviews) {
+                $reviewsToDate = $customerReviews->filter(
+                    fn ($review) => $review->created_at && $review->created_at->lte($month->copy()->endOfMonth())
+                );
+
+                return $reviewsToDate->isEmpty() ? 0 : round((float) $reviewsToDate->avg('rating'), 2);
+            })
+            ->values()
+            ->all();
+
+        $reviewsSparkline = collect($reviewTrendData)
+            ->map(fn (array $row) => $row['store_reviews'] + $row['product_reviews'])
+            ->values()
+            ->all();
+
+        $productCreatedDates = (clone $productsBaseQuery)->pluck('created_at');
+        $productsSparkline = $sparklineMonths
+            ->map(function (CarbonInterface $month) use ($productCreatedDates) {
+                $endOfMonth = $month->copy()->endOfMonth();
+
+                return $productCreatedDates
+                    ->filter(fn ($date) => $date && Carbon::parse($date)->lte($endOfMonth))
+                    ->count();
+            })
+            ->values()
+            ->all();
+
+        $paymentRows = ConcessionairePayment::query()
+            ->where('concessionaire_id', $user->id)
+            ->whereBetween('payment_date', [$trendStart, $trendEnd])
+            ->get(['payment_date', 'amount']);
+
+        $paymentsSparkline = $sparklineMonths
+            ->map(function (CarbonInterface $month) use ($paymentRows) {
+                $monthKey = $month->format('Y-m');
+
+                return (float) $paymentRows
+                    ->filter(fn ($payment) => $payment->payment_date && Carbon::parse($payment->payment_date)->format('Y-m') === $monthKey)
+                    ->sum('amount');
+            })
+            ->values()
+            ->all();
+
+        $statSparklines = [
+            'rating' => $ratingSparkline,
+            'reviews' => $reviewsSparkline,
+            'products' => $productsSparkline,
+            'payments' => $paymentsSparkline,
+        ];
+
         $products = (clone $productsBaseQuery)->get(['category']);
         $productCategoryData = [
             'food' => $products->where('category', 'food')->count(),
@@ -989,6 +1045,7 @@ class ConcessionaireController extends Controller
             'monthlyPaymentsTotal' => $monthlyPaymentsTotal,
             'reviewTrendData' => $reviewTrendData,
             'productCategoryData' => $productCategoryData,
+            'statSparklines' => $statSparklines,
         ];
     }
 
