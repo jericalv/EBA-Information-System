@@ -104,7 +104,8 @@
             </div>
 
             <div class="border-t border-slate-100 px-4 py-2.5">
-                {{ $orders->links() }}
+                {{-- Faculty portal uses its own styled pagination; cashier keeps the default. --}}
+                {{ $orders->links(auth()->user()?->role === 'faculty' ? 'faculty.partials.pagination' : null) }}
             </div>
         @endif
     </div>

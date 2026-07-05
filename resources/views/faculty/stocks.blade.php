@@ -24,7 +24,7 @@
     }
     .stocks-card-blue { border-top-color: #3b82f6; }
     .stocks-card-indigo { border-top-color: #6366f1; }
-    .stocks-card-green { border-top-color: #10b981; }
+    .stocks-card-green { border-top-color: #1F2937; }
     .stocks-card-gray { border-top-color: #64748b; }
     .stocks-card-header {
         display: flex;
@@ -48,7 +48,7 @@
     }
     .stocks-card-icon-blue { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); }
     .stocks-card-icon-indigo { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
-    .stocks-card-icon-green { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+    .stocks-card-icon-green { background: linear-gradient(135deg, #374151 0%, #1F2937 100%); }
     .stocks-card-icon-gray { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
     .stocks-card-label {
         font-size: 13px;
@@ -73,8 +73,8 @@
         width: fit-content;
     }
     .stocks-card-status-green {
-        background: #dcfce7;
-        color: #166534;
+        background: #E9EDF1;
+        color: #1F2937;
     }
     .stocks-card-status-amber {
         background: #fef3c7;
@@ -123,12 +123,12 @@
     .stocks-field input[type="number"],
     .stocks-field input[type="file"] {
         width: 100%;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
         font-family: inherit;
         font-size: 14px;
-        color: #0f172a;
-        background: #f8fafc;
+        color: var(--ink);
+        background: #fff;
     }
     .stocks-field input[type="text"],
     .stocks-field input[type="number"] {
@@ -205,10 +205,10 @@
         width: 100%;
         height: 40px;
         padding: 0 12px 0 36px;
-        border: 1px solid #dbe2ea;
-        border-radius: 10px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
         font-size: 14px;
-        color: #0f172a;
+        color: var(--ink);
         background: #fff;
     }
     .search-box input:focus {
@@ -289,9 +289,9 @@
         right: 0;
         top: calc(100% + 4px);
         background: #fff;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        box-shadow: var(--shadow-pop);
         z-index: 60;
         width: 170px;
         overflow: hidden;
@@ -317,8 +317,8 @@
         box-sizing: border-box;
     }
     .actions-dropdown-item:hover {
-        background: #f1f5f9;
-        color: #0f172a;
+        background: var(--pine-soft);
+        color: var(--ink);
     }
     .actions-dropdown-item.btn-delete-item {
         color: #dc2626;
@@ -349,12 +349,12 @@
         flex-shrink: 0;
     }
     .stock-status-badge-active {
-        background: #d1fae5;
-        color: #065f46;
-        border-color: #a7f3d0;
+        background: #E9EDF1;
+        color: #1F2937;
+        border-color: #D6DCE3;
     }
     .stock-status-badge-active .stock-status-badge-dot {
-        background: #10b981;
+        background: #1F2937;
     }
     .stock-status-badge-archived {
         background: #ffe4e6;
@@ -440,18 +440,27 @@
     .add-modal-field input[type="file"],
     .add-modal-field select {
         width: 100%;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
         font-family: inherit;
         font-size: 14px;
-        color: #0f172a;
-        background: #f8fafc;
+        color: var(--ink);
+        background: #fff;
     }
     .add-modal-field input[type="text"],
     .add-modal-field input[type="number"],
     .add-modal-field select {
         height: 42px;
         padding: 0 14px;
+    }
+    .add-modal-field select {
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23687180' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 34px;
     }
     .add-modal-field input[type="file"] {
         padding: 10px;
@@ -494,12 +503,12 @@
     }
     .add-size-item input {
         width: 100%;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
         height: 38px;
         padding: 0 10px;
         font-size: 13px;
-        background: #f8fafc;
+        background: #fff;
     }
     .add-size-item input:focus {
         outline: none;
@@ -538,7 +547,7 @@
     .feedback-modal-close {
         border: 0;
         background: #f1f5f9;
-        border-radius: 8px;
+        border-radius: 6px;
         width: 32px;
         height: 32px;
         display: inline-flex;
@@ -570,12 +579,12 @@
     }
     .edit-modal-field input {
         width: 100%;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
         font-family: inherit;
         font-size: 14px;
-        color: #0f172a;
-        background: #f8fafc;
+        color: var(--ink);
+        background: #fff;
         height: 44px;
         padding: 0 14px;
     }
@@ -666,7 +675,7 @@
                 type="text"
                 placeholder="Search items..."
                 oninput="filterRows()"
-                style="height:38px;padding:0 14px 0 34px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;color:#0f172a;background:#fff;width:220px;font-family:inherit;"
+                style="height:38px;padding:0 14px 0 34px;border:1px solid var(--line-strong);border-radius:6px;font-size:13px;color:var(--ink);background:#fff;width:220px;font-family:inherit;"
                 onfocus="this.style.borderColor='#1F2937';this.style.boxShadow='0 0 0 3px rgba(31,41,55,0.10)'"
                 onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'"
             >
@@ -715,8 +724,8 @@
                                     Low Stock
                                     </span>
                                  @else
-                                    <span style="color:#059669;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
-                                         <span style="width:7px;height:7px;border-radius:50%;background:#059669;display:inline-block;flex-shrink:0;"></span>
+                                    <span style="color:#1F2937;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
+                                         <span style="width:7px;height:7px;border-radius:50%;background:#1F2937;display:inline-block;flex-shrink:0;"></span>
                                     Healthy
                                     </span>
                                 @endif
@@ -973,7 +982,7 @@
             </div>
             <div class="delete-modal-footer">
                 <button type="button" class="btn btn-outline btn-sm" onclick="closeDeleteModal()">Cancel</button>
-                <button type="submit" class="btn btn-sm" style="background:#dc2626;color:#fff;border:1px solid #dc2626;cursor:pointer;font-weight:600;min-height:36px;border-radius:6px;padding:0 16px;">Confirm Delete</button>
+                <button type="submit" class="btn btn-danger btn-sm">Confirm Delete</button>
             </div>
         </form>
     </div>

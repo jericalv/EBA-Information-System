@@ -208,11 +208,92 @@
             border-color: var(--line-strong);
         }
         .btn-outline:hover {
-            background: #F6F9F7;
-            border-color: #AEC1B4;
+            background: #F2F4F6;
+            border-color: #AEB6C0;
         }
+        .btn-red {
+            background: #FDF3F3;
+            color: var(--danger);
+            border-color: #F2D8D8;
+        }
+        .btn-red:hover {
+            background: #FAE5E5;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #991B1B;
+        }
+        .btn-sm {
+            padding: 6px 11px;
+            font-size: 12.5px;
+        }
+        .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+        .btn-sm svg { width: 14px; height: 14px; }
         .pagination-wrap {
             padding: 14px 20px;
+            border-top: 1px solid var(--line);
+        }
+
+        /* ---------- Pagination ---------- */
+        .pg {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        .pg-info {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+        .pg-list {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .pg-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 32px;
+            height: 32px;
+            padding: 0 10px;
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+            background: #fff;
+            color: var(--ink);
+            font-family: var(--font-mono);
+            font-size: 12.5px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+        .pg-btn:hover {
+            background: #F2F4F6;
+            border-color: #AEB6C0;
+        }
+        .pg-btn.is-current {
+            background: var(--pine);
+            border-color: var(--pine);
+            color: #fff;
+        }
+        .pg-btn.is-disabled {
+            color: var(--faint);
+            background: var(--paper);
+            pointer-events: none;
+        }
+        .pg-dots {
+            color: var(--faint);
+            font-family: var(--font-mono);
+            font-size: 12px;
+            padding: 0 2px;
         }
         @media (max-width: 860px) {
             .toolbar {

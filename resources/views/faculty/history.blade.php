@@ -89,8 +89,8 @@
         </div>
 
         @if ($logs->hasPages())
-            <div style="padding:16px 24px;border-top:1px solid #eef2f7;display:flex;justify-content:center;">
-                {{ $logs->links() }}
+            <div class="pagination-wrap">
+                {{ $logs->links('faculty.partials.pagination') }}
             </div>
         @endif
     </div>
