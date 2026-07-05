@@ -15,7 +15,7 @@
         white-space: nowrap;
     }
     .status-badge-overdue { background: #fee2e2; color: #991b1b; }
-    .status-badge-paid { background: #dcfce7; color: #166534; }
+    .status-badge-paid { background: #E9EDF1; color: #1F2937; }
     .status-badge-due { background: #fef3c7; color: #92400e; }
     .status-badge-none { background: #e2e8f0; color: #475569; }
 
@@ -78,8 +78,8 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: #dcfce7;
-        color: #166534;
+        background: #E9EDF1;
+        color: #1F2937;
         font-weight: 700;
         font-size: 13px;
     }

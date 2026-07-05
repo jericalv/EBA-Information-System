@@ -21,17 +21,10 @@
 
     .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; }
     .badge-pending { background: rgba(245,158,11,0.1); color: #d97706; }
-    .badge-approved { background: #dcfce7; color: #166534; }
+    .badge-approved { background: #E9F6EE; color: #15803D; }
     .badge-rejected { background: rgba(239,68,68,0.1); color: #dc2626; }
     .badge-registered { background: rgba(59,130,246,0.1); color: #2563eb; }
     .badge-expired { background: #e5e7eb; color: #4b5563; }
-
-    /* Buttons not provided by the faculty layout */
-    .btn-red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-    .btn-red:hover { background: #fee2e2; }
-    .btn-sm { padding: 5px 10px; font-size: 12px; }
-    .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
-    .btn-sm svg { width: 14px; height: 14px; }
 
     /* Wizard step badge (table) */
     .wizard-badge {
@@ -53,7 +46,7 @@
     .wizard-badge.amber { background: #fffbeb; color: #b45309; border-color: #fde68a; }
     .wizard-badge.violet { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
     .wizard-badge.blue { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-    .wizard-badge.green { background: #ecfdf3; color: #166534; border-color: #bbf7d0; }
+    .wizard-badge.green { background: #EEF0F3; color: #1F2937; border-color: #D6DCE3; }
     .wizard-dot {
         width: 8px;
         height: 8px;
@@ -70,12 +63,17 @@
     }
 
     /* Modal */
+    :root {
+        --wiz-green: #16A34A;
+        --wiz-green-dark: #15803D;
+        --wiz-green-soft: #E9F6EE;
+    }
     .modal-backdrop {
         position: fixed;
         inset: 0;
-        background: rgba(15, 23, 42, 0.5);
-        backdrop-filter: blur(2px);
-        -webkit-backdrop-filter: blur(2px);
+        background: rgba(17, 24, 39, 0.45);
+        backdrop-filter: blur(3px);
+        -webkit-backdrop-filter: blur(3px);
         display: none;
         align-items: center;
         justify-content: center;
@@ -84,36 +82,37 @@
     .modal-backdrop.active { display: flex; }
     .modal {
         background: #fff;
-        border-radius: 16px;
-        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        border: 1px solid var(--line);
         padding: 24px;
         max-width: 500px;
         width: 90%;
         max-height: 90vh;
         overflow-y: auto;
-        box-shadow: 0 30px 60px rgba(15, 23, 42, 0.2);
+        box-shadow: var(--shadow-pop);
     }
     .modal h3 { font-size: 18px; margin-bottom: 16px; }
     #viewModal .modal {
-        max-width: 640px;
-        width: min(92vw, 640px);
+        max-width: 660px;
+        width: min(94vw, 660px);
         padding: 0;
         max-height: 90vh;
-        border-radius: 16px;
+        border-radius: 14px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
     }
     #viewModal .view-modal-topbar {
         margin-bottom: 0;
-        padding: 18px 22px;
-        background: linear-gradient(135deg, #0A5C2F 0%, #166534 100%);
-        border-radius: 16px 16px 0 0;
-        border-bottom: none;
+        padding: 14px 20px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+        border-radius: 14px 14px 0 0;
     }
     #viewModal #viewContent {
         overflow-y: auto;
-        padding: 18px 20px 20px;
+        padding: 20px;
+        background: #FAFBFC;
     }
     .view-modal-topbar {
         display: flex;
@@ -123,101 +122,112 @@
     }
     .view-modal-title {
         margin: 0;
+        font-family: var(--font-mono);
         font-size: 11px;
-        font-weight: 800;
-        color: rgba(255, 255, 255, 0.65);
+        font-weight: 600;
+        color: var(--muted);
         letter-spacing: 0.14em;
         text-transform: uppercase;
     }
+    .view-modal-topbar-right { display: inline-flex; align-items: center; gap: 10px; }
     .view-modal-close {
-        border: 1.5px solid rgba(255, 255, 255, 0.25);
-        background: rgba(255, 255, 255, 0.12);
-        color: rgba(255, 255, 255, 0.85);
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
+        border: 1px solid var(--line-strong);
+        background: #fff;
+        color: var(--muted);
+        width: 30px;
+        height: 30px;
+        border-radius: 6px;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 18px;
+        font-size: 17px;
         line-height: 1;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         flex-shrink: 0;
     }
     .view-modal-close:hover {
-        background: rgba(255, 255, 255, 0.22);
-        color: #fff;
-        border-color: rgba(255, 255, 255, 0.45);
-        transform: rotate(90deg) scale(1.05);
+        background: var(--pine-soft);
+        color: var(--ink);
+        border-color: var(--line-strong);
     }
 
-    .view-modal-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 18px;
-        border: 1px solid #e5e7eb;
-        border-left: 4px solid #0A5C2F;
-        border-radius: 10px;
-        background: #faf9f7;
-    }
-    .view-modal-header-main { display: flex; align-items: flex-start; gap: 14px; min-width: 0; }
-    .view-modal-avatar {
-        width: 62px;
-        height: 62px;
-        border-radius: 18px;
-        background: linear-gradient(135deg, #047857 0%, #059669 100%);
-        color: #fff;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 19px;
-        font-weight: 800;
-        flex-shrink: 0;
-        border: 3px solid rgba(255, 255, 255, 0.95);
-        letter-spacing: 0.5px;
-    }
-    .view-modal-name { margin: 0; font-size: 19px; font-weight: 800; color: #0f172a; line-height: 1.2; letter-spacing: -0.01em; }
-    .view-modal-subtext { margin-top: 5px; font-size: 13px; color: #64748b; line-height: 1.55; font-weight: 500; }
-    .view-modal-status-chip {
-        padding: 7px 14px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 800;
-        line-height: 1;
-        white-space: nowrap;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
-    }
-    .view-modal-section {
-        margin-top: 18px;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
+    /* Application form summary */
+    .rv-section {
+        border: 1px solid var(--line);
+        border-radius: 12px;
         background: #fff;
-        padding: 18px;
-        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05), 0 2px 8px rgba(15, 23, 42, 0.05);
+        margin-top: 14px;
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
     }
-    .view-modal-section-title {
+    .rv-section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 11px 16px;
+        border-bottom: 1px solid var(--line);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+    .rv-grid { display: grid; grid-template-columns: 1fr 1fr; }
+    .rv-field { padding: 11px 16px 12px; border-top: 1px solid var(--line); min-width: 0; }
+    .rv-grid .rv-field:nth-child(-n+2) { border-top: none; }
+    .rv-field-span { grid-column: 1 / -1; }
+    .rv-field-label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--faint);
+        margin-bottom: 4px;
+    }
+    .rv-field-value {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--ink);
+        line-height: 1.5;
+        overflow-wrap: break-word;
+    }
+    .rv-proposal {
+        margin-top: 2px;
+        background: #FAFBFC;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 12px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #374151;
+        white-space: pre-wrap;
+        max-height: 140px;
+        overflow-y: auto;
+        line-height: 1.6;
+    }
+    .rv-attachments {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        padding: 12px 16px;
+        border-top: 1px solid var(--line);
+        background: #FAFBFC;
+    }
+    .rv-attachments .rv-field-label { margin: 0 4px 0 0; }
+    .rv-attachment-empty {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        margin: 0 0 12px;
-        font-size: 11px;
-        font-weight: 800;
-        text-transform: uppercase;
-        letter-spacing: 0.08em;
-        color: #334155;
-    }
-    .view-modal-section-title::before {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: #16a34a;
-        box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.15);
+        padding: 4px 10px;
+        background: #fff;
+        color: var(--faint);
+        border: 1px dashed var(--line-strong);
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
     }
     .view-modal-notice {
         font-size: 13px;
@@ -253,140 +263,173 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        color: #0a5c2f;
+        color: var(--pine);
         font-weight: 600;
         text-decoration: none;
     }
     .file-link:hover { text-decoration: underline; }
     .file-link.file-link-pill {
         padding: 4px 10px;
-        border-radius: 999px;
-        border: 1px solid #86efac;
-        background: #f0fdf4;
-        color: #166534;
+        border-radius: 6px;
+        border: 1px solid var(--line-strong);
+        background: #F2F4F6;
+        color: var(--ink);
         font-size: 12px;
         font-weight: 700;
         text-decoration: none;
     }
-    .file-link.file-link-pill:hover { background: #dcfce7; border-color: #4ade80; text-decoration: none; }
+    .file-link.file-link-pill:hover { background: #E9EDF1; border-color: #AEB6C0; text-decoration: none; }
 
-    /* Wizard progress */
-    .wizard-mini-progress {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 8px;
-        max-width: 420px;
-        margin: 0 auto 12px;
+    /* Completion wizard */
+    .rv-wizard {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        padding: 18px 18px 14px;
+        box-shadow: var(--shadow-card);
     }
-    .wizard-mini-progress > div { justify-content: center; }
-    .wizard-mini-step { display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    .wizard-mini-dot {
-        width: 32px;
-        height: 32px;
+    .rv-steps { display: flex; align-items: flex-start; max-width: 460px; margin: 0 auto; }
+    .rv-step { display: flex; flex-direction: column; align-items: center; gap: 7px; flex: 0 0 auto; min-width: 58px; }
+    .rv-step-dot {
+        width: 30px;
+        height: 30px;
         border-radius: 999px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        font-size: 13px;
-        font-weight: 800;
-        border: 3px solid #d1d5db;
-        color: #6b7280;
-        background: #fff;
-        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08);
-    }
-    .wizard-mini-dot.completed {
-        background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);
-        border-color: #15803d;
-        color: #fff;
-        box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
-        transform: scale(1.05);
-    }
-    .wizard-mini-dot.step-1.active { background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%); border-color: #1d4ed8; color: #fff; transform: scale(1.08); }
-    .wizard-mini-dot.step-2.active { background: linear-gradient(135deg, #ea580c 0%, #f97316 100%); border-color: #ea580c; color: #fff; transform: scale(1.08); }
-    .wizard-mini-dot.step-3.active { background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%); border-color: #7c3aed; color: #fff; transform: scale(1.08); }
-    .wizard-mini-dot.step-4.active { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); border-color: #0d9488; color: #fff; transform: scale(1.08); }
-    .wizard-mini-label { font-size: 11px; color: #64748b; font-weight: 700; text-align: center; letter-spacing: 0.3px; }
-    .wizard-mini-line {
-        height: 3px;
-        width: 72px;
-        margin-top: 14px;
-        background: #e5e7eb;
-        border-radius: 999px;
-        transition: all 0.3s ease;
-    }
-    .wizard-mini-line.step-1.done,
-    .wizard-mini-line.step-2.done,
-    .wizard-mini-line.step-3.done {
-        background: linear-gradient(90deg, #16a34a 0%, #22c55e 100%);
-        box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
-    }
-
-    .wizard-status-callout {
-        border-radius: 12px;
-        padding: 12px 14px;
-        border: 1px solid transparent;
-        font-size: 13px;
+        font-family: var(--font-mono);
+        font-size: 12px;
         font-weight: 600;
-        margin-bottom: 14px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+        background: #fff;
+        border: 1.5px solid var(--line-strong);
+        color: var(--faint);
+        transition: all 0.2s ease;
     }
-    .wizard-status-callout.gray { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
-    .wizard-status-callout.amber { background: #fffbeb; color: #b45309; border-color: #fde68a; }
-    .wizard-status-callout.red { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-    .wizard-status-callout.violet { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
-    .wizard-status-callout.blue { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-    .wizard-status-callout.green { background: #ecfdf3; color: #166534; border-color: #bbf7d0; }
+    .rv-step-dot.done {
+        background: var(--wiz-green);
+        border-color: var(--wiz-green);
+        color: #fff;
+    }
+    .rv-step-dot.active {
+        border-color: var(--wiz-green);
+        color: var(--wiz-green-dark);
+        font-weight: 700;
+        box-shadow: 0 0 0 4px var(--wiz-green-soft);
+    }
+    .rv-step-label {
+        font-family: var(--font-mono);
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--faint);
+        text-align: center;
+    }
+    .rv-step-label.done, .rv-step-label.active { color: var(--wiz-green-dark); }
+    .rv-step-line {
+        flex: 1 1 auto;
+        height: 2px;
+        border-radius: 999px;
+        background: var(--line);
+        margin-top: 14px;
+        transition: background-color 0.2s ease;
+    }
+    .rv-step-line.done { background: var(--wiz-green); }
+
+    .rv-callout {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 16px;
+        padding: 9px 12px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        font-size: 12.5px;
+        font-weight: 600;
+    }
+    .rv-callout::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: currentColor;
+        flex-shrink: 0;
+    }
+    .rv-callout.gray { background: #F3F4F6; color: #4B5563; border-color: #E5E7EB; }
+    .rv-callout.amber { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
+    .rv-callout.red { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
+    .rv-callout.violet { background: #F5F3FF; color: #6D28D9; border-color: #DDD6FE; }
+    .rv-callout.blue { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
+    .rv-callout.green { background: var(--wiz-green-soft); color: #166534; border-color: #BBE5C8; }
 
     .wizard-action-panel {
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
+        margin-top: 14px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
         padding: 16px;
-        box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05), 0 1px 4px rgba(15, 23, 42, 0.03);
+        box-shadow: var(--shadow-card);
     }
-    .wizard-action-title { margin: 0 0 6px; font-size: 15px; font-weight: 800; color: #0f172a; letter-spacing: -0.01em; }
-    .wizard-action-subtitle { margin: 0 0 10px; font-size: 12px; color: #64748b; }
+    .wizard-action-title { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
+    .wizard-action-subtitle { margin: -4px 0 10px; font-size: 12px; color: var(--muted); }
     .wizard-inline-error {
         margin-top: 10px;
         font-size: 12px;
-        color: #b91c1c;
-        background: #fee2e2;
-        border: 1px solid #fecaca;
+        font-weight: 600;
+        color: #B91C1C;
+        background: #FEF2F2;
+        border: 1px solid #FECACA;
         border-radius: 8px;
-        padding: 8px;
+        padding: 8px 10px;
         display: none;
     }
     .wizard-inline-success {
         margin-top: 10px;
         font-size: 12px;
+        font-weight: 600;
         color: #166534;
-        background: #dcfce7;
-        border: 1px solid #86efac;
+        background: var(--wiz-green-soft);
+        border: 1px solid #BBE5C8;
         border-radius: 8px;
-        padding: 8px;
+        padding: 8px 10px;
         display: none;
     }
-    .wizard-doc-check-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 13px; color: #1f2937; }
+    .wizard-doc-check-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 0;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        cursor: pointer;
+    }
+    .wizard-doc-check-row + .wizard-doc-check-row { border-top: 1px solid var(--line); }
+    .wizard-doc-check-row input[type="checkbox"] {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--wiz-green);
+        flex-shrink: 0;
+    }
     .wizard-doc-readonly {
         display: flex;
         align-items: center;
         gap: 8px;
         padding: 8px 10px;
         border-radius: 8px;
-        background: #ecfdf3;
+        background: var(--wiz-green-soft);
         color: #166534;
         font-size: 12px;
         font-weight: 700;
-        margin-bottom: 8px;
+        margin-bottom: 6px;
     }
     .wizard-docs-done-banner {
         margin-top: 10px;
         display: none;
-        padding: 10px;
+        padding: 9px 12px;
         border-radius: 8px;
-        border: 1px solid #86efac;
-        background: #dcfce7;
+        border: 1px solid #BBE5C8;
+        background: var(--wiz-green-soft);
         color: #166534;
         font-size: 12px;
         font-weight: 700;
@@ -396,7 +439,7 @@
         min-height: 96px;
         padding: 10px 12px;
         border-radius: 8px;
-        border: 1px solid #fca5a5;
+        border: 1px solid #FCA5A5;
         resize: vertical;
         font-size: 13px;
         font-family: inherit;
@@ -406,15 +449,18 @@
     }
     .reject-modal-textarea:focus {
         outline: none;
-        border-color: #ef4444;
-        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+        border-color: #EF4444;
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
     }
 
     @media (max-width: 640px) {
         #viewModal .modal { width: calc(100vw - 20px); padding: 0; }
-        #viewModal .view-modal-topbar { padding: 14px 16px; }
+        #viewModal .view-modal-topbar { padding: 12px 14px; }
         #viewModal #viewContent { padding: 14px; }
-        .view-modal-header { flex-direction: column; }
+        .rv-grid { grid-template-columns: 1fr; }
+        .rv-grid .rv-field:nth-child(-n+2) { border-top: 1px solid var(--line); }
+        .rv-grid .rv-field:first-child { border-top: none; }
+        .rv-step { min-width: 48px; }
     }
 </style>
 @endsection
@@ -438,7 +484,7 @@
         </div>
     </div>
 
-    <div class="card">
+    <div class="card" style="margin-bottom:32px;">
         <div class="card-body" style="width:100%;">
             <table class="table" style="width:100%;">
                 <thead>
@@ -517,7 +563,8 @@
                             <td>
                                 <button
                                     type="button"
-                                    class="btn btn-green btn-sm"
+                                    class="btn btn-green"
+                                    style="padding:10px 20px;font-size:14px;"
                                     onclick="openViewModalFromButton(this)"
                                     data-app-id="{{ $application->id }}"
                                     data-app-status="{{ $application->status }}"
@@ -528,6 +575,7 @@
                                     data-app-phone="{{ $application->phone_number ?: $application->phone }}"
                                     data-wizard-status="{{ $application->wizard_status }}"
                                     data-wizard-step="{{ $application->wizardStepNumber() }}"
+                                    data-form-submitted="{{ ($application->form_submitted_at || $application->business_proposal || $application->proposed_location || $application->type_of_business) ? '1' : '0' }}"
                                     data-loi-path="{{ ($application->letter_of_intent_path || $application->letter_of_intent) ? route('staff.partnerships.document', ['application' => $application, 'type' => 'letter_of_intent']) : '' }}"
                                     data-loi-paths="{{ json_encode(collect($application->documentPaths('letter_of_intent'))->map(fn($p, $i) => route('staff.partnerships.document', ['application' => $application, 'type' => 'letter_of_intent', 'index' => $i]))->all()) }}"
                                     data-receipt-path="{{ $application->receipt_path ? route('staff.partnerships.document', ['application' => $application, 'type' => 'receipt']) : '' }}"
@@ -572,7 +620,7 @@
 
         @if ($applications->hasPages())
             <div class="pagination-wrap">
-                {{ $applications->links('pagination::bootstrap-5') }}
+                {{ $applications->links('faculty.partials.pagination') }}
             </div>
         @endif
     </div>
@@ -581,8 +629,11 @@
     <div class="modal-backdrop" id="viewModal">
         <div class="modal modal-view">
             <div class="view-modal-topbar">
-                <h3 class="view-modal-title">Application Details</h3>
-                <button type="button" class="view-modal-close" onclick="closeViewModal()" aria-label="Close">&times;</button>
+                <h3 class="view-modal-title">Application Review</h3>
+                <div class="view-modal-topbar-right">
+                    <span class="badge" id="viewModalStatusChip" style="display:none;"></span>
+                    <button type="button" class="view-modal-close" onclick="closeViewModal()" aria-label="Close">&times;</button>
+                </div>
             </div>
             <div id="viewContent">
                 <!-- Filled by JS -->
@@ -631,24 +682,22 @@
     function buildWizardProgressHtml(step, wizardStatus, appStatus) {
         const effectiveStep = Math.max(1, Math.min(4, Number(step) || 1));
         const isApproved = wizardStatus === 'final_approved' || appStatus === 'approved';
-        const labels = ['1. LOI', '2. Form', '3. Docs', '4. Receipt'];
+        const labels = ['LOI', 'Form', 'Docs', 'Receipt'];
 
         return `
-            <div class="wizard-mini-progress">
+            <div class="rv-steps">
                 ${labels.map((label, index) => {
                     const stepNo = index + 1;
-                    const completed = isApproved || effectiveStep > stepNo;
+                    const done = isApproved || effectiveStep > stepNo;
                     const active = !isApproved && effectiveStep === stepNo;
-                    const lineDone = isApproved || effectiveStep > stepNo;
+                    const stateClass = done ? 'done' : (active ? 'active' : '');
 
                     return `
-                        <div style="display:flex;align-items:flex-start;gap:8px;">
-                            <div class="wizard-mini-step" style="flex:0 0 auto;">
-                                <span class="wizard-mini-dot step-${stepNo} ${completed ? 'completed' : ''} ${active ? 'active' : ''}">${stepNo}</span>
-                                <span class="wizard-mini-label">${label}</span>
-                            </div>
-                            ${stepNo < 4 ? `<span class="wizard-mini-line step-${stepNo} ${lineDone ? 'done' : ''}"></span>` : ''}
+                        <div class="rv-step">
+                            <span class="rv-step-dot ${stateClass}">${done ? '&#10003;' : stepNo}</span>
+                            <span class="rv-step-label ${stateClass}">${label}</span>
                         </div>
+                        ${stepNo < 4 ? `<span class="rv-step-line ${done ? 'done' : ''}"></span>` : ''}
                     `;
                 }).join('')}
             </div>
@@ -783,12 +832,14 @@
         const statusBadgeClass = isWizardRejected ? 'badge-rejected' : (statusBadgeClassMap[appStatus] || 'badge-expired');
         const statusLabel = isWizardRejected ? 'Rejected' : (statusLabelMap[appStatus] || appStatus || 'Pending');
 
-        const fullName = `${appFirstName} ${appMiddleName} ${appLastName}`.replace(/\s+/g, ' ').trim();
-        const initials = `${String(appFirstName).trim().charAt(0)}${String(appLastName).trim().charAt(0)}`.toUpperCase() || 'NA';
         const wizardStatusConfig = getWizardStatusConfig(wizardStatus, appStatus);
 
+        const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        }[c]));
+
         const wizardStatusCallout = `
-            <div class="wizard-status-callout ${wizardStatusConfig.color}">
+            <div class="rv-callout ${wizardStatusConfig.color}">
                 ${wizardStatusConfig.message}
             </div>
         `;
@@ -811,78 +862,10 @@
                 </div>
             `;
         } else if (wizardStatus === 'form_submitted') {
-            const attachmentPill = (url, label) =>
-                `<a href="${url}" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7;border-radius:999px;font-size:12px;font-weight:700;text-decoration:none;">📎 ${label}</a>`;
-            const noAttachmentPill = (label) =>
-                `<span style="display:inline-flex;align-items:center;gap:5px;padding:5px 11px;background:#f8fafc;color:#94a3b8;border:1px solid #e2e8f0;border-radius:999px;font-size:12px;font-weight:600;">${label}</span>`;
-
-            const validIdHtml = validIdUrls.length
-                ? validIdUrls.map((url, i) => attachmentPill(url, `View Valid ID${validIdUrls.length > 1 ? ' ' + (i + 1) : ''}`)).join(' ')
-                : noAttachmentPill('No Valid ID');
-
-            const businessPermitHtml = businessPermitUrls.length
-                ? businessPermitUrls.map((url, i) => attachmentPill(url, `View Business Permit${businessPermitUrls.length > 1 ? ' ' + (i + 1) : ''}`)).join(' ')
-                : noAttachmentPill('No Business Permit');
-
             wizardActionInnerHtml = `
-                <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:20px;margin-top:12px;">
-                    <div style="font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;color:#64748b;margin-bottom:16px;">Application Form Summary</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 20px;">
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">First Name</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formFirstName || '—'}</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Last Name</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formLastName || '—'}</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Business Name</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formBusinessName || '—'}</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Phone</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formPhone || '—'}</div>
-                        </div>
-                        <div style="grid-column:span 2;">
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Address</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formAddress || '—'}</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Type of Business</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${normalizedBusinessType || '—'}</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Proposed Location</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formProposedLocation || '—'}</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Proposed Duration</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formProposedDuration || '—'}</div>
-                        </div>
-                        <div>
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Previous CvSU Concessionaire?</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formIsPrevious || '—'}</div>
-                        </div>
-                        ${hasPreviousLocationYear ? `
-                        <div style="grid-column:span 2;">
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:4px;">Location &amp; Year</div>
-                            <div style="font-size:13px;color:#0f172a;font-weight:600;line-height:1.4;">${formPreviousLocationYear}</div>
-                        </div>` : ''}
-                        <div style="grid-column:span 2;">
-                            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:6px;">Business Proposal</div>
-                            <div style="background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;font-size:13px;color:#374151;white-space:pre-wrap;max-height:120px;overflow-y:auto;line-height:1.6;">${formProposal || 'No business proposal submitted.'}</div>
-                        </div>
-                    </div>
-                    <div style="margin-top:14px;padding-top:14px;border-top:1px solid #e2e8f0;">
-                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:#94a3b8;margin-bottom:8px;">Attachments</div>
-                        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
-                            ${validIdHtml}
-                            ${businessPermitHtml}
-                        </div>
-                    </div>
-                </div>
-                <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;">
+                <h4 class="wizard-action-title">Step 2 Review: Application Form</h4>
+                <p class="wizard-action-subtitle">Review the form summary above, then approve or reject.</p>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;">
                     <button type="button" class="btn btn-green btn-sm" id="wizardApproveFormBtn">Approve Form</button>
                     <button type="button" class="btn btn-red btn-sm" id="wizardShowRejectFormBtn">Reject Form</button>
                 </div>
@@ -926,40 +909,99 @@
         }
 
         const wizardSectionHtml = `
-            <div class="view-modal-section">
+            <div class="rv-wizard">
                 ${buildWizardProgressHtml(wizardStep, wizardStatus, appStatus)}
                 ${wizardStatusCallout}
-                ${wizardActionInnerHtml ? `
+            </div>
+        `;
+
+        const field = (label, value, span = false) => `
+            <div class="rv-field${span ? ' rv-field-span' : ''}">
+                <div class="rv-field-label">${label}</div>
+                <div class="rv-field-value">${esc(value) || '—'}</div>
+            </div>
+        `;
+
+        const attachmentPill = (url, label) =>
+            `<a href="${url}" target="_blank" rel="noopener" class="file-link file-link-pill">${label}</a>`;
+        const noAttachmentPill = (label) =>
+            `<span class="rv-attachment-empty">${label}</span>`;
+
+        const validIdHtml = validIdUrls.length
+            ? validIdUrls.map((url, i) => attachmentPill(url, `Valid ID${validIdUrls.length > 1 ? ' ' + (i + 1) : ''}`)).join(' ')
+            : noAttachmentPill('No Valid ID');
+
+        const businessPermitHtml = businessPermitUrls.length
+            ? businessPermitUrls.map((url, i) => attachmentPill(url, `Business Permit${businessPermitUrls.length > 1 ? ' ' + (i + 1) : ''}`)).join(' ')
+            : noAttachmentPill('No Business Permit');
+
+        const hasFormData = wizardDataset.formSubmitted === '1'
+            || (formProposal && formProposal.trim() !== '')
+            || (normalizedBusinessType && normalizedBusinessType !== '—')
+            || (formProposedLocation && formProposedLocation !== '—')
+            || (formProposedDuration && formProposedDuration !== '—');
+
+        const formSummaryHtml = hasFormData ? `
+            <div class="rv-section">
+                <div class="rv-section-head">Application Form Summary</div>
+                <div class="rv-grid">
+                    ${field('First Name', formFirstName)}
+                    ${field('Last Name', formLastName)}
+                    ${field('Business Name', formBusinessName)}
+                    ${field('Type of Business', normalizedBusinessType)}
+                    ${field('Email', appEmail)}
+                    ${field('Phone', formPhone || appPhone)}
+                    ${field('Address', formAddress, true)}
+                    ${field('Proposed Location', formProposedLocation)}
+                    ${field('Proposed Duration', formProposedDuration)}
+                    ${field('Previous CvSU Concessionaire?', formIsPrevious, !hasPreviousLocationYear)}
+                    ${hasPreviousLocationYear ? field('Location & Year', formPreviousLocationYear) : ''}
+                    <div class="rv-field rv-field-span">
+                        <div class="rv-field-label">Business Proposal</div>
+                        <div class="rv-proposal">${esc(formProposal) || 'No business proposal submitted.'}</div>
+                    </div>
+                </div>
+                <div class="rv-attachments">
+                    <span class="rv-field-label">Attachments</span>
+                    ${validIdHtml}
+                    ${businessPermitHtml}
+                </div>
+            </div>
+        ` : `
+            <div class="rv-section">
+                <div class="rv-section-head">Application Form Summary</div>
+                <div style="padding:16px;">
+                    <div class="view-modal-notice">The applicant hasn't submitted the application form yet, so there are no details to summarize.</div>
+                </div>
+            </div>
+        `;
+
+        const statusChip = document.getElementById('viewModalStatusChip');
+        if (statusChip) {
+            statusChip.className = `badge ${statusBadgeClass}`;
+            statusChip.textContent = statusLabel;
+            statusChip.style.display = 'inline-flex';
+        }
+
+        document.getElementById('viewContent').innerHTML = `
+            ${wizardSectionHtml}
+
+            ${formSummaryHtml}
+
+            ${wizardActionInnerHtml ? `
                 <div class="wizard-action-panel" id="wizardActionPanel">
                     ${wizardActionInnerHtml}
                     <div id="wizardPanelError" class="wizard-inline-error"></div>
                     <div id="wizardPanelSuccess" class="wizard-inline-success"></div>
                 </div>
-                ` : ''}
-            </div>
-        `;
-
-        document.getElementById('viewContent').innerHTML = `
-            <div class="view-modal-header">
-                <div class="view-modal-header-main">
-                    <div class="view-modal-avatar">${initials}</div>
-                    <div style="min-width:0;">
-                        <h4 class="view-modal-name">${fullName}</h4>
-                        <div class="view-modal-subtext">
-                            <div>${appEmail}</div>
-                            <div>${appPhone}</div>
-                        </div>
-                    </div>
-                </div>
-                <span class="badge view-modal-status-chip ${statusBadgeClass}">${statusLabel}</span>
-            </div>
-
-            ${wizardSectionHtml}
+            ` : ''}
 
             ${app?.rejection_reason ? `
-                <div class="view-modal-section">
-                    <div class="view-modal-section-title">Rejection Reason</div>
-                    <div class="proposal-text" style="white-space:pre-wrap;">${app.rejection_reason}</div>
+                <div class="rv-section">
+                    <div class="rv-section-head">Rejection Reason</div>
+                    <div style="padding:12px 16px;">
+                        <div class="rv-proposal" style="margin-top:0;">${esc(app.rejection_reason)}</div>
+                    </div>
                 </div>
             ` : ''}
         `;
