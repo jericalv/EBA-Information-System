@@ -554,7 +554,6 @@
                                     data-business-permit-path="{{ $application->business_permit_path ? Storage::url($application->business_permit_path) : '' }}"
                                     data-business-permit-paths="{{ json_encode(collect($application->documentPaths('business_permit'))->map(fn($p) => Storage::url($p))->all()) }}"
                                 >
-                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                     Review
                                 </button>
                             </td>

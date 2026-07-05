@@ -27,22 +27,17 @@
     }
     .fee-form input {
         width: 120px;
-        padding: 8px 10px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
+        padding: 9px 12px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
         font: inherit;
+        color: var(--ink);
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
-    .fee-form button {
-        padding: 8px 12px;
-        border: 0;
-        border-radius: 8px;
-        background: #0a5c2f;
-        color: #fff;
-        font-weight: 700;
-        cursor: pointer;
-    }
-    .fee-form button:hover {
-        background: #0d7a3e;
+    .fee-form input:focus {
+        outline: none;
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
     }
 
     .concessionaire-table-wrap {
@@ -180,7 +175,7 @@
                                         @csrf
                                         @method('PATCH')
                                         <input type="number" name="monthly_fee" min="0" step="0.01" value="{{ $concessionaire->monthly_fee !== null ? number_format((float) $concessionaire->monthly_fee, 2, '.', '') : '' }}" placeholder="0.00" required>
-                                        <button type="submit">Set Fee</button>
+                                        <button type="submit" class="btn btn-green">Set Fee</button>
                                     </form>
                                 </td>
                             </tr>

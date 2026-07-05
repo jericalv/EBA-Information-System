@@ -119,7 +119,7 @@
         color: var(--ink);
     }
     .chart-menu-btn:focus-visible {
-        outline: 2px solid rgba(10, 92, 47, 0.45);
+        outline: 2px solid rgba(31, 41, 55, 0.40);
         outline-offset: 2px;
     }
     .chart-menu {
@@ -407,7 +407,7 @@
     var chartFont = getComputedStyle(document.documentElement).getPropertyValue('--font-ui').trim() || 'Manrope, sans-serif';
     var chartBase = {
         fontFamily: chartFont,
-        foreColor: '#66756C',
+        foreColor: '#687180',
         toolbar: { show: false },
         animations: { enabled: !prefersReducedMotion }
     };
@@ -425,7 +425,7 @@
             series: [
                 { name: 'Applications', data: appMonthData }
             ],
-            colors: ['#0A5C2F'],
+            colors: ['#1F2937'],
             stroke: { curve: 'smooth', width: 2.5, lineCap: 'round' },
             fill: {
                 type: 'gradient',
@@ -467,7 +467,7 @@
                 }
             },
             grid: {
-                borderColor: '#EDF2EE',
+                borderColor: '#EEF0F3',
                 strokeDashArray: 4,
                 padding: { left: 6, right: 6 }
             }
@@ -491,7 +491,7 @@
             series: [
                 { name: 'Applications', data: statusData }
             ],
-            colors: ['#D97706', '#64748B', '#0A5C2F', '#B3261E', '#6FAF8D'],
+            colors: ['#D97706', '#64748B', '#1F2937', '#B3261E', '#94A3B8'],
             plotOptions: {
                 bar: {
                     columnWidth: '44%',
@@ -530,7 +530,7 @@
                 }
             },
             grid: {
-                borderColor: '#EDF2EE',
+                borderColor: '#EEF0F3',
                 strokeDashArray: 4,
                 padding: { left: 6, right: 6 }
             }

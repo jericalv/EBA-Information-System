@@ -15,24 +15,24 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         :root {
-            --green: #0A5C2F;
-            --green-dark: #064420;
-            --pine: #0A5C2F;
-            --pine-strong: #084A26;
-            --pine-soft: #EAF3ED;
-            --ink: #1A2B21;
-            --muted: #66756C;
-            --faint: #93A198;
-            --paper: #F5F7F5;
+            --green: #1F2937;
+            --green-dark: #111827;
+            --pine: #1F2937;
+            --pine-strong: #111827;
+            --pine-soft: #EEF0F3;
+            --ink: #1B232B;
+            --muted: #687180;
+            --faint: #98A1AD;
+            --paper: #F5F6F8;
             --card: #FFFFFF;
-            --line: #E2E8E3;
-            --line-strong: #CBD6CE;
+            --line: #E4E7EB;
+            --line-strong: #CBD1D8;
             --amber: #B45309;
             --danger: #B91C1C;
             --font-ui: 'Manrope', ui-sans-serif, system-ui, sans-serif;
             --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
-            --shadow-card: 0 1px 2px rgba(23, 37, 28, 0.04);
-            --shadow-pop: 0 12px 32px rgba(23, 37, 28, 0.14);
+            --shadow-card: 0 1px 2px rgba(17, 24, 39, 0.05);
+            --shadow-pop: 0 12px 32px rgba(17, 24, 39, 0.14);
         }
 
         body {
@@ -100,7 +100,7 @@
             font-weight: 500;
             line-height: 1.5;
         }
-        .alert-success { background: #F0F7F2; border-color: #CDE3D4; color: #14532D; }
+        .alert-success { background: #F2F4F6; border-color: var(--line-strong); color: var(--ink); }
         .alert-error { background: #FDF3F3; border-color: #F2D8D8; color: var(--danger); }
 
         /* ---------- Legacy shared components (used across faculty pages) ---------- */
@@ -140,7 +140,7 @@
         }
         .search-box:focus-within {
             border-color: var(--pine);
-            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+            box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
         }
         .search-box input {
             border: none;
@@ -164,7 +164,7 @@
             cursor: pointer;
             appearance: none;
             -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366756C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23687180' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 12px center;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -172,7 +172,7 @@
         .filter-select:focus {
             outline: none;
             border-color: var(--pine);
-            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+            box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
         }
         .btn {
             display: inline-flex;
@@ -192,7 +192,7 @@
             transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
         .btn:focus-visible {
-            outline: 2px solid rgba(10, 92, 47, 0.45);
+            outline: 2px solid rgba(31, 41, 55, 0.40);
             outline-offset: 2px;
         }
         .btn-green {
@@ -227,8 +227,8 @@
 
         /* ---------- Sidebar ---------- */
         .sb {
-            background: #0B3120;
-            border-right: 1px solid #0A2A1B;
+            background: #181D24;
+            border-right: 1px solid #10141A;
         }
         .sb-brand {
             display: flex;
@@ -294,7 +294,7 @@
             padding: 9px 12px;
             font-size: 13.5px;
             font-weight: 600;
-            color: #B9CDBF;
+            color: #A7B0BC;
             text-decoration: none;
             transition: background-color 0.15s ease, color 0.15s ease;
         }
@@ -312,7 +312,7 @@
             bottom: 8px;
             width: 2px;
             border-radius: 2px;
-            background: #7BD3A0;
+            background: #CAD2DC;
         }
         .sb-item.sb-item-danger { color: #E7B4B4; }
         .sb-item.sb-item-danger:hover { background: rgba(185, 28, 28, 0.22); color: #FCDCDC; }
@@ -337,7 +337,7 @@
             transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
         }
         .nb-icon-btn:hover { background: var(--pine-soft); color: var(--pine); }
-        .nb-icon-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
+        .nb-icon-btn:focus-visible { outline: 2px solid rgba(31, 41, 55, 0.40); outline-offset: 2px; }
         @media (min-width: 1024px) {
             .mobile-only { display: none !important; }
         }
@@ -375,7 +375,7 @@
             outline: none;
             background: #fff;
             border-color: var(--pine);
-            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+            box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
         }
         .nb-search-icon {
             position: absolute;
@@ -462,7 +462,7 @@
             transition: background-color 0.15s ease, border-color 0.15s ease;
         }
         .nb-user-btn:hover { background: var(--pine-soft); }
-        .nb-user-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
+        .nb-user-btn:focus-visible { outline: 2px solid rgba(31, 41, 55, 0.40); outline-offset: 2px; }
         .nb-avatar {
             width: 32px;
             height: 32px;
@@ -792,13 +792,13 @@
                                 @if($unreadCount > 0)
                                     @foreach($unreadPayments as $payment)
                                         <a href="{{ route('staff.transaction-logs') }}" class="flex items-start gap-3 rounded-md p-2.5 transition-colors" style="text-decoration:none;" onmouseover="this.style.background='var(--pine-soft)'" onmouseout="this.style.background='transparent'">
-                                            <span class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md" style="background:#F0F7F2;color:var(--pine);">
+                                            <span class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md" style="background:var(--pine-soft);color:var(--pine);">
                                                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                                                 </svg>
                                             </span>
                                             <span>
-                                                <span class="block text-[13px] font-bold" style="color:#14532D;">Payment recorded</span>
+                                                <span class="block text-[13px] font-bold" style="color:var(--ink);">Payment recorded</span>
                                                 <span class="mt-0.5 block text-xs leading-snug" style="color:var(--muted);">
                                                     {{ $payment->concessionaire?->business_name ?: ($payment->concessionaire?->name ?: 'Concessionaire') }} paid &#8369;{{ number_format((float) $payment->amount, 2) }}
                                                 </span>

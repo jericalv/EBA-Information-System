@@ -120,7 +120,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
         <div class="px-6 pt-5 pb-7">
 
             <div class="w-full max-w-sm">
-                <select id="paymentType" wire:model="paymentType" class="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 shadow-sm focus:border-[#1a3c2e] focus:outline-none focus:ring-2 focus:ring-[#1a3c2e]/10">
+                <select id="paymentType" wire:model="paymentType" class="h-11 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 shadow-sm focus:border-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#1F2937]/10">
                     <option value="cash">Cash</option>
                     <option value="gcash">GCash</option>
                     <option value="card">Card</option>
@@ -279,7 +279,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
              x-on:click="addItem()"
             :disabled="cart.length >= maxCartItems"
             :class="cart.length >= maxCartItems ? 'opacity-50 cursor-not-allowed' : ''"
-            class="inline-flex items-center rounded-md border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-50"
+            class="btn btn-outline btn-sm"
         >
         <span x-text="cart.length >= maxCartItems ? 'Maximum 10 Items' : '+ Add Item'"></span>
         </button>
@@ -305,7 +305,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                                 <select
                                     x-model="item.uniform_stock_id"
                                     x-on:change="onStockChange(index)"
-                                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 focus:border-[#1a3c2e] focus:outline-none focus:ring-2 focus:ring-[#1a3c2e]/10"
+                                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 focus:border-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#1F2937]/10"
                                 >
                                     <option value="">Select item</option>
                                     <template x-for="stock in stockItems" :key="stock.id">
@@ -319,7 +319,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                                     x-model="item.selected_size"
                                     x-on:change="onSizeChange(index)"
                                     :disabled="!item.uniform_stock_id"
-                                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 focus:border-[#1a3c2e] focus:outline-none focus:ring-2 focus:ring-[#1a3c2e]/10 disabled:cursor-not-allowed disabled:bg-slate-100"
+                                    class="h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm text-slate-700 focus:border-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#1F2937]/10 disabled:cursor-not-allowed disabled:bg-slate-100"
                                 >
                                     <option value="">Select size</option>
                                     <template x-for="option in getSizeOptions(item.uniform_stock_id)" :key="option.size">
@@ -337,7 +337,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                                     x-model.number="item.quantity"
                                     :class="item.uniform_stock_id && item.quantity > item.max_available_stock
                                         ? 'h-10 w-full rounded-md border-2 border-red-400 px-3 text-sm text-slate-700 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100'
-                                        : 'h-10 w-full rounded-md border border-slate-300 px-3 text-sm text-slate-700 focus:border-[#1a3c2e] focus:outline-none focus:ring-2 focus:ring-[#1a3c2e]/10'"
+                                        : 'h-10 w-full rounded-md border border-slate-300 px-3 text-sm text-slate-700 focus:border-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#1F2937]/10'"
                                 >
                             </td>
                             <td class="min-w-[190px] px-5 py-4">
@@ -346,10 +346,10 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                                     min="0"
                                     step="0.01"
                                     x-model.number="item.unit_price"
-                                    class="h-10 w-full rounded-md border border-slate-300 px-3 text-sm text-slate-700 focus:border-[#1a3c2e] focus:outline-none focus:ring-2 focus:ring-[#1a3c2e]/10"
+                                    class="h-10 w-full rounded-md border border-slate-300 px-3 text-sm text-slate-700 focus:border-[#1F2937] focus:outline-none focus:ring-2 focus:ring-[#1F2937]/10"
                                 >
                             </td>
-                            <td class="whitespace-nowrap px-5 py-4 text-base font-extrabold text-[#1a3c2e]" x-text="fmt(subtotal(item))"></td>
+                            <td class="whitespace-nowrap px-5 py-4 text-base font-extrabold text-[#1F2937]" x-text="fmt(subtotal(item))"></td>
                             <td class="px-5 py-4 text-right">
                                 <button
                                     type="button"
@@ -366,7 +366,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                 <tfoot>
                     <tr class="bg-slate-50/80">
                         <td colspan="5" class="px-5 py-4 text-right text-sm font-semibold text-slate-600">Order Total</td>
-                        <td class="whitespace-nowrap px-5 py-4 text-2xl font-extrabold text-[#1a3c2e]" x-text="fmt(orderTotal)"></td>
+                        <td class="whitespace-nowrap px-5 py-4 text-2xl font-extrabold text-[#1F2937]" x-text="fmt(orderTotal)"></td>
                         <td class="px-5 py-4"></td>
                     </tr>
                 </tfoot>
@@ -379,7 +379,8 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                 x-on:click="submit()"
                 :disabled="hasOverstock || loading"
                 :class="(hasOverstock || loading) ? 'opacity-60 cursor-not-allowed' : ''"
-                class="inline-flex items-center rounded-md bg-[#1a3c2e] px-6 py-3 text-sm font-semibold text-white transition hover:bg-[#214837]"
+                class="btn btn-green"
+                style="padding: 11px 24px;"
             >
                 <span x-text="loading ? 'Processing…' : 'Complete Sale'"></span>
             </button>
@@ -425,7 +426,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                 <div class="mt-6 rounded-xl border border-slate-100 bg-slate-50 p-5">
                     <div class="flex items-center justify-between">
                         <span class="text-base font-medium text-slate-500">Recorded Total</span>
-                        <span class="text-2xl font-extrabold text-[#1a3c2e]" x-text="fmt(lastCompletedTotal)"></span>
+                        <span class="text-2xl font-extrabold text-[#1F2937]" x-text="fmt(lastCompletedTotal)"></span>
                     </div>
                 </div>
 
@@ -433,7 +434,7 @@ new #[Layout('cashier.layout')] #[Title('Uniform Checkout')] class extends Compo
                     <button
                         type="button"
                         x-on:click="closeSuccessModal()"
-                        class="inline-flex w-full justify-center rounded-lg bg-[#1a3c2e] px-4 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-[#214837] focus:outline-none focus:ring-2 focus:ring-[#1a3c2e] focus:ring-offset-2"
+                        class="inline-flex w-full justify-center rounded-lg bg-[#1F2937] px-4 py-3 text-base font-semibold text-white shadow-sm transition hover:bg-[#111827] focus:outline-none focus:ring-2 focus:ring-[#1F2937] focus:ring-offset-2"
                     >
                         Close & Continue
                     </button>
