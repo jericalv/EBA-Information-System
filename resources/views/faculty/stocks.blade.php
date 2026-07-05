@@ -140,8 +140,8 @@
     }
     .stocks-field input:focus {
         outline: none;
-        border-color: #0a5c2f;
-        box-shadow: 0 0 0 3px rgba(10,92,47,0.08);
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
         background: #fff;
     }
     .stocks-help {
@@ -213,8 +213,8 @@
     }
     .search-box input:focus {
         outline: none;
-        border-color: #0a5c2f;
-        box-shadow: 0 0 0 3px rgba(10,92,47,0.08);
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
     }
 
     .stocks-table-card table {
@@ -259,26 +259,26 @@
         text-align: left;
     }
     .btn-actions-trigger {
-        background: #f8fafc;
-        color: #334155;
-        border: 1px solid #cbd5e1;
-        padding: 5px 8px;
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid var(--line-strong);
+        padding: 0 12px;
         border-radius: 6px;
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 700;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        transition: all 0.2s;
-        height: 28px;
+        gap: 6px;
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        height: 32px;
         line-height: 1;
         box-sizing: border-box;
     }
     .btn-actions-trigger:hover {
-        background: #f1f5f9;
-        border-color: #94a3b8;
-        color: #0f172a;
+        background: #F2F4F6;
+        border-color: #AEB6C0;
+        color: var(--ink);
     }
     .btn-actions-trigger svg {
         width: 12px;
@@ -459,8 +459,8 @@
     .add-modal-field input:focus,
     .add-modal-field select:focus {
         outline: none;
-        border-color: #0a5c2f;
-        box-shadow: 0 0 0 3px rgba(10,92,47,0.08);
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
         background: #fff;
     }
     .add-modal-help {
@@ -503,8 +503,8 @@
     }
     .add-size-item input:focus {
         outline: none;
-        border-color: #0a5c2f;
-        box-shadow: 0 0 0 3px rgba(10,92,47,0.08);
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
         background: #fff;
     }
     .add-modal-footer {
@@ -525,7 +525,7 @@
         cursor: not-allowed;
     }
     .feedback-modal-header h3 {
-        color: #0a5c2f;
+        color: var(--ink);
     }
     .delete-modal-header h3 {
         color: #dc2626;
@@ -581,8 +581,8 @@
     }
     .edit-modal-field input:focus {
         outline: none;
-        border-color: #0a5c2f;
-        box-shadow: 0 0 0 3px rgba(10,92,47,0.08);
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
         background: #fff;
     }
     .edit-modal-footer,
@@ -667,7 +667,7 @@
                 placeholder="Search items..."
                 oninput="filterRows()"
                 style="height:38px;padding:0 14px 0 34px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;color:#0f172a;background:#fff;width:220px;font-family:inherit;"
-                onfocus="this.style.borderColor='#0a5c2f';this.style.boxShadow='0 0 0 3px rgba(10,92,47,0.08)'"
+                onfocus="this.style.borderColor='#1F2937';this.style.boxShadow='0 0 0 3px rgba(31,41,55,0.10)'"
                 onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'"
             >
         </div>
