@@ -10,18 +10,18 @@
         gap: 20px;
     }
     .card {
-        background: #fff;
-        border-radius: 14px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-        border: 1px solid #e2e8f0;
+        background: var(--card);
+        border-radius: 12px;
+        box-shadow: var(--shadow-card);
+        border: 1px solid var(--line);
         overflow: hidden;
     }
     .card-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        padding: 20px 24px;
-        border-bottom: 1px solid #f1f5f9;
+        padding: 18px 22px;
+        border-bottom: 1px solid var(--line);
     }
     .card-body {
         padding: 0;
@@ -29,8 +29,8 @@
     }
     .section-header {
         font-size: 13px;
-        color: #64748b;
-        margin-top: 4px;
+        color: var(--muted);
+        margin-top: 2px;
     }
     .reviews-header {
         display: flex;
@@ -45,21 +45,16 @@
         justify-content: flex-end;
         gap: 8px;
     }
-    .reviews-pill {
-        font-size: 12px;
-        font-weight: 700;
-        padding: 6px 12px;
-    }
     .reviews-toolbar {
-        background: #fff;
-        border-bottom: 1px solid #f1f5f9;
+        background: var(--paper);
+        border-bottom: 1px solid var(--line);
     }
     .reviews-toolbar-inner {
         display: flex;
-        gap: 14px;
+        gap: 12px;
         align-items: center;
         flex-wrap: wrap;
-        padding: 16px 24px;
+        padding: 14px 22px;
     }
     .reviews-search-wrapper {
         position: relative;
@@ -68,43 +63,22 @@
     }
     .reviews-search-wrapper svg {
         position: absolute;
-        left: 14px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
-        color: #94a3b8;
+        width: 16px;
+        height: 16px;
+        color: var(--faint);
+        pointer-events: none;
     }
     .filters-select {
-        padding: 12px 16px;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 14px;
-        font-family: inherit;
-        background: #fff;
-        cursor: pointer;
         min-width: 170px;
         width: auto;
         flex-shrink: 0;
     }
-    .filters-select:focus {
-        outline: none;
-        border-color: #0a5c2f;
-    }
     .reviews-search-input {
         width: 100%;
-        padding: 12px 16px 12px 44px;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        background: #ffffff;
-        color: #1e293b;
-        font: inherit;
-        font-size: 14px;
-        transition: border-color 0.2s;
-    }
-    .reviews-search-input:focus {
-        outline: none;
-        border-color: #0a5c2f;
+        padding-left: 38px;
     }
     table {
         width: 100%;
@@ -112,23 +86,25 @@
     }
     thead th {
         text-align: left;
-        padding: 12px 24px;
-        font-size: 12px;
-        font-weight: 600;
+        padding: 11px 22px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
         text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #64748b;
-        background: #f8fafc;
-        border-bottom: 1px solid #e2e8f0;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        background: var(--paper);
+        border-bottom: 1px solid var(--line);
     }
     tbody td {
-        padding: 14px 24px;
-        font-size: 14px;
-        border-bottom: 1px solid #f1f5f9;
+        padding: 14px 22px;
+        font-size: 13.5px;
+        color: var(--ink);
+        border-bottom: 1px solid var(--line);
         vertical-align: middle;
     }
     tbody tr:hover {
-        background: #f8fafc;
+        background: #FAFCFA;
     }
     tbody tr:last-child td {
         border-bottom: none;
@@ -139,10 +115,10 @@
         gap: 10px;
     }
     .user-avatar {
-        width: 34px;
-        height: 34px;
-        border-radius: 50%;
-        background: #0a5c2f;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        background: var(--pine);
         color: #fff;
         display: flex;
         align-items: center;
@@ -153,73 +129,44 @@
     }
     .user-name {
         font-weight: 600;
+        color: var(--ink);
     }
     .user-email {
-        font-size: 13px;
-        color: #64748b;
+        font-size: 12.5px;
+        color: var(--muted);
     }
     .stars {
         letter-spacing: 1px;
-        color: #f59e0b;
+        color: var(--star);
         white-space: nowrap;
     }
     .table-meta {
         display: block;
-        margin-top: 4px;
-        color: #64748b;
+        margin-top: 3px;
+        color: var(--muted);
         font-size: 12px;
     }
     .comment-cell {
-        color: #334155;
+        color: var(--ink);
         line-height: 1.55;
         white-space: normal;
     }
     .badge {
         display: inline-flex;
-        padding: 3px 10px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: 600;
-    }
-    .badge-secondary {
-        background: #f1f5f9;
-        color: #64748b;
-    }
-    .btn {
-        display: inline-flex;
         align-items: center;
-        gap: 6px;
-        padding: 7px 14px;
-        border-radius: 7px;
-        font-size: 13px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        font-family: inherit;
-        text-decoration: none;
-        transition: all 0.2s;
-    }
-    .btn-sm {
-        padding: 5px 10px;
-        font-size: 12px;
-    }
-    .btn-green {
-        background: var(--green);
-        color: #fff;
-    }
-    .btn-green:hover {
-        background: #0d7a3e;
-    }
-    .btn-outline {
-        background: transparent;
-        color: #475569;
-        border: 1px solid #e2e8f0;
-    }
-    .btn-outline:hover {
-        background: #f8fafc;
+        padding: 5px 11px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--ink);
+        white-space: nowrap;
     }
     .pagination-wrap {
-        padding: 16px 24px;
+        padding: 16px 22px;
+        border-top: 1px solid var(--line);
     }
     .pagination-wrap nav {
         width: 100%;
@@ -269,24 +216,25 @@
         border-radius: 6px;
         font-size: 13px;
         text-decoration: none;
-        color: #475569;
-        border: 1px solid #e2e8f0;
+        color: var(--muted);
+        border: 1px solid var(--line);
         background: #fff;
+        transition: border-color 0.15s ease, color 0.15s ease;
     }
     .pagination-wrap .page-item.disabled .page-link {
-        color: #94a3b8;
-        background: #f8fafc;
-        border-color: #e2e8f0;
+        color: var(--faint);
+        background: var(--paper);
+        border-color: var(--line);
         cursor: not-allowed;
     }
     .pagination-wrap .page-link:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
+        border-color: var(--pine);
+        color: var(--pine);
     }
     .pagination-wrap .page-item.active .page-link {
-        background: var(--green);
+        background: var(--pine);
         color: #fff;
-        border-color: var(--green);
+        border-color: var(--pine);
     }
     .pagination-wrap svg {
         width: 14px;
@@ -332,15 +280,15 @@
         <div class="card">
             <div class="card-header reviews-header">
                 <div>
-                    <strong style="font-size:16px;color:#111827;">Customer Reviews</strong>
+                    <h2 class="panel-title">Customer Reviews</h2>
                     <div class="section-header">Student feedback for your concessionaire.</div>
                 </div>
                 <div class="reviews-stat-pills">
-                    <span class="badge badge-secondary reviews-pill">
+                    <span class="badge">
                         Avg {{ $averageRating !== null ? number_format((float) $averageRating, 1) : '0.0' }} &#9733;
                     </span>
-                    <span class="badge badge-secondary reviews-pill">{{ number_format($totalReviews) }} Total Reviews</span>
-                    <span class="badge badge-secondary reviews-pill">{{ $fiveStarShare }}% Five-Star Share</span>
+                    <span class="badge">{{ number_format($totalReviews) }} Reviews</span>
+                    <span class="badge">{{ $fiveStarShare }}% Five-Star</span>
                 </div>
             </div>
 
@@ -350,16 +298,16 @@
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                         </svg>
-                        <input id="reviewsInstantSearch" type="search" class="reviews-search-input" placeholder="Search reviews..." autocomplete="off">
+                        <input id="reviewsInstantSearch" type="search" class="control reviews-search-input" placeholder="Search reviews..." autocomplete="off">
                     </div>
 
-                    <select id="filterReviewType" class="filters-select">
+                    <select id="filterReviewType" class="control filters-select">
                         <option value="">All Types</option>
                         <option value="store">Store Reviews</option>
                         <option value="product">Product Reviews</option>
                     </select>
 
-                    <select id="filterMinRating" class="filters-select">
+                    <select id="filterMinRating" class="control filters-select">
                         <option value="">All Ratings</option>
                         <option value="1">&#11088; 1 Star</option>
                         <option value="2">&#11088;&#11088; 2 Stars</option>
