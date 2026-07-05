@@ -5,19 +5,18 @@
 @section('extra-css')
 <style>
     .edit-product-wrap {
-        max-width: 820px;
-        margin: 32px auto;
-        padding: 0 24px;
+        max-width: 780px;
+        margin: 0 auto;
     }
-    .card {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 8px 26px rgba(0,0,0,0.08);
-        padding: 24px;
+    .edit-product-card {
+        padding: 24px 26px;
     }
-    .card h2 {
-        color: var(--green);
-        margin-bottom: 16px;
+    .edit-product-card h2 {
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        margin-bottom: 18px;
     }
     .form-grid {
         display: grid;
@@ -33,32 +32,47 @@
         grid-column: span 2;
     }
     .field label {
-        font-size: 13px;
-        font-weight: 700;
-        color: #334155;
-    }
-    .field input,
-    .field textarea,
-    .field select {
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        padding: 10px 12px;
-        font: inherit;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
     }
     .field textarea {
         min-height: 110px;
         resize: vertical;
+        line-height: 1.5;
+    }
+    .checkbox-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: var(--font-ui);
+        font-size: 13.5px;
+        font-weight: 500;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--ink);
+        cursor: pointer;
+    }
+    .checkbox-line input[type="checkbox"] {
+        accent-color: var(--pine);
+        width: 15px;
+        height: 15px;
     }
     .preview {
         width: 220px;
         height: 160px;
-        border-radius: 12px;
-        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        border: 1px solid var(--line-strong);
         overflow: hidden;
-        background: #f8fafc;
+        background: var(--paper);
         display: flex;
         align-items: center;
         justify-content: center;
+        color: var(--muted);
+        font-size: 13px;
     }
     .preview img {
         width: 100%;
@@ -66,38 +80,19 @@
         object-fit: cover;
     }
     .actions {
-        margin-top: 18px;
+        margin-top: 20px;
         display: flex;
         justify-content: flex-end;
         gap: 10px;
     }
-    .btn {
-        padding: 10px 18px;
-        border: none;
-        border-radius: 10px;
-        text-decoration: none;
-        cursor: pointer;
-        font-weight: 700;
-        font-family: inherit;
-        background: var(--green);
-        color: #fff;
-    }
-    .btn:hover {
-        background: var(--green-light);
-    }
-    .btn-outline {
-        background: #fff;
-        color: var(--green);
-        border: 1px solid #cbd5e1;
-    }
     .error-list {
-        background: #fee2e2;
-        border: 1px solid #fca5a5;
-        color: #991b1b;
-        border-radius: 10px;
-        padding: 12px;
-        margin-bottom: 14px;
-        font-size: 14px;
+        background: #FDF3F3;
+        border: 1px solid #F2D8D8;
+        color: var(--danger);
+        border-radius: 8px;
+        padding: 12px 16px;
+        margin-bottom: 16px;
+        font-size: 13.5px;
     }
     @media (max-width: 700px) {
         .form-grid {
@@ -112,7 +107,7 @@
 
 @section('content')
     <div class="edit-product-wrap">
-        <div class="card">
+        <div class="panel edit-product-card">
             <h2>Edit Product</h2>
 
             @if ($errors->any())
@@ -132,22 +127,22 @@
                 <div class="form-grid">
                     <div class="field full">
                         <label for="name">Name</label>
-                        <input id="name" type="text" name="name" value="{{ old('name', $product->name) }}" required maxlength="255">
+                        <input id="name" class="control" type="text" name="name" value="{{ old('name', $product->name) }}" required maxlength="255">
                     </div>
 
                     <div class="field full">
                         <label for="description">Description</label>
-                        <textarea id="description" name="description">{{ old('description', $product->description) }}</textarea>
+                        <textarea id="description" class="control" name="description">{{ old('description', $product->description) }}</textarea>
                     </div>
 
                     <div class="field">
                         <label for="price">Price</label>
-                        <input id="price" type="number" name="price" value="{{ old('price', $product->price) }}" min="0" step="0.01" required>
+                        <input id="price" class="control" type="number" name="price" value="{{ old('price', $product->price) }}" min="0" step="0.01" required>
                     </div>
 
                     <div class="field">
                         <label for="category">Category</label>
-                        <select id="category" name="category" required>
+                        <select id="category" class="control" name="category" required>
                             <option value="food" {{ old('category', $product->category) === 'food' ? 'selected' : '' }}>Food</option>
                             <option value="beverage" {{ old('category', $product->category) === 'beverage' ? 'selected' : '' }}>Beverage</option>
                             <option value="snack" {{ old('category', $product->category) === 'snack' ? 'selected' : '' }}>Snack</option>
@@ -167,12 +162,12 @@
 
                     <div class="field full">
                         <label for="image">New Image (optional)</label>
-                        <input id="image" type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                        <input id="image" class="control" type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                     </div>
 
                     <div class="field full">
                         <input type="hidden" name="is_available" value="0">
-                        <label style="display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                        <label class="checkbox-line">
                             <input type="checkbox" name="is_available" value="1" {{ old('is_available', $product->is_available) ? 'checked' : '' }}>
                             Available
                         </label>
@@ -180,8 +175,8 @@
                 </div>
 
                 <div class="actions">
-                    <a href="{{ route('concessionaire.products') }}" class="btn btn-outline">Cancel</a>
-                    <button type="submit" class="btn">Save Changes</button>
+                    <a href="{{ route('concessionaire.products') }}" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
         </div>

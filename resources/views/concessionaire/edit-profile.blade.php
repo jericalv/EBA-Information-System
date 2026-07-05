@@ -5,90 +5,52 @@
 @section('extra-css')
 <style>
     .edit-container {
-        max-width: 700px;
-        margin: 32px auto;
-        padding: 0 24px;
+        max-width: 680px;
+        margin: 0 auto;
     }
     .edit-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        padding: 26px 28px;
     }
     .edit-card h2 {
-        font-size: 24px;
-        font-weight: 800;
-        color: var(--green);
-        margin-bottom: 24px;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        margin-bottom: 20px;
+    }
+    .edit-card .alert {
+        margin-bottom: 18px;
     }
     .form-group {
-        margin-bottom: 20px;
+        margin-bottom: 18px;
     }
     .form-group label {
         display: block;
-        font-weight: 600;
-        font-size: 14px;
-        color: #374151;
-        margin-bottom: 8px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
+        margin-bottom: 7px;
     }
     .form-group input,
     .form-group textarea {
         width: 100%;
-        padding: 12px 16px;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 15px;
-        font-family: inherit;
-        background: #f8fafc;
-        transition: all 0.2s;
-    }
-    .form-group input:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: var(--green);
-        background: #fff;
-        box-shadow: 0 0 0 3px rgba(10,92,47,0.1);
     }
     .form-group textarea {
         min-height: 120px;
         resize: vertical;
+        line-height: 1.5;
     }
     .btn-group {
         display: flex;
-        gap: 12px;
-        margin-top: 24px;
-    }
-    .btn {
-        padding: 12px 24px;
-        border-radius: 10px;
-        font-size: 15px;
-        font-weight: 700;
-        font-family: inherit;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
-        border: none;
-    }
-    .btn-primary {
-        background: var(--green);
-        color: #fff;
-    }
-    .btn-primary:hover {
-        background: var(--green-light);
-    }
-    .btn-secondary {
-        background: #f1f5f9;
-        color: #475569;
-    }
-    .btn-secondary:hover {
-        background: #e2e8f0;
+        gap: 10px;
+        margin-top: 22px;
     }
     .error-msg {
-        color: #dc2626;
-        font-size: 13px;
+        color: var(--danger);
+        font-size: 12.5px;
         margin-top: 5px;
     }
 </style>
@@ -96,7 +58,7 @@
 
 @section('content')
     <div class="edit-container">
-        <div class="edit-card">
+        <div class="panel edit-card">
             <h2>Edit Profile</h2>
 
             @if (session('success'))
@@ -109,7 +71,7 @@
 
                 <div class="form-group">
                     <label for="business_name">Public Business Name</label>
-                    <input type="text" id="business_name" name="business_name" value="{{ old('business_name', $user->business_name) }}" maxlength="255" placeholder="e.g., Campus Canteen">
+                    <input type="text" id="business_name" name="business_name" class="control" value="{{ old('business_name', $user->business_name) }}" maxlength="255" placeholder="e.g., Campus Canteen">
                     @error('business_name')
                         <div class="error-msg">{{ $message }}</div>
                     @enderror
@@ -117,7 +79,7 @@
 
                 <div class="form-group">
                     <label for="name">Business Name</label>
-                    <input type="text" id="name" name="name" value="{{ old('name', $user->name) }}" required>
+                    <input type="text" id="name" name="name" class="control" value="{{ old('name', $user->name) }}" required>
                     @error('name')
                         <div class="error-msg">{{ $message }}</div>
                     @enderror
@@ -125,7 +87,7 @@
 
                 <div class="form-group">
                     <label for="location">Location</label>
-                    <input type="text" id="location" name="location" value="{{ old('location', $user->location) }}" placeholder="e.g., Near the main gate">
+                    <input type="text" id="location" name="location" class="control" value="{{ old('location', $user->location) }}" placeholder="e.g., Near the main gate">
                     @error('location')
                         <div class="error-msg">{{ $message }}</div>
                     @enderror
@@ -133,7 +95,7 @@
 
                 <div class="form-group">
                     <label for="description">About / Description</label>
-                    <textarea id="description" name="description" placeholder="Tell students about your business...">{{ old('description', $user->description) }}</textarea>
+                    <textarea id="description" name="description" class="control" placeholder="Tell students about your business...">{{ old('description', $user->description) }}</textarea>
                     @error('description')
                         <div class="error-msg">{{ $message }}</div>
                     @enderror

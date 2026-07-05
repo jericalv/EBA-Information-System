@@ -4,34 +4,6 @@
 
 @section('extra-css')
 <style>
-    @font-face {
-        font-family: 'Inter';
-        src: url('/fonts/web/Inter-Regular.woff2') format('woff2');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-    }
-    @font-face {
-        font-family: 'Inter';
-        src: url('/fonts/web/Inter-Medium.woff2') format('woff2');
-        font-weight: 500;
-        font-style: normal;
-        font-display: swap;
-    }
-    @font-face {
-        font-family: 'Inter';
-        src: url('/fonts/web/Inter-SemiBold.woff2') format('woff2');
-        font-weight: 600;
-        font-style: normal;
-        font-display: swap;
-    }
-    .products-page-wrapper,
-    .products-page-wrapper input,
-    .products-page-wrapper select,
-    .products-page-wrapper button,
-    .products-page-wrapper textarea {
-        font-family: 'Inter', sans-serif;
-    }
     .products-page {
         width: 100%;
         display: flex;
@@ -44,11 +16,11 @@
         align-items: center;
     }
     .products-toolbar {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 16px;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px;
+        box-shadow: var(--shadow-card);
     }
     .products-instant-search {
         position: relative;
@@ -57,141 +29,66 @@
     }
     .products-instant-search input {
         width: 100%;
-        padding: 12px 16px 12px 44px;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 14px;
-        font-family: inherit;
-        transition: border-color 0.2s;
-        background: #fff;
-    }
-    .products-instant-search input:focus {
-        outline: none;
-        border-color: var(--green);
+        padding-left: 38px;
     }
     .products-instant-search svg {
         position: absolute;
-        left: 14px;
+        left: 12px;
         top: 50%;
         transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
-        color: #94a3b8;
-    }
-    #openAddProductModal {
-        padding: 10px 24px;
-        font-weight: 600;
-        border-radius: 6px;
-        background: #0a5c2f;
-        color: #ffffff;
-        border: none;
-        cursor: pointer;
-        font-size: 14px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-    }
-    #openAddProductModal:hover {
-        background: #084a25;
-    }
-    #openAddProductModal svg {
         width: 16px;
         height: 16px;
+        color: var(--faint);
+        pointer-events: none;
     }
     .error-box {
-        margin-top: 16px;
-        border: 1px solid #fecaca;
-        background: #fef2f2;
-        color: #991b1b;
-        border-radius: 10px;
-        padding: 12px 14px;
-        font-size: 14px;
+        border: 1px solid #F2D8D8;
+        background: #FDF3F3;
+        color: var(--danger);
+        border-radius: 8px;
+        padding: 12px 16px;
+        font-size: 13.5px;
     }
     .filters-bar {
-        background: transparent;
-        border-radius: 0;
-        padding: 0;
-        margin-bottom: 0;
-        box-shadow: none;
-        border-top: 0;
         display: flex;
-        gap: 14px;
+        gap: 12px;
         align-items: center;
     }
-    .search-box {
-        min-width: 0;
-        position: relative;
-    }
-    .search-box input {
-        width: 100%;
-        padding: 12px 16px 12px 44px;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 14px;
-        font-family: inherit;
-        transition: border-color 0.2s;
-    }
-    .search-box input:focus {
-        outline: none;
-        border-color: var(--green);
-    }
-    .search-box svg {
-        position: absolute;
-        left: 14px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
-        color: #94a3b8;
-    }
     .filter-select {
-        padding: 12px 16px;
-        border: 2px solid #e2e8f0;
-        border-radius: 10px;
-        font-size: 14px;
-        font-family: inherit;
-        background: #fff;
-        cursor: pointer;
         min-width: 170px;
         width: auto;
         flex-shrink: 0;
     }
-    .filter-select:focus {
-        outline: none;
-        border-color: var(--green);
-    }
     .products-results {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
         padding: 18px;
-        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+        box-shadow: var(--shadow-card);
     }
     .products-grid {
         display: grid;
         grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 20px;
+        gap: 18px;
     }
     .product-card {
-        border: 1px solid #e7edf5;
-        border-radius: 16px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
         background: #fff;
         overflow: hidden;
-        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
         display: flex;
         flex-direction: column;
         min-height: 100%;
-        transition: transform 0.22s ease, box-shadow 0.22s ease;
+        transition: border-color 0.15s ease;
     }
     .product-card:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+        border-color: var(--line-strong);
     }
     .product-media {
         position: relative;
         width: 100%;
         padding-top: 78%;
-        background: #f1f5f9;
+        background: var(--paper);
         overflow: hidden;
     }
     .product-media img {
@@ -228,16 +125,17 @@
     }
     .product-name {
         margin: 0;
-        font-size: 17px;
+        font-size: 15px;
         line-height: 1.35;
-        font-weight: 600;
-        color: #0f172a;
+        font-weight: 700;
+        color: var(--ink);
+        letter-spacing: -0.01em;
         word-break: break-word;
     }
     .product-desc {
         margin: 0;
-        color: #64748b;
-        font-size: 12px;
+        color: var(--muted);
+        font-size: 12.5px;
         line-height: 1.45;
         display: -webkit-box;
         line-clamp: 2;
@@ -255,15 +153,16 @@
     .product-chip {
         display: inline-flex;
         align-items: center;
-        padding: 4px 10px;
-        border-radius: 999px;
+        padding: 3px 9px;
+        border-radius: 5px;
+        font-family: var(--font-mono);
         font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.04em;
+        font-weight: 500;
+        letter-spacing: 0.08em;
         text-transform: uppercase;
-        border: 1px solid #dbe4ef;
-        color: #475569;
-        background: #f8fafc;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        background: var(--paper);
     }
     .product-bottom {
         margin-top: auto;
@@ -275,19 +174,12 @@
     }
     .product-price {
         margin: 0;
-        font-size: 15px;
+        font-family: var(--font-mono);
+        font-size: 14px;
         line-height: 1.2;
-        font-weight: 700;
-        color: #0f172a;
-    }
-    .product-actions {
-        display: flex;
-        align-items: center;
-        justify-content: flex-end;
-        gap: 10px;
-    }
-    .product-actions form {
-        margin: 0;
+        font-weight: 600;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
     }
     .toggle-btn {
         border: 0;
@@ -295,6 +187,7 @@
         border-radius: 999px;
         font-size: 11px;
         font-weight: 600;
+        font-family: inherit;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
@@ -309,49 +202,26 @@
         background: currentColor;
     }
     .toggle-btn.available {
-        color: #166534;
-        background: #ecfdf3;
+        color: #14532D;
+        background: #EAF3ED;
     }
     .toggle-btn.unavailable {
-        color: #64748b;
-        background: #f1f5f9;
+        color: var(--muted);
+        background: var(--paper);
     }
     .product-links {
         display: inline-flex;
         align-items: center;
         gap: 8px;
     }
-    .open-edit-btn {
-        padding: 8px 20px;
-        font-weight: 600;
-        border-radius: 6px;
-        background: #f3f4f6;
-        color: #1f2937;
-        border: none;
-        cursor: pointer;
-        font-size: 13px;
-    }
-    .open-edit-btn:hover {
-        background: #e5e7eb;
-    }
-    .product-links form button[type="submit"] {
-        padding: 8px 20px;
-        font-weight: 600;
-        border-radius: 6px;
-        background: #fef2f2;
-        color: #dc2626;
-        border: none;
-        cursor: pointer;
-        font-size: 13px;
-    }
-    .product-links form button[type="submit"]:hover {
-        background: #fee2e2;
+    .product-links form {
+        margin: 0;
     }
     .edit-current-image {
         margin-top: 4px;
-        border: 1px solid #cbd5e1;
-        border-radius: 10px;
-        background: #f8fafc;
+        border: 1px solid var(--line-strong);
+        border-radius: 8px;
+        background: var(--paper);
         overflow: hidden;
         width: 100%;
         max-width: 240px;
@@ -365,7 +235,7 @@
     .edit-image-note {
         margin: 8px 2px 0;
         font-size: 12px;
-        color: #6b7280;
+        color: var(--muted);
     }
     .is-hidden {
         display: none !important;
@@ -383,60 +253,62 @@
     }
     .pagination-wrap a,
     .pagination-wrap span {
-        padding: 8px 14px;
-        border-radius: 8px;
+        padding: 8px 13px;
+        border-radius: 6px;
         font-size: 13px;
         font-weight: 500;
         text-decoration: none;
-        color: #475569;
+        color: var(--muted);
         background: #fff;
-        border: 1px solid #e2e8f0;
-        transition: all 0.15s;
+        border: 1px solid var(--line);
+        transition: border-color 0.15s, color 0.15s;
         display: inline-block;
     }
     .pagination-wrap a:hover {
-        border-color: #0a5c2f;
-        color: #0a5c2f;
+        border-color: var(--pine);
+        color: var(--pine);
     }
     .pagination-wrap span[aria-current="page"] {
-        background: #0a5c2f;
-        border-color: #0a5c2f;
+        background: var(--pine);
+        border-color: var(--pine);
         color: #fff;
     }
     .pagination-wrap span.cursor-default {
-        color: #cbd5e1;
-        background: #f8fafc;
+        color: var(--line-strong);
+        background: var(--paper);
     }
     .empty-state {
         margin-top: 0;
-        border: 1px dashed #cbd5e1;
-        border-radius: 16px;
+        border: 1px dashed var(--line-strong);
+        border-radius: 12px;
         background: #fff;
         text-align: center;
         padding: 56px 20px;
     }
     .empty-state svg {
-        width: 72px;
-        height: 72px;
-        color: #cbd5e1;
-        margin-bottom: 10px;
+        width: 56px;
+        height: 56px;
+        color: var(--line-strong);
+        margin-bottom: 12px;
     }
     .empty-state h3 {
         margin: 0;
-        color: #0f172a;
-        font-size: 30px;
-        line-height: 1.1;
+        color: var(--ink);
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        line-height: 1.2;
     }
     .empty-state p {
-        margin: 10px 0 18px;
-        color: #64748b;
-        font-size: 15px;
+        margin: 8px 0 18px;
+        color: var(--muted);
+        font-size: 13.5px;
     }
     .modal-wrap {
         position: fixed;
         inset: 0;
         z-index: 3000;
-        background: rgba(15, 23, 42, 0.55);
+        background: rgba(23, 37, 28, 0.5);
         display: none;
         align-items: center;
         justify-content: center;
@@ -447,15 +319,17 @@
     }
     .modal-card {
         width: 100%;
-        max-width: 760px;
+        max-width: 720px;
         background: #fff;
-        border-radius: 14px;
-        padding: 20px;
-        box-shadow: 0 22px 54px rgba(0,0,0,0.28);
-        font-family: 'Century Gothic', sans-serif;
+        border-radius: 12px;
+        border: 1px solid var(--line);
+        padding: 22px;
+        box-shadow: var(--shadow-pop);
+        max-height: calc(100vh - 32px);
+        overflow-y: auto;
     }
     .modal-card-sm {
-        max-width: 460px;
+        max-width: 440px;
     }
     .modal-head {
         display: flex;
@@ -465,31 +339,37 @@
     }
     .modal-head h3 {
         margin: 0;
-        color: #0f172a;
-        font-size: 24px;
-        font-weight: 800;
+        color: var(--ink);
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
     }
     .modal-close {
-        width: 34px;
-        height: 34px;
+        width: 32px;
+        height: 32px;
         border: 0;
-        border-radius: 8px;
-        background: #f1f5f9;
-        color: #475569;
-        font-size: 20px;
+        border-radius: 6px;
+        background: var(--paper);
+        color: var(--muted);
+        font-size: 18px;
         line-height: 1;
         cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .modal-close:hover {
+        background: var(--pine-soft);
+        color: var(--ink);
     }
     .modal-sub {
-        margin: 8px 0 0;
-        color: #64748b;
-        font-size: 14px;
+        margin: 6px 0 0;
+        color: var(--muted);
+        font-size: 13px;
     }
     .form-grid {
-        margin-top: 14px;
+        margin-top: 16px;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 12px;
+        gap: 14px;
     }
     .field {
         display: flex;
@@ -500,29 +380,35 @@
         grid-column: span 2;
     }
     .field label {
-        font-size: 12px;
-        font-weight: 700;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
-        color: #111827;
+        letter-spacing: 0.08em;
+        color: var(--muted);
     }
     .field input,
     .field textarea,
     .field select {
-        border: 1px solid #cbd5e1;
-        border-radius: 10px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
         padding: 9px 12px;
-        font: inherit;
-        color: #111827;
-        background: #f9fafb;
+        font-family: var(--font-ui);
+        font-size: 13.5px;
+        color: var(--ink);
+        background: #fff;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+        outline: none;
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
     }
     .modal-card .field input::placeholder,
     .modal-card .field textarea::placeholder {
-        color: #6b7280 !important;
-    }
-    .modal-card .field input::-webkit-input-placeholder,
-    .modal-card .field textarea::-webkit-input-placeholder {
-        color: #6b7280 !important;
+        color: var(--faint);
     }
     .field textarea {
         min-height: 98px;
@@ -530,39 +416,47 @@
     }
     .upload-zone {
         position: relative;
-        border: 1px dashed #94a3b8;
-        border-radius: 10px;
-        background: #f8fafc;
-        min-height: 132px;
+        border: 1px dashed var(--line-strong);
+        border-radius: 8px;
+        background: var(--paper);
+        min-height: 122px;
         padding: 18px 16px;
         display: flex;
         align-items: center;
         justify-content: center;
         text-align: center;
         cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
     }
     .upload-zone:hover {
-        background: #f1f5f9;
-        border-color: #64748b;
+        background: var(--pine-soft);
+        border-color: var(--pine);
     }
     .upload-zone svg {
-        width: 24px;
-        height: 24px;
-        color: #475569;
+        width: 22px;
+        height: 22px;
+        color: var(--muted);
         margin: 0 auto 10px;
         display: block;
     }
     .upload-zone-title {
         display: block;
-        font-size: 14px;
+        font-family: var(--font-ui);
+        font-size: 13.5px;
         font-weight: 600;
-        color: #111827;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--ink);
     }
     .upload-zone-subtext {
         display: block;
         margin-top: 4px;
+        font-family: var(--font-ui);
         font-size: 12px;
-        color: #6b7280;
+        font-weight: 500;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--muted);
     }
     .upload-input {
         position: absolute;
@@ -575,60 +469,36 @@
     .upload-file-name {
         margin: 8px 2px 0;
         font-size: 12px;
-        color: #6b7280;
+        color: var(--muted);
     }
     .checkbox-line {
         display: inline-flex;
         align-items: center;
         gap: 8px;
-        color: #111827;
-        font-size: 14px;
+        color: var(--ink);
+        font-family: var(--font-ui);
+        font-size: 13.5px;
+        font-weight: 500;
+        text-transform: none;
+        letter-spacing: 0;
+        cursor: pointer;
+    }
+    .checkbox-line input[type="checkbox"] {
+        accent-color: var(--pine);
+        width: 15px;
+        height: 15px;
     }
     .modal-actions {
-        margin-top: 16px;
+        margin-top: 18px;
         display: flex;
         justify-content: flex-end;
         gap: 10px;
     }
-    .btn-cancel,
-    .btn-save {
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 700;
-        padding: 10px 14px;
-        cursor: pointer;
-    }
-    .btn-cancel {
-        border: 1px solid #cbd5e1;
-        background: #fff;
-        color: #475569;
-    }
-    .btn-save {
-        border: 0;
-        background: #0f6a35;
-        color: #fff;
-    }
-    .btn-save:hover {
-        background: #0b5a2d;
-    }
-    .btn-danger {
-        border: 0;
-        border-radius: 10px;
-        background: #dc2626;
-        color: #fff;
-        font-size: 14px;
-        font-weight: 700;
-        padding: 10px 14px;
-        cursor: pointer;
-    }
-    .btn-danger:hover {
-        background: #b91c1c;
-    }
     .delete-product-name {
-        margin: 10px 0 0;
-        color: #1e293b;
-        font-size: 14px;
-        line-height: 1.4;
+        margin: 12px 0 0;
+        color: var(--ink);
+        font-size: 13.5px;
+        line-height: 1.5;
         font-weight: 600;
     }
     @media (max-width: 1024px) {
@@ -640,7 +510,7 @@
         .products-action-row {
             justify-content: stretch;
         }
-        .products-action-row .add-product-btn {
+        .products-action-row #openAddProductModal {
             width: 100%;
             justify-content: center;
         }
@@ -664,12 +534,6 @@
         .products-grid {
             grid-template-columns: 1fr;
             gap: 16px;
-        }
-        .product-name {
-            font-size: 18px;
-        }
-        .product-price {
-            font-size: 19px;
         }
         .form-grid {
             grid-template-columns: 1fr;
@@ -703,7 +567,7 @@
             data-open-product-feedback-modal="{{ $showProductActionSuccessModal ? '1' : '0' }}"
         >
             <div class="products-action-row">
-                <button class="px-8 py-3 font-semibold rounded bg-green-800 text-white hover:bg-green-900 text-sm" type="button" id="openAddProductModal">
+                <button class="btn btn-primary" type="button" id="openAddProductModal">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
                     </svg>
@@ -717,16 +581,16 @@
                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                             <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
                         </svg>
-                        <input id="productsInstantSearch" type="search" placeholder="Search products..." autocomplete="off">
+                        <input id="productsInstantSearch" class="control" type="search" placeholder="Search products..." autocomplete="off">
                     </div>
 
-                    <select id="categoryFilter" class="filter-select">
+                    <select id="categoryFilter" class="control filter-select">
                         <option value="">All Categories</option>
                         @foreach($categories as $cat)
                             <option value="{{ $cat }}">{{ ucfirst($cat) }}</option>
                         @endforeach
                     </select>
-                    <select id="sortFilter" class="filter-select">
+                    <select id="sortFilter" class="control filter-select">
                         <option value="default">Default Order</option>
                         <option value="name-asc">Name A-Z</option>
                         <option value="name-desc">Name Z-A</option>
@@ -786,7 +650,7 @@
                                         <div class="product-links">
                                             <button
                                                 type="button"
-                                                class="open-edit-btn px-8 py-3 font-semibold rounded bg-gray-100 text-gray-800 hover:bg-gray-200 text-sm"
+                                                class="open-edit-btn btn btn-secondary btn-sm"
                                                 data-id="{{ $product->id }}"
                                                 data-name="{{ e($product->name) }}"
                                                 data-description="{{ e($product->description ?? '') }}"
@@ -801,7 +665,7 @@
                                             <form method="POST" action="{{ route('concessionaire.products.destroy', $product) }}" class="delete-product-form" data-product-name="{{ e($product->name) }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="px-8 py-3 font-semibold rounded bg-red-50 text-red-600 hover:bg-red-100 text-sm">Delete</button>
+                                                <button type="submit" class="btn btn-danger-soft btn-sm">Delete</button>
                                             </form>
                                         </div>
                                     </div>
@@ -886,8 +750,8 @@
                 </div>
 
                 <div class="modal-actions">
-                    <button class="btn-cancel" type="button" id="cancelAddProduct">Cancel</button>
-                    <button class="btn-save" type="submit">Save Product</button>
+                    <button class="btn btn-secondary" type="button" id="cancelAddProduct">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Save Product</button>
                 </div>
             </form>
         </div>
@@ -966,8 +830,8 @@
                 </div>
 
                 <div class="modal-actions">
-                    <button class="btn-cancel" type="button" id="cancelEditProduct">Cancel</button>
-                    <button class="btn-save" type="submit">Update Product</button>
+                    <button class="btn btn-secondary" type="button" id="cancelEditProduct">Cancel</button>
+                    <button class="btn btn-primary" type="submit">Update Product</button>
                 </div>
             </form>
         </div>
@@ -983,8 +847,8 @@
             <p class="delete-product-name" id="deleteProductName">You are about to permanently delete this product.</p>
 
             <div class="modal-actions">
-                <button class="btn-cancel" type="button" id="cancelDeleteProduct">Cancel</button>
-                <button class="btn-danger" type="button" id="confirmDeleteProduct">Delete</button>
+                <button class="btn btn-secondary" type="button" id="cancelDeleteProduct">Cancel</button>
+                <button class="btn btn-danger" type="button" id="confirmDeleteProduct">Delete</button>
             </div>
         </div>
     </div>
@@ -999,7 +863,7 @@
                 <p class="modal-sub">{{ $currentSuccessMessage }}</p>
 
                 <div class="modal-actions">
-                    <button class="btn-save" type="button" id="ackProductFeedbackModal">Okay</button>
+                    <button class="btn btn-primary" type="button" id="ackProductFeedbackModal">Okay</button>
                 </div>
             </div>
         </div>
@@ -1313,6 +1177,13 @@
 
                 if (sortFilter) {
                     sortFilter.addEventListener('change', applyFiltersAndSort);
+                }
+
+                // Prefill from the navbar search handoff (?q=...)
+                const initialQuery = (new URLSearchParams(window.location.search).get('q') || '').trim();
+                if (initialQuery) {
+                    instantSearchInput.value = initialQuery;
+                    applyFiltersAndSort();
                 }
             }
         })();

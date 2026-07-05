@@ -5,95 +5,129 @@
 @section('extra-css')
 <style>
     .media-container {
-        max-width: 800px;
-        margin: 32px auto;
-        padding: 0 24px;
+        max-width: 760px;
+        margin: 0 auto;
         display: flex;
         flex-direction: column;
-        gap: 24px;
+        gap: 20px;
     }
     .media-header h2 {
-        font-size: 24px;
-        font-weight: 800;
-        color: #0A5C2F;
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--ink);
         margin: 0;
     }
     .media-header p {
         margin: 4px 0 0;
-        font-size: 14px;
-        color: #64748b;
+        font-size: 13.5px;
+        color: var(--muted);
     }
-    .alert-success {
-        padding: 12px 16px;
-        border-radius: 12px;
-        background: rgba(10, 92, 47, 0.08);
-        border: 1px solid rgba(10, 92, 47, 0.2);
-        color: #0A5C2F;
-        font-size: 14px;
-        font-weight: 600;
+    .media-panel {
+        padding: 20px 22px;
     }
-    .section-card {
-        background: linear-gradient(to bottom, #ffffff 0%, #fafffe 100%);
-        border: 1px solid #d4e8dc;
-        border-radius: 20px;
-        padding: 24px;
-        box-shadow: 0 4px 12px rgba(6, 68, 32, 0.06), 0 12px 32px rgba(6, 68, 32, 0.08);
-        transition: all 0.3s ease;
+    .media-panel-head {
+        margin-bottom: 16px;
     }
-    .section-card:hover {
-        box-shadow: 0 8px 20px rgba(6, 68, 32, 0.08), 0 16px 40px rgba(6, 68, 32, 0.1);
-        border-color: #c0dcc8;
-    }
-    .section-card-title {
-        font-size: 18px;
-        font-weight: 800;
-        color: #0A5C2F;
-        margin-bottom: 6px;
+    .carousel-preview {
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+        background: var(--paper);
+        border: 1px dashed var(--line-strong);
+        min-height: 160px;
         display: flex;
         align-items: center;
+        justify-content: center;
+    }
+    .carousel-preview img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        display: block;
+    }
+    .carousel-remove {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    .carousel-drop-zone {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         gap: 8px;
+        padding: 40px 24px;
+        cursor: pointer;
+        width: 100%;
+        text-align: center;
     }
-    .section-card-title::before {
-        content: '';
-        width: 4px;
-        height: 20px;
-        background: linear-gradient(to bottom, #0A5C2F, #1a8f50);
-        border-radius: 4px;
+    .carousel-drop-zone svg {
+        width: 40px;
+        height: 40px;
+        color: var(--faint);
     }
-    .section-card-subtitle {
-        font-size: 13px;
-        color: #64748b;
-        margin-bottom: 18px;
-        font-weight: 500;
+    .carousel-drop-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: var(--muted);
+    }
+    .carousel-drop-sub {
+        font-size: 12px;
+        color: var(--faint);
+    }
+    .carousel-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 16px;
+    }
+    .carousel-file-picker {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 14px;
+        border: 1px dashed var(--line-strong);
+        border-radius: 6px;
+        background: var(--paper);
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .carousel-file-picker:hover {
+        border-color: var(--pine);
+        background: var(--pine-soft);
+    }
+    .carousel-file-picker svg {
+        width: 16px;
+        height: 16px;
+        color: var(--muted);
+        flex-shrink: 0;
+    }
+    .carousel-file-picker span {
+        font-size: 13.5px;
+        color: var(--muted);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .field-error {
+        color: var(--danger);
+        font-size: 12.5px;
+        margin: 4px 0 0;
     }
     .about-store-form {
         display: flex;
         flex-direction: column;
         gap: 10px;
-        margin-top: 8px;
     }
     .about-store-textarea {
         width: 100%;
         min-height: 110px;
-        border: 1px solid #cfe1d6;
-        border-radius: 12px;
-        padding: 12px 14px;
-        font-size: 14px;
-        line-height: 1.5;
-        color: #0f172a;
-        background: #f9fdfb;
         resize: vertical;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
-    }
-    .about-store-textarea:focus {
-        outline: none;
-        border-color: #0A5C2F;
-        background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+        line-height: 1.5;
     }
     .about-store-textarea.is-invalid {
-        border-color: #dc2626;
-        box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.12);
+        border-color: var(--danger);
+        box-shadow: 0 0 0 3px rgba(185, 28, 28, 0.1);
     }
     .about-store-actions {
         display: flex;
@@ -105,32 +139,7 @@
     .about-store-hint {
         margin: 0;
         font-size: 12px;
-        color: #64748b;
-    }
-    .about-store-save {
-        border: 0;
-        border-radius: 10px;
-        padding: 9px 16px;
-        font-size: 13px;
-        font-weight: 700;
-        color: #ffffff;
-        background: linear-gradient(90deg, #0A5C2F 0%, #0e7b40 100%);
-        cursor: pointer;
-        box-shadow: 0 6px 14px rgba(10, 92, 47, 0.2);
-        transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
-    .about-store-save:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 8px 18px rgba(10, 92, 47, 0.28);
-    }
-    .about-store-save:active {
-        transform: translateY(0);
-    }
-    .about-store-error {
-        margin: 0;
-        color: #b91c1c;
-        font-size: 13px;
-        font-weight: 600;
+        color: var(--muted);
     }
 </style>
 @endsection
@@ -143,64 +152,59 @@
         </div>
 
         @if (session('success'))
-            <div class="alert-success">{{ session('success') }}</div>
+            <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
-        <div class="section-card" id="carousel-image-section">
-            <div class="section-card-title">Carousel Banner Image</div>
-            <div class="section-card-subtitle">This image appears on the public concessionaires page carousel. Use a wide landscape photo (recommended: 1200×500 px).</div>
-
-            <div style="display:flex;flex-direction:column;gap:20px;margin-top:16px;">
-                {{-- Current Image Preview --}}
-                <div id="carousel-preview-wrap" style="position:relative;border-radius:14px;overflow:hidden;background:#f1f5f9;border:2px dashed #c5dace;min-height:160px;display:flex;align-items:center;justify-content:center;">
-                    @if ($user->carousel_image)
-                        <img id="carousel-preview-img"
-                             src="{{ asset('storage/' . $user->carousel_image) }}"
-                             alt="Carousel banner"
-                             style="width:100%;height:200px;object-fit:cover;display:block;border-radius:12px;">
-                        <div style="position:absolute;top:10px;right:10px;">
-                            <form method="POST" action="{{ route('concessionaire.carousel-image.delete') }}" onsubmit="return confirm('Remove carousel image?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" style="background:rgba(220,38,38,0.9);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:13px;font-weight:700;cursor:pointer;backdrop-filter:blur(4px);">Remove</button>
-                            </form>
-                        </div>
-                    @else
-                        <div id="carousel-drop-zone" style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:40px 24px;cursor:pointer;width:100%;" onclick="document.getElementById('carousel_image_input').click();">
-                            <svg width="48" height="48" fill="none" stroke="#94a3b8" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                            <span style="font-size:14px;font-weight:600;color:#64748b;">Click to upload a carousel image</span>
-                            <span style="font-size:12px;color:#94a3b8;">JPG, PNG, WebP — max 4 MB</span>
-                        </div>
-                    @endif
-                </div>
-
-                {{-- Upload Form --}}
-                <form method="POST" action="{{ route('concessionaire.carousel-image.update') }}" enctype="multipart/form-data" id="carousel-upload-form">
-                    @csrf
-                    <div style="display:flex;flex-direction:column;gap:10px;">
-                        <label for="carousel_image_input" style="display:block;cursor:pointer;">
-                            <div style="display:flex;align-items:center;gap:10px;padding:12px 16px;border:2px solid #e2e8f0;border-radius:10px;background:#f8fafc;transition:all 0.2s;" onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='#e2e8f0'">
-                                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:#64748b;flex-shrink:0;"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
-                                <span id="carousel-file-label" style="font-size:14px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $user->carousel_image ? 'Click to replace image...' : 'Click to choose an image...' }}</span>
-                            </div>
-                            <input type="file" id="carousel_image_input" name="carousel_image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="previewCarouselImage(this)">
-                        </label>
-                        <button type="submit" id="carousel-upload-btn"
-                                style="width:100%;padding:13px;background:#0A5C2F;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:background 0.2s;"
-                                onmouseover="this.style.background='#0D7A3E'" onmouseout="this.style.background='#0A5C2F'">
-                            Upload Image
-                        </button>
-                    </div>
-                    @error('carousel_image')
-                        <p style="color:#dc2626;font-size:13px;margin-top:6px;">{{ $message }}</p>
-                    @enderror
-                </form>
+        <div class="panel media-panel" id="carousel-image-section">
+            <div class="media-panel-head">
+                <h3 class="panel-title">Carousel Banner Image</h3>
+                <p class="panel-sub">This image appears on the public concessionaires page carousel. Use a wide landscape photo (recommended: 1200&times;500 px).</p>
             </div>
+
+            {{-- Current Image Preview --}}
+            <div id="carousel-preview-wrap" class="carousel-preview">
+                @if ($user->carousel_image)
+                    <img id="carousel-preview-img"
+                         src="{{ asset('storage/' . $user->carousel_image) }}"
+                         alt="Carousel banner">
+                    <div class="carousel-remove">
+                        <form method="POST" action="{{ route('concessionaire.carousel-image.delete') }}" onsubmit="return confirm('Remove carousel image?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </div>
+                @else
+                    <div id="carousel-drop-zone" class="carousel-drop-zone" onclick="document.getElementById('carousel_image_input').click();">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <span class="carousel-drop-title">Click to upload a carousel image</span>
+                        <span class="carousel-drop-sub">JPG, PNG, WebP — max 4 MB</span>
+                    </div>
+                @endif
+            </div>
+
+            {{-- Upload Form --}}
+            <form method="POST" action="{{ route('concessionaire.carousel-image.update') }}" enctype="multipart/form-data" id="carousel-upload-form" class="carousel-form">
+                @csrf
+                <label for="carousel_image_input" class="carousel-file-picker">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                    <span id="carousel-file-label">{{ $user->carousel_image ? 'Click to replace image...' : 'Click to choose an image...' }}</span>
+                    <input type="file" id="carousel_image_input" name="carousel_image" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="previewCarouselImage(this)">
+                </label>
+                <button type="submit" id="carousel-upload-btn" class="btn btn-primary" style="width:100%;">
+                    Upload Image
+                </button>
+                @error('carousel_image')
+                    <p class="field-error">{{ $message }}</p>
+                @enderror
+            </form>
         </div>
 
-        <div class="section-card">
-            <div class="section-card-title">About Your Store</div>
-            <div class="section-card-subtitle">This description appears across your concessionaire profile.</div>
+        <div class="panel media-panel">
+            <div class="media-panel-head">
+                <h3 class="panel-title">About Your Store</h3>
+                <p class="panel-sub">This description appears across your concessionaire profile.</p>
+            </div>
             <form method="POST" action="{{ route('concessionaire.update') }}" class="about-store-form">
                 @csrf
                 @method('PATCH')
@@ -209,17 +213,17 @@
                     id="description"
                     name="description"
                     maxlength="1000"
-                    class="about-store-textarea @error('description') is-invalid @enderror"
+                    class="control about-store-textarea @error('description') is-invalid @enderror"
                     placeholder="Tell students what makes your store special..."
                 >{{ old('description', $user->description) }}</textarea>
 
                 @error('description')
-                    <p class="about-store-error">{{ $message }}</p>
+                    <p class="field-error">{{ $message }}</p>
                 @enderror
 
                 <div class="about-store-actions">
                     <p class="about-store-hint">You can leave this blank if you prefer not to show a description.</p>
-                    <button type="submit" class="about-store-save">Save Description</button>
+                    <button type="submit" class="btn btn-primary">Save Description</button>
                 </div>
             </form>
         </div>
@@ -237,7 +241,7 @@
         reader.onload = function (e) {
             const wrap = document.getElementById('carousel-preview-wrap');
             if (!wrap) return;
-            wrap.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:200px;object-fit:cover;display:block;border-radius:12px;">';
+            wrap.innerHTML = '<img src="' + e.target.result + '" alt="Carousel banner preview">';
         };
         reader.readAsDataURL(file);
     }

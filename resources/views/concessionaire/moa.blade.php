@@ -5,38 +5,36 @@
 @section('extra-css')
 <style>
     .moa-container {
-        --green: #0a5c2f;
-        --green-light: #117a42;
-        --gold: #d4a843;
-        
-        max-width: 800px;
-        margin: 32px auto;
-        padding: 0 24px;
+        max-width: 780px;
+        margin: 0 auto;
     }
     .section-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 24px;
+        margin-bottom: 20px;
         flex-wrap: wrap;
         gap: 16px;
     }
     .section-header h2 {
-        font-size: 24px;
-        font-weight: 800;
-        color: var(--green);
+        font-size: 20px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--ink);
     }
     .moa-card {
-        background: #fff;
-        border-radius: 16px;
-        padding: 32px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        box-shadow: var(--shadow-card);
+        padding: 24px 26px;
     }
     .doc-title {
-        margin: 0 0 14px;
-        font-size: 19px;
-        font-weight: 800;
-        color: #0f172a;
+        margin: 0 0 16px;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--ink);
     }
     .section-gap {
         margin-top: 20px;
@@ -44,120 +42,103 @@
     .moa-info {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 14px;
     }
     .info-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #f3f4f6;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
     }
     .info-row:last-child {
         border-bottom: none;
         padding-bottom: 0;
     }
     .info-label {
-        font-weight: 600;
-        color: #6b7280;
-        font-size: 14px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--muted);
     }
     .info-value {
-        font-weight: 700;
-        color: #1f2937;
-        font-size: 15px;
+        font-weight: 600;
+        color: var(--ink);
+        font-size: 13.5px;
     }
     .status-badge {
-        padding: 6px 14px;
-        border-radius: 20px;
-        font-size: 13px;
-        font-weight: 700;
-    }
-    .status-active {
-        background: rgba(10,92,47,0.1);
-        color: var(--green);
-    }
-    .status-pending {
-        background: rgba(212,168,67,0.2);
-        color: #b8860b;
-    }
-    .status-expired {
-        background: rgba(220,38,38,0.1);
-        color: #dc2626;
-    }
-    .btn {
-        padding: 12px 24px;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 700;
-        font-family: inherit;
-        cursor: pointer;
-        text-decoration: none;
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        transition: all 0.2s;
-        border: none;
+        padding: 4px 11px;
+        border-radius: 6px;
+        border: 1px solid;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 500;
     }
-    .btn-primary {
-        background: var(--green);
-        color: #fff;
+    .status-active {
+        background: #F0F7F2;
+        border-color: #CDE3D4;
+        color: #14532D;
     }
-    .btn-primary:hover {
-        background: var(--green-light);
+    .status-pending {
+        background: #FDF8EC;
+        border-color: #F0E1BC;
+        color: #92400E;
     }
-    .btn-outline {
-        background: transparent;
-        border: 2px solid var(--green);
-        color: var(--green);
-    }
-    .btn-outline:hover {
-        background: var(--green);
-        color: #fff;
+    .status-expired {
+        background: #FDF3F3;
+        border-color: #F2D8D8;
+        color: var(--danger);
     }
     .moa-actions {
         display: flex;
-        gap: 12px;
-        margin-top: 24px;
+        gap: 10px;
+        margin-top: 20px;
         flex-wrap: wrap;
     }
     .empty-state {
         text-align: center;
-        padding: 60px 20px;
+        padding: 48px 20px;
     }
     .empty-state svg {
-        width: 80px;
-        height: 80px;
-        color: #d1d5db;
-        margin-bottom: 16px;
+        width: 56px;
+        height: 56px;
+        color: var(--line-strong);
+        margin: 0 auto 14px;
     }
     .empty-state h3 {
-        font-size: 20px;
+        font-size: 18px;
         font-weight: 700;
-        color: #374151;
-        margin-bottom: 8px;
+        letter-spacing: -0.01em;
+        color: var(--ink);
+        margin-bottom: 6px;
     }
     .empty-state p {
-        color: #9ca3af;
-        margin-bottom: 20px;
+        color: var(--muted);
+        font-size: 13.5px;
+        margin-bottom: 18px;
     }
     .notice-box {
-        background: rgba(212,168,67,0.1);
-        border-left: 4px solid var(--gold);
-        padding: 16px 20px;
-        border-radius: 0 10px 10px 0;
-        margin-top: 24px;
+        background: #FDF8EC;
+        border: 1px solid #F0E1BC;
+        padding: 14px 18px;
+        border-radius: 8px;
+        margin-top: 20px;
     }
     .notice-box h4 {
         font-weight: 700;
-        color: #92400e;
+        color: #92400E;
         margin-bottom: 4px;
-        font-size: 14px;
+        font-size: 13.5px;
     }
     .notice-box p {
-        color: #78350f;
+        color: #92400E;
         font-size: 13px;
         line-height: 1.5;
+        opacity: 0.85;
     }
 </style>
 @endsection
@@ -197,10 +178,10 @@
                 </div>
 
                 <div class="moa-actions">
-                    <a class="btn btn-outline" href="{{ asset('storage/' . ltrim($moaPath, '/')) }}" target="_blank" rel="noopener">
+                    <a class="btn btn-secondary" href="{{ asset('storage/' . ltrim($moaPath, '/')) }}" target="_blank" rel="noopener">
                         View Document
                     </a>
-                    <a class="btn btn-outline" href="{{ route('application') }}#my-application">
+                    <a class="btn btn-secondary" href="{{ route('application') }}#my-application">
                         Replace Document
                     </a>
                 </div>
@@ -236,10 +217,10 @@
                 </div>
 
                 <div class="moa-actions">
-                    <a class="btn btn-outline" href="{{ asset('storage/' . ltrim($contractPath, '/')) }}" target="_blank" rel="noopener">
+                    <a class="btn btn-secondary" href="{{ asset('storage/' . ltrim($contractPath, '/')) }}" target="_blank" rel="noopener">
                         View Document
                     </a>
-                    <a class="btn btn-outline" href="{{ route('application') }}#my-application">
+                    <a class="btn btn-secondary" href="{{ route('application') }}#my-application">
                         Replace Document
                     </a>
                 </div>
