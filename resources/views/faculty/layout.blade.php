@@ -10,79 +10,110 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|ibm-plex-mono:400,500,600&display=swap" rel="stylesheet" />
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        nav {
-            animation: navbarGlow 3s ease-in-out infinite;
+        :root {
+            --green: #0A5C2F;
+            --green-dark: #064420;
+            --pine: #0A5C2F;
+            --pine-strong: #084A26;
+            --pine-soft: #EAF3ED;
+            --ink: #1A2B21;
+            --muted: #66756C;
+            --faint: #93A198;
+            --paper: #F5F7F5;
+            --card: #FFFFFF;
+            --line: #E2E8E3;
+            --line-strong: #CBD6CE;
+            --amber: #B45309;
+            --danger: #B91C1C;
+            --font-ui: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+            --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+            --shadow-card: 0 1px 2px rgba(23, 37, 28, 0.04);
+            --shadow-pop: 0 12px 32px rgba(23, 37, 28, 0.14);
         }
 
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 0;
-            font-size: 16px;
-            color: #64748b;
+        body {
+            font-family: var(--font-ui);
+            background: var(--paper);
+            color: var(--ink);
         }
-        .breadcrumb a {
-            color: #059669;
-            text-decoration: none;
-            transition: color 0.2s;
-            font-weight: 600;
+
+        /* ---------- Shared primitives ---------- */
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
         }
-        .breadcrumb a:hover {
-            color: #047857;
-            text-decoration: underline;
+
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
         }
-        .breadcrumb-separator {
-            color: #94a3b8;
+        .panel-title {
             font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.01em;
         }
-        .breadcrumb-current {
-            color: #0f172a;
-            font-weight: 800;
+        .panel-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .pop {
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            box-shadow: var(--shadow-pop);
+            overflow: hidden;
         }
 
         .page-title {
-            font-size: 28px;
+            font-size: 21px;
             font-weight: 800;
-            color: #064420;
-            margin: 0 0 8px;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            margin: 0 0 6px;
+            line-height: 1.2;
         }
         .page-subtitle {
-            color: #64748b;
+            color: var(--muted);
             margin: 0 0 20px;
-            font-size: 14px;
+            font-size: 13.5px;
         }
+
         .alert {
-            padding: 14px 16px;
-            border-radius: 10px;
+            border-radius: 8px;
+            border: 1px solid;
+            padding: 12px 16px;
             margin-bottom: 18px;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: 500;
+            line-height: 1.5;
         }
-        .alert-success {
-            background: rgba(10, 92, 47, 0.08);
-            border: 1px solid rgba(10, 92, 47, 0.18);
-            color: #0a5c2f;
-        }
-        .alert-error {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
-            color: #991b1b;
-        }
+        .alert-success { background: #F0F7F2; border-color: #CDE3D4; color: #14532D; }
+        .alert-error { background: #FDF3F3; border-color: #F2D8D8; color: var(--danger); }
+
+        /* ---------- Legacy shared components (used across faculty pages) ---------- */
         .card {
-            background: #fff;
-            border: 1px solid #e5e7eb;
-            border-radius: 14px;
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: var(--shadow-card);
         }
         .card-header {
-            padding: 18px 20px;
-            border-bottom: 1px solid #e5e7eb;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--line);
         }
         .card-body {
             padding: 0;
@@ -98,61 +129,87 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
+            background: #fff;
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
             padding: 0 12px;
             flex: 1;
             min-width: 220px;
             max-width: 360px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .search-box:focus-within {
+            border-color: var(--pine);
+            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
         }
         .search-box input {
             border: none;
             background: transparent;
             padding: 9px 0;
-            font-size: 14px;
+            font-size: 13.5px;
             font-family: inherit;
             width: 100%;
             outline: none;
-            color: #1e293b;
+            color: var(--ink);
         }
+        .search-box input::placeholder { color: var(--faint); }
         .filter-select {
-            padding: 9px 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
+            padding: 9px 34px 9px 12px;
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+            font-size: 13.5px;
             font-family: inherit;
-            background: #f8fafc;
-            color: #1e293b;
+            background-color: #fff;
+            color: var(--ink);
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366756C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--pine);
+            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
         }
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            border: 0;
-            border-radius: 8px;
-            padding: 9px 14px;
+            gap: 7px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            padding: 9px 15px;
             font-size: 13px;
             font-weight: 700;
+            line-height: 1.2;
             cursor: pointer;
             font-family: inherit;
             text-decoration: none;
+            white-space: nowrap;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        }
+        .btn:focus-visible {
+            outline: 2px solid rgba(10, 92, 47, 0.45);
+            outline-offset: 2px;
         }
         .btn-green {
-            background: #0a5c2f;
+            background: var(--pine);
             color: #fff;
         }
         .btn-green:hover {
-            background: #0b6a36;
+            background: var(--pine-strong);
         }
         .btn-outline {
             background: #fff;
-            color: #334155;
-            border: 1px solid #dbe2ea;
+            color: var(--ink);
+            border-color: var(--line-strong);
         }
         .btn-outline:hover {
-            background: #f8fafc;
+            background: #F6F9F7;
+            border-color: #AEC1B4;
         }
         .pagination-wrap {
             padding: 14px 20px;
@@ -167,10 +224,316 @@
                 width: 100%;
             }
         }
+
+        /* ---------- Sidebar ---------- */
+        .sb {
+            background: #0B3120;
+            border-right: 1px solid #0A2A1B;
+        }
+        .sb-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 18px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .sb-brand-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: #fff;
+            padding: 3px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .sb-brand-logo-fallback {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+        .sb-brand-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+        .sb-brand-campus {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.45);
+            margin-top: 3px;
+        }
+        .sb-group-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.38);
+            padding: 0 12px;
+            margin-bottom: 6px;
+        }
+        .sb-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            border-radius: 6px;
+            padding: 9px 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #B9CDBF;
+            text-decoration: none;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .sb-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.85; }
+        .sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+        .sb-item.is-active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .sb-item.is-active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            border-radius: 2px;
+            background: #7BD3A0;
+        }
+        .sb-item.sb-item-danger { color: #E7B4B4; }
+        .sb-item.sb-item-danger:hover { background: rgba(185, 28, 28, 0.22); color: #FCDCDC; }
+
+        /* ---------- Navbar ---------- */
+        .nb {
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+        }
+        .nb-icon-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .nb-icon-btn:hover { background: var(--pine-soft); color: var(--pine); }
+        .nb-icon-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
+        @media (min-width: 1024px) {
+            .mobile-only { display: none !important; }
+        }
+        .nb-crumbs {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+        .nb-crumbs a {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .nb-crumbs a:hover { color: var(--pine); }
+        .nb-crumb-sep { color: var(--line-strong); }
+        .nb-crumb-current { color: var(--ink); font-weight: 700; }
+
+        .nb-search { position: relative; width: 100%; max-width: 380px; }
+        .nb-search-input {
+            width: 100%;
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--font-ui);
+            font-size: 13px;
+            padding: 8px 62px 8px 34px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+        .nb-search-input::placeholder { color: var(--faint); }
+        .nb-search-input:focus {
+            outline: none;
+            background: #fff;
+            border-color: var(--pine);
+            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+        }
+        .nb-search-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            color: var(--faint);
+            pointer-events: none;
+        }
+        .nb-search-kbd {
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--faint);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: #fff;
+            padding: 2px 5px;
+            pointer-events: none;
+        }
+        .nb-search-panel {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            z-index: 60;
+            display: none;
+            padding: 6px;
+        }
+        .nb-search-panel.is-open { display: block; }
+        .nb-search-group {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--faint);
+            padding: 8px 10px 4px;
+        }
+        .nb-search-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            border-radius: 6px;
+            padding: 9px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .nb-search-option svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+        .nb-search-option small {
+            font-weight: 500;
+            font-size: 12px;
+            color: var(--muted);
+            margin-left: auto;
+            white-space: nowrap;
+        }
+        .nb-search-option.is-selected,
+        .nb-search-option:hover { background: var(--pine-soft); color: var(--pine-strong); }
+        .nb-search-option.is-selected svg,
+        .nb-search-option:hover svg { color: var(--pine); }
+        .nb-search-empty {
+            padding: 12px 10px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .nb-user-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            background: transparent;
+            padding: 4px 8px 4px 4px;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+        .nb-user-btn:hover { background: var(--pine-soft); }
+        .nb-user-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
+        .nb-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .nb-avatar-fallback {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--pine);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .nb-badge {
+            position: absolute;
+            top: 7px;
+            right: 8px;
+            min-width: 15px;
+            height: 15px;
+            padding: 0 4px;
+            border-radius: 999px;
+            background: var(--amber);
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 9px;
+            font-weight: 600;
+            line-height: 15px;
+            text-align: center;
+            box-shadow: 0 0 0 2px #fff;
+        }
+
+        .pop-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            text-decoration: none;
+            text-align: left;
+            background: none;
+            border: 0;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background-color 0.15s ease;
+        }
+        .pop-item svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+        .pop-item:hover { background: var(--pine-soft); }
+        .pop-item.pop-item-danger { color: var(--danger); }
+        .pop-item.pop-item-danger svg { color: var(--danger); }
+        .pop-item.pop-item-danger:hover { background: #FDF3F3; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
     @yield('extra-css')
 </head>
-<body class="bg-gray-100 text-gray-900 antialiased" style="font-family: 'Inter', sans-serif;">
+<body class="antialiased">
     @php
         $facultyUser = auth()->user();
         $facultyName = $facultyUser?->name ?? 'Faculty';
@@ -193,336 +556,348 @@
             ? route('staff.settings')
             : null;
 
-        $pageTitle = trim($__env->yieldContent('page-title'));
-        if ($pageTitle === '') {
-            $pageTitle = trim($__env->yieldContent('title')) ?: 'Faculty Portal';
-        }
-
         $unreadPayments = $unreadPayments ?? collect();
         $unreadCount = $unreadCount ?? 0;
     @endphp
 
-    <aside id="faculty-sidebar" class="fixed top-0 left-0 z-40 h-screen w-64 -translate-x-full border-r border-emerald-900/70 bg-[#1a3c2e] transition-transform duration-300 lg:translate-x-0" aria-label="Faculty sidebar" data-drawer-backdrop="true">
-        <div class="h-full overflow-y-auto px-3 py-4">
-            <div class="mb-5 flex items-center justify-end lg:hidden">
-                <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-emerald-200 hover:bg-emerald-800/60 hover:text-white" data-drawer-hide="faculty-sidebar" aria-controls="faculty-sidebar">
+    <aside id="faculty-sidebar" class="sb fixed top-0 left-0 z-40 h-screen w-64 -translate-x-full transition-transform duration-300 lg:translate-x-0" aria-label="Faculty sidebar" data-drawer-backdrop="true">
+        <div class="flex h-full flex-col">
+            <div class="sb-brand">
+                @if($ebaLogoUrl)
+                    <img src="{{ $ebaLogoUrl }}" alt="EBA Logo" class="sb-brand-logo">
+                @else
+                    <div class="sb-brand-logo-fallback">EBA</div>
+                @endif
+                <div class="min-w-0 flex-1">
+                    <p class="sb-brand-name">EBA Information System</p>
+                    <p class="sb-brand-campus">CvSU &middot; TMC Campus</p>
+                </div>
+                <button type="button" class="nb-icon-btn mobile-only" style="color:rgba(255,255,255,0.6);" data-drawer-hide="faculty-sidebar" aria-controls="faculty-sidebar">
                     <span class="sr-only">Close sidebar</span>
-                    <svg class="h-4 w-4" aria-hidden="true" fill="none" viewBox="0 0 14 14">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 12 12M13 1 1 13" />
+                    <svg class="h-3.5 w-3.5" aria-hidden="true" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 12 12M13 1 1 13"/>
                     </svg>
                 </button>
             </div>
 
-            <div class="mb-5 rounded-lg border border-emerald-800/40 bg-emerald-900/30 p-3">
-                <div class="flex items-center gap-3">
-                    @if($ebaLogoUrl)
-                        <img src="{{ $ebaLogoUrl }}" alt="EBA Logo" class="h-10 w-10 rounded-lg border border-emerald-700/60 bg-white/90 p-1 object-contain">
-                    @else
-                        <div class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-emerald-700/60 bg-emerald-700 text-sm font-semibold text-white">EBA</div>
-                    @endif
-                    <div class="min-w-0 flex-1">
-                        <p class="text-sm font-semibold text-white whitespace-normal break-words leading-4">EBA IS</p>
-                        <p class="text-xs text-emerald-300/80 whitespace-normal break-words leading-4 mt-1">CvSU - TMC Campus</p>
-                    </div>
+            <div class="flex-1 overflow-y-auto px-3 py-5">
+                <div class="mb-6">
+                    <h3 class="sb-group-label">Main</h3>
+                    <ul class="space-y-0.5">
+                        <li>
+                            <a href="{{ route('staff.dashboard') }}" class="sb-item {{ request()->routeIs('staff.dashboard') ? 'is-active' : '' }}">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                                </svg>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ $partnershipsRoute }}" class="sb-item {{ request()->routeIs('staff.partnerships') || request()->routeIs('staff.partnerships.*') ? 'is-active' : '' }}">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                <span>Partnerships</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ $concessionairesRoute }}" class="sb-item {{ request()->routeIs('staff.concessionaires') || request()->routeIs('staff.concessionaires.*') ? 'is-active' : '' }}">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span>Concessionaires</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('staff.stocks.index') }}" class="sb-item {{ request()->routeIs('staff.stocks*') ? 'is-active' : '' }}">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5Z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9 4.5 9-4.5"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5 12 21l9-4.5"/>
+                                </svg>
+                                <span>Stocks</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('staff.uniform-checkout') }}" class="sb-item {{ request()->routeIs('staff.uniform-checkout*') ? 'is-active' : '' }}">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+                                </svg>
+                                <span>Uniform Checkout</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('staff.transaction-logs') }}" class="sb-item {{ request()->routeIs('staff.transaction-logs') ? 'is-active' : '' }}">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6a2 2 0 012-2h6m-6 8h6m-6 0H7a2 2 0 01-2-2V7a2 2 0 012-2h6m0 0V3m0 2v2m4 4h2m-2 4h2"/>
+                                </svg>
+                                <span>Transaction Logs</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('staff.history') }}" class="sb-item {{ request()->routeIs('staff.history') ? 'is-active' : '' }}">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                                <span>History</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="sb-group-label">General</h3>
+                    <ul class="space-y-0.5">
+                        @if ($settingsRoute)
+                            <li>
+                                <a href="{{ $settingsRoute }}" class="sb-item {{ request()->routeIs('staff.settings') || request()->routeIs('staff.settings.*') ? 'is-active' : '' }}">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    </svg>
+                                    <span>Settings</span>
+                                </a>
+                            </li>
+                        @endif
+                        <li>
+                            <a href="{{ url('/') }}" class="sb-item">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                                </svg>
+                                <span>Back to Main Site</span>
+                            </a>
+                        </li>
+                    </ul>
                 </div>
             </div>
 
-            <div class="mb-3">
-                <h3 class="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-emerald-400/60">Main</h3>
-                <ul class="space-y-1 font-medium">
-                    <li>
-                        <a href="{{ route('staff.dashboard') }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('staff.dashboard') ? 'bg-emerald-800/80 text-white' : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white' }}">
-                            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
-                            </svg>
-                            <span class="ms-3">Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ $partnershipsRoute }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('staff.partnerships') || request()->routeIs('staff.partnerships.*') ? 'bg-emerald-800/80 text-white' : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white' }}">
-                            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
-                            <span class="ms-3">Partnerships</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ $concessionairesRoute }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('staff.concessionaires') || request()->routeIs('staff.concessionaires.*') ? 'bg-emerald-800/80 text-white' : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white' }}">
-                            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            <span class="ms-3">Concessionaires</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('staff.history') }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('staff.history') ? 'bg-emerald-800/80 text-white' : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white' }}">
-                            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span class="ms-3">History</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('staff.transaction-logs') }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('staff.transaction-logs') ? 'bg-emerald-800/80 text-white' : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white' }}">
-                            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 17v-6a2 2 0 012-2h6m-6 8h6m-6 0H7a2 2 0 01-2-2V7a2 2 0 012-2h6m0 0V3m0 2v2m4 4h2m-2 4h2" />
-                            </svg>
-                            <span class="ms-3">Transaction Logs</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('staff.uniform-checkout') }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('staff.uniform-checkout*') ? 'bg-emerald-800/80 text-white' : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white' }}">
-                            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                            <span class="ms-3">Uniform Checkout</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('staff.stocks.index') }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('staff.stocks*') ? 'bg-emerald-800/80 text-white' : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white' }}">
-                            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5 12 3l9 4.5-9 4.5-9-4.5Z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9 4.5 9-4.5" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5 12 21l9-4.5" />
-                            </svg>
-                            <span class="ms-3">Stocks</span>
-                        </a>
-                    </li>
-                    @if ($settingsRoute)
-                        <li>
-                            <a href="{{ $settingsRoute }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm transition-colors {{ request()->routeIs('staff.settings') || request()->routeIs('staff.settings.*') ? 'bg-emerald-800/80 text-white' : 'text-emerald-100 hover:bg-emerald-800/50 hover:text-white' }}">
-                                <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                <span class="ms-3">Settings</span>
-                            </a>
-                        </li>
-                    @endif
-                </ul>
-            </div>
-
-            <div class="mt-auto">
-                <ul class="space-y-1 font-medium">
-                    <li>
-                        <a href="{{ url('/') }}" class="group flex items-center rounded-lg px-3 py-2.5 text-sm text-emerald-100 transition-colors hover:bg-emerald-800/50 hover:text-white">
-                            <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                            </svg>
-                            <span class="ms-3">Back to Main Site</span>
-                        </a>
-                    </li>
-                    <li>
-                        <form method="POST" action="{{ route('logout') }}">
-                            @csrf
-                            <button type="submit" class="group flex w-full items-center rounded-lg px-3 py-2.5 text-left text-sm text-red-200 transition-colors hover:bg-red-500/20 hover:text-red-100">
-                                <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                </svg>
-                                <span class="ms-3">Logout</span>
-                            </button>
-                        </form>
-                    </li>
-                </ul>
+            <div class="border-t border-white/10 px-3 py-3">
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit" class="sb-item sb-item-danger w-full">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                        <span>Logout</span>
+                    </button>
+                </form>
             </div>
         </div>
     </aside>
 
     <div class="relative min-h-screen lg:ml-64">
-        <nav class="fixed top-0 z-30 w-full border-b border-emerald-100 bg-gradient-to-r from-white via-emerald-50/30 to-white backdrop-blur-sm shadow-md lg:w-[calc(100%-16rem)]">
-            <div class="px-4 py-3.5 lg:px-8">
-                <div class="flex items-center justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <button type="button" class="inline-flex items-center rounded-xl bg-gradient-to-br from-emerald-50 to-white p-2.5 text-emerald-700 shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 lg:hidden" data-drawer-target="faculty-sidebar" data-drawer-toggle="faculty-sidebar" aria-controls="faculty-sidebar">
+        <nav class="nb fixed top-0 z-30 w-full lg:w-[calc(100%-16rem)]">
+            <div class="px-4 py-3 lg:px-8">
+                <div class="flex items-center justify-between gap-3 sm:gap-5">
+                    <div class="flex min-w-0 items-center gap-2 sm:gap-4">
+                        <button type="button" class="nb-icon-btn mobile-only" data-drawer-target="faculty-sidebar" data-drawer-toggle="faculty-sidebar" aria-controls="faculty-sidebar">
                             <span class="sr-only">Open sidebar</span>
                             <svg class="h-5 w-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20">
-                                <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 5A.75.75 0 0 1 2.75 9h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 9.75Zm0 5A.75.75 0 0 1 2.75 14h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z" />
+                                <path clip-rule="evenodd" fill-rule="evenodd" d="M2 4.75A.75.75 0 0 1 2.75 4h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 4.75Zm0 5A.75.75 0 0 1 2.75 9h14.5a.75.75 0 0 1 0 1.5H2.75A.75.75 0 0 1 2 9.75Zm0 5A.75.75 0 0 1 2.75 14h14.5a.75.75 0 0 1 0 1.5H2.75a.75.75 0 0 1-.75-.75Z"/>
                             </svg>
                         </button>
-                        <div class="flex flex-col">
-                            @php
-                                $breadcrumbs = [];
-                                if (request()->routeIs('staff.dashboard')) {
-                                    $breadcrumbs = [
-                                        ['label' => 'Dashboard', 'active' => true]
-                                    ];
-                                } elseif (request()->routeIs('staff.partnerships*')) {
-                                    $breadcrumbs = [
-                                        ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                        ['label' => 'Partnerships', 'active' => true]
-                                    ];
-                                } elseif (request()->routeIs('staff.concessionaires*')) {
-                                    $breadcrumbs = [
-                                        ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                        ['label' => 'Concessionaires', 'active' => true]
-                                    ];
-                                } elseif (request()->routeIs('staff.history*')) {
-                                    $breadcrumbs = [
-                                        ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                        ['label' => 'History', 'active' => true]
-                                    ];
-                                } elseif (request()->routeIs('staff.transaction-logs')) {
-                                    $breadcrumbs = [
-                                        ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                        ['label' => 'Transaction Logs', 'active' => true]
-                                    ];
-                                } elseif (request()->routeIs('staff.uniform-checkout*')) {
-                                    $breadcrumbs = [
-                                        ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                        ['label' => 'Uniform Checkout', 'active' => true]
-                                    ];
-                                } elseif (request()->routeIs('staff.stocks*')) {
-                                    $breadcrumbs = [
-                                        ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                        ['label' => 'Stocks', 'active' => true]
-                                    ];
-                                } elseif (request()->routeIs('staff.settings*')) {
-                                    $breadcrumbs = [
-                                        ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                        ['label' => 'Settings', 'active' => true]
-                                    ];
-                                }
-                            @endphp
-                            @if(count($breadcrumbs) > 0)
-                                <div class="breadcrumb hidden sm:flex" aria-label="Breadcrumb">
-                                    @foreach($breadcrumbs as $index => $crumb)
-                                        @if($index > 0)
-                                            <span class="breadcrumb-separator">/</span>
-                                        @endif
-                                        @if(isset($crumb['active']) && $crumb['active'])
-                                            <span class="breadcrumb-current">{{ $crumb['label'] }}</span>
-                                        @else
-                                            <a href="{{ $crumb['url'] }}">{{ $crumb['label'] }}</a>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            @endif
-                        </div>
+
+                        @php
+                            $breadcrumbs = [];
+                            if (request()->routeIs('staff.dashboard')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'active' => true]
+                                ];
+                            } elseif (request()->routeIs('staff.partnerships*')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
+                                    ['label' => 'Partnerships', 'active' => true]
+                                ];
+                            } elseif (request()->routeIs('staff.concessionaires*')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
+                                    ['label' => 'Concessionaires', 'active' => true]
+                                ];
+                            } elseif (request()->routeIs('staff.stocks*')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
+                                    ['label' => 'Stocks', 'active' => true]
+                                ];
+                            } elseif (request()->routeIs('staff.uniform-checkout*')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
+                                    ['label' => 'Uniform Checkout', 'active' => true]
+                                ];
+                            } elseif (request()->routeIs('staff.transaction-logs')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
+                                    ['label' => 'Transaction Logs', 'active' => true]
+                                ];
+                            } elseif (request()->routeIs('staff.history*')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
+                                    ['label' => 'History', 'active' => true]
+                                ];
+                            } elseif (request()->routeIs('staff.settings*')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
+                                    ['label' => 'Settings', 'active' => true]
+                                ];
+                            }
+                        @endphp
+                        @if(count($breadcrumbs) > 0)
+                            <div class="nb-crumbs hidden md:flex" aria-label="Breadcrumb">
+                                @foreach($breadcrumbs as $index => $crumb)
+                                    @if($index > 0)
+                                        <span class="nb-crumb-sep">/</span>
+                                    @endif
+                                    @if(isset($crumb['active']) && $crumb['active'])
+                                        <span class="nb-crumb-current">{{ $crumb['label'] }}</span>
+                                    @else
+                                        <a href="{{ $crumb['url'] }}">{{ $crumb['label'] }}</a>
+                                    @endif
+                                @endforeach
+                            </div>
+                        @endif
                     </div>
 
-                    <div class="flex items-center gap-3 sm:gap-4">
-                        <button id="payment-notification-button" type="button" class="group relative inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-orange-50 to-amber-50 text-orange-600 shadow-sm transition-all hover:shadow-md hover:scale-105 focus:outline-none focus:ring-2 focus:ring-orange-500" title="Notifications" data-dropdown-toggle="payment-notification-dropdown" data-dropdown-placement="bottom-end" data-unread-count="{{ $unreadCount }}">
-                            <svg class="h-7 w-7 transition-transform group-hover:rotate-12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <div class="nb-search hidden sm:block">
+                        <svg class="nb-search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <input
+                            id="portal-search-input"
+                            class="nb-search-input"
+                            type="search"
+                            placeholder="Search pages&hellip;"
+                            autocomplete="off"
+                            role="combobox"
+                            aria-expanded="false"
+                            aria-controls="portal-search-panel"
+                        >
+                        <kbd class="nb-search-kbd">Ctrl K</kbd>
+                        <div id="portal-search-panel" class="nb-search-panel pop" role="listbox"></div>
+                    </div>
+
+                    <div class="flex items-center gap-1.5 sm:gap-2.5">
+                        <button id="payment-notification-button" type="button" class="nb-icon-btn" title="Notifications" data-dropdown-toggle="payment-notification-dropdown" data-dropdown-placement="bottom-end" data-unread-count="{{ $unreadCount }}">
+                            <svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.437L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                             </svg>
-
                             @if($unreadCount > 0)
-                                <span id="payment-notification-badge" class="absolute -right-0.5 -top-0.5 flex h-5 w-5">
-                                    <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-orange-400 opacity-75"></span>
-                                    <span class="relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-gradient-to-br from-orange-500 to-red-500 text-[9px] font-bold text-white shadow-lg ring-2 ring-white">{{ $unreadCount }}</span>
-                                </span>
+                                <span id="payment-notification-badge" class="nb-badge">{{ $unreadCount > 9 ? '9+' : $unreadCount }}</span>
                             @endif
                         </button>
 
-                        <div id="payment-notification-dropdown" class="z-50 hidden w-[320px] divide-y divide-emerald-100 rounded-2xl bg-white shadow-xl border border-emerald-100" role="menu" aria-labelledby="payment-notification-button">
-                            <div class="bg-gradient-to-br from-emerald-50 to-white px-5 py-3 rounded-t-2xl border-b border-emerald-100">
-                                <span class="text-sm font-bold text-emerald-900">Notifications</span>
+                        <div id="payment-notification-dropdown" class="pop z-50 hidden w-[320px]" role="menu" aria-labelledby="payment-notification-button">
+                            <div class="border-b px-4 py-3" style="border-color: var(--line);">
+                                <span class="panel-title" style="font-size: 13.5px;">Notifications</span>
                             </div>
-                            <div class="p-4">
+                            <div class="max-h-[300px] overflow-y-auto p-2">
                                 @if($unreadCount > 0)
                                     @foreach($unreadPayments as $payment)
-                                        <a href="{{ route('staff.transaction-logs') }}" class="flex items-start gap-4 p-2 rounded-xl transition-colors hover:bg-emerald-50">
-                                            <div class="rounded-full bg-emerald-100 p-2 text-emerald-600 shrink-0">
-                                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                        <a href="{{ route('staff.transaction-logs') }}" class="flex items-start gap-3 rounded-md p-2.5 transition-colors" style="text-decoration:none;" onmouseover="this.style.background='var(--pine-soft)'" onmouseout="this.style.background='transparent'">
+                                            <span class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md" style="background:#F0F7F2;color:var(--pine);">
+                                                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                                                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
                                                 </svg>
-                                            </div>
-                                            <div>
-                                                <p class="text-sm font-bold text-emerald-700">Payment Recorded</p>
-                                                <p class="mt-1 text-xs text-emerald-600/80 font-medium leading-tight">
-                                                    {{ $payment->concessionaire?->business_name ?: ($payment->concessionaire?->name ?: 'Concessionaire') }} paid ₱{{ number_format((float) $payment->amount, 2) }}
-                                                </p>
-                                            </div>
+                                            </span>
+                                            <span>
+                                                <span class="block text-[13px] font-bold" style="color:#14532D;">Payment recorded</span>
+                                                <span class="mt-0.5 block text-xs leading-snug" style="color:var(--muted);">
+                                                    {{ $payment->concessionaire?->business_name ?: ($payment->concessionaire?->name ?: 'Concessionaire') }} paid &#8369;{{ number_format((float) $payment->amount, 2) }}
+                                                </span>
+                                            </span>
                                         </a>
                                     @endforeach
                                 @else
-                                    <div class="flex items-start gap-4 p-2">
-                                        <div class="rounded-full bg-gray-100 p-2 text-gray-500 shrink-0">
-                                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <div class="flex items-start gap-3 p-2.5">
+                                        <span class="mt-0.5 inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md" style="background:var(--paper);color:var(--muted);">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                             </svg>
-                                        </div>
-                                        <div>
-                                            <p class="text-sm font-bold text-gray-700">No New Payments</p>
-                                            <p class="mt-1 text-xs text-gray-500 font-medium leading-tight">
+                                        </span>
+                                        <span>
+                                            <span class="block text-[13px] font-bold" style="color:var(--ink);">No new payments</span>
+                                            <span class="mt-0.5 block text-xs leading-snug" style="color:var(--muted);">
                                                 You're all caught up
-                                            </p>
-                                        </div>
+                                            </span>
+                                        </span>
                                     </div>
                                 @endif
                             </div>
-                            <div class="p-2 bg-gray-50/50 rounded-b-2xl">
-                                <a href="{{ route('staff.transaction-logs') }}" class="block w-full rounded-xl px-4 py-2.5 text-center text-sm font-bold text-emerald-700 hover:bg-emerald-100/50 transition-colors">
-                                    View Transaction Logs &rarr;
+                            <div class="border-t p-2" style="border-color: var(--line);">
+                                <a href="{{ route('staff.transaction-logs') }}" class="pop-item" style="justify-content:center;border-radius:6px;color:var(--pine);">
+                                    View transaction logs
                                 </a>
                             </div>
                         </div>
 
-                        <div class="h-8 w-px bg-gradient-to-b from-transparent via-emerald-200 to-transparent hidden sm:block"></div>
+                        <div class="hidden h-6 w-px sm:block" style="background: var(--line);"></div>
 
-                        <button id="faculty-user-menu-button" type="button" class="group inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-br from-emerald-50 to-white px-3 py-2 shadow-sm transition-all hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1" data-dropdown-toggle="faculty-user-menu" data-dropdown-placement="bottom-end" aria-expanded="false">
+                        <button id="faculty-user-menu-button" type="button" class="nb-user-btn" data-dropdown-toggle="faculty-user-menu" data-dropdown-placement="bottom-end" aria-expanded="false">
                             @if($facultyAvatarUrl)
-                                <img src="{{ $facultyAvatarUrl }}" alt="{{ $facultyName }}" class="h-9 w-9 rounded-full border-2 border-emerald-600 object-cover shadow-sm ring-2 ring-emerald-100">
+                                <img src="{{ $facultyAvatarUrl }}" alt="{{ $facultyName }}" class="nb-avatar">
                             @else
-                                <span class="inline-flex h-9 w-9 items-center justify-center rounded-full border-2 border-emerald-600 bg-gradient-to-br from-emerald-700 to-emerald-900 text-sm font-bold text-white shadow-sm ring-2 ring-emerald-100">{{ $facultyInitial }}</span>
+                                <span class="nb-avatar-fallback">{{ $facultyInitial }}</span>
                             @endif
-                            <div class="hidden sm:flex sm:flex-col sm:items-start">
-                                <span class="max-w-[120px] truncate text-sm font-bold text-emerald-900">{{ $facultyName }}</span>
-                                <span class="text-xs font-medium text-emerald-600/70">Faculty</span>
-                            </div>
-                            <svg class="hidden h-4 w-4 text-emerald-600 transition-transform group-hover:translate-y-0.5 sm:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            <span class="hidden lg:flex lg:flex-col lg:items-start">
+                                <span class="max-w-[130px] truncate text-[13px] font-bold" style="color:var(--ink);">{{ $facultyName }}</span>
+                                <span class="eyebrow" style="font-size:9.5px;">Faculty</span>
+                            </span>
+                            <svg class="hidden h-3.5 w-3.5 lg:block" style="color:var(--muted);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
                             </svg>
                         </button>
 
-                        <div id="faculty-user-menu" class="z-50 hidden w-56 divide-y divide-emerald-100 rounded-xl border border-emerald-100 bg-white shadow-xl" role="menu" aria-labelledby="faculty-user-menu-button">
-                            <div class="px-4 py-3">
-                                <p class="truncate text-sm font-semibold text-emerald-900">{{ $facultyName }}</p>
-                                <p class="truncate text-xs text-emerald-600/80">{{ $facultyEmail }}</p>
+                        <div id="faculty-user-menu" class="pop z-50 hidden w-64" role="menu" aria-labelledby="faculty-user-menu-button">
+                            <div class="border-b px-4 py-3.5" style="border-color: var(--line);">
+                                <div class="flex items-center gap-3">
+                                    @if($facultyAvatarUrl)
+                                        <img src="{{ $facultyAvatarUrl }}" alt="{{ $facultyName }}" class="nb-avatar" style="width:38px;height:38px;">
+                                    @else
+                                        <span class="nb-avatar-fallback" style="width:38px;height:38px;font-size:15px;">{{ $facultyInitial }}</span>
+                                    @endif
+                                    <div class="min-w-0 flex-1">
+                                        <div class="truncate text-[13px] font-bold" style="color:var(--ink);">{{ $facultyName }}</div>
+                                        <div class="truncate text-xs" style="color:var(--muted);">{{ $facultyEmail }}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <ul class="py-1 text-sm text-gray-700" aria-labelledby="faculty-user-menu-button">
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="flex w-full items-center gap-3 px-4 py-2.5 text-left text-red-600 transition-colors hover:bg-red-50" role="menuitem">
-                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                                            </svg>
-                                            <span class="font-semibold">Logout</span>
-                                        </button>
-                                    </form>
-                                </li>
-                            </ul>
+                            <div class="py-1.5">
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit" class="pop-item pop-item-danger">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                        </svg>
+                                        <span>Logout</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <main class="px-4 pb-6 pt-20 lg:px-6 lg:pt-24">
-            <div>
-                @php
-                    $suppressSuccessAlert = trim($__env->yieldContent('suppress-success-alert')) === '1';
-                @endphp
+        <main class="mx-auto w-full max-w-[1320px] px-4 pb-10 pt-[76px] lg:px-8 lg:pt-[84px]">
+            @php
+                $suppressSuccessAlert = trim($__env->yieldContent('suppress-success-alert')) === '1';
+            @endphp
 
-                @if (session('success') && ! $suppressSuccessAlert)
-                    <div class="alert alert-success">{{ session('success') }}</div>
-                @endif
+            @if (session('success') && ! $suppressSuccessAlert)
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
 
-                @if (session('error'))
-                    <div class="alert alert-error">{{ session('error') }}</div>
-                @endif
+            @if (session('error'))
+                <div class="alert alert-error">{{ session('error') }}</div>
+            @endif
 
-                @if ($errors->any())
-                    <div class="alert alert-error">
-                        @foreach ($errors->all() as $error)
-                            <div>{{ $error }}</div>
-                        @endforeach
-                    </div>
-                @endif
+            @if ($errors->any())
+                <div class="alert alert-error">
+                    @foreach ($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            @endif
 
-                @yield('content')
-            </div>
+            @yield('content')
         </main>
     </div>
 
@@ -569,6 +944,115 @@
                 });
             });
         });
+
+        (() => {
+            const input = document.getElementById('portal-search-input');
+            const panel = document.getElementById('portal-search-panel');
+            if (!input || !panel) return;
+
+            const pages = [
+                { label: 'Dashboard', hint: 'Page', url: @json(route('staff.dashboard')), keywords: 'home overview stats charts applications summary' },
+                { label: 'Partnerships', hint: 'Page', url: @json($partnershipsRoute), keywords: 'applications review approve reject recommend loi documents wizard' },
+                { label: 'Concessionaires', hint: 'Page', url: @json($concessionairesRoute), keywords: 'vendors stores business monthly fee edit contract' },
+                { label: 'Stocks', hint: 'Page', url: @json(route('staff.stocks.index')), keywords: 'uniform inventory sizes quantity add stock items' },
+                { label: 'Uniform Checkout', hint: 'Page', url: @json(route('staff.uniform-checkout')), keywords: 'sell pos sale student purchase cart' },
+                { label: 'Transaction Logs', hint: 'Page', url: @json(route('staff.transaction-logs')), keywords: 'payments sales records receipts logs' },
+                { label: 'History', hint: 'Page', url: @json(route('staff.history')), keywords: 'past archive previous contracts records' },
+            ];
+
+            const pageIcon = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 7l5 5-5 5"/></svg>';
+
+            let options = [];
+            let selectedIndex = -1;
+
+            const escapeHtml = (value) => value.replace(/[&<>"']/g, (ch) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[ch]));
+
+            const closePanel = () => {
+                panel.classList.remove('is-open');
+                input.setAttribute('aria-expanded', 'false');
+                selectedIndex = -1;
+            };
+
+            const render = () => {
+                const query = input.value.trim().toLowerCase();
+                const matches = query === ''
+                    ? pages
+                    : pages.filter((page) =>
+                        page.label.toLowerCase().includes(query) || page.keywords.includes(query));
+
+                options = matches.map((page) => ({ url: page.url, label: page.label, hint: page.hint }));
+
+                if (!options.length) {
+                    panel.innerHTML = '<div class="nb-search-empty">No pages match that search.</div>';
+                } else {
+                    panel.innerHTML = '<div class="nb-search-group">Go to</div>' + options.map((option, index) =>
+                        '<a class="nb-search-option" role="option" data-index="' + index + '" href="' + escapeHtml(option.url) + '">'
+                        + pageIcon
+                        + '<span>' + escapeHtml(option.label) + '</span>'
+                        + '<small>' + escapeHtml(option.hint) + '</small>'
+                        + '</a>'
+                    ).join('');
+                }
+
+                selectedIndex = -1;
+                panel.classList.add('is-open');
+                input.setAttribute('aria-expanded', 'true');
+            };
+
+            const highlight = () => {
+                panel.querySelectorAll('.nb-search-option').forEach((el, index) => {
+                    el.classList.toggle('is-selected', index === selectedIndex);
+                });
+            };
+
+            input.addEventListener('input', render);
+            input.addEventListener('focus', render);
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closePanel();
+                    input.blur();
+                    return;
+                }
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    if (!panel.classList.contains('is-open')) render();
+                    if (!options.length) return;
+                    const step = event.key === 'ArrowDown' ? 1 : -1;
+                    selectedIndex = (selectedIndex + step + options.length) % options.length;
+                    highlight();
+                    return;
+                }
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    if (selectedIndex >= 0 && options[selectedIndex]) {
+                        window.location.href = options[selectedIndex].url;
+                    } else if (options.length) {
+                        window.location.href = options[0].url;
+                    }
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!panel.contains(event.target) && event.target !== input) {
+                    closePanel();
+                }
+            });
+
+            document.addEventListener('keydown', (event) => {
+                const tag = document.activeElement ? document.activeElement.tagName : '';
+                const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+                if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+                    event.preventDefault();
+                    input.focus();
+                } else if (event.key === '/' && !typing) {
+                    event.preventDefault();
+                    input.focus();
+                }
+            });
+        })();
     </script>
 
     @livewireScripts

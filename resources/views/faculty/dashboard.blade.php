@@ -8,157 +8,182 @@
         display: flex;
         flex-direction: column;
         gap: 20px;
-        background: linear-gradient(to bottom, #f8fdf9 0%, #f0f9f4 100%);
-        min-height: calc(100vh - 80px);
-        padding: 8px;
-        margin: -8px;
-    }
-    .stats-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 24px;
-        margin-bottom: 24px;
-    }
-    .stat-panel {
-        background: linear-gradient(135deg, #ffffff 0%, #fafffe 50%, #f4fcf7 100%);
-        border: 1px solid #d4e8dc;
-        border-radius: 24px;
-        padding: 28px;
-        box-shadow: 0 4px 12px rgba(6, 68, 32, 0.06), 0 12px 32px rgba(6, 68, 32, 0.08);
-        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-    }
-    .stat-panel::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 4px;
-        background: linear-gradient(90deg, #0A5C2F 0%, #1a8f50 50%, #0ea555 100%);
-        transform: scaleX(0);
-        transform-origin: left;
-        transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .stat-panel:hover {
-        transform: translateY(-6px) scale(1.02);
-        box-shadow: 0 12px 32px rgba(6, 68, 32, 0.12), 0 4px 16px rgba(6, 68, 32, 0.08);
-        border-color: #b8d8c5;
-    }
-    .stat-panel:hover::before {
-        transform: scaleX(1);
-    }
-    .stat-panel-header {
-        display: flex;
-        align-items: flex-start;
-        justify-content: flex-end;
-        margin-bottom: 16px;
-    }
-    .stat-trend-indicator {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 10px;
-        border-radius: 12px;
-        font-size: 11px;
-        font-weight: 700;
-        line-height: 1;
-        transition: all 0.3s ease;
-    }
-    .stat-trend-indicator.positive {
-        background: rgba(16, 185, 129, 0.12);
-        color: #059669;
-        border: 1px solid rgba(16, 185, 129, 0.2);
-    }
-    .stat-trend-indicator.neutral {
-        background: rgba(107, 114, 128, 0.1);
-        color: #6b7280;
-        border: 1px solid rgba(107, 114, 128, 0.2);
-    }
-    .stat-trend-indicator.negative {
-        background: rgba(239, 68, 68, 0.12);
-        color: #dc2626;
-        border: 1px solid rgba(239, 68, 68, 0.2);
-    }
-    .stat-panel-label {
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: #64748b;
-        font-weight: 700;
-        margin-bottom: 12px;
-    }
-    .stat-panel-value {
-        font-size: 38px;
-        line-height: 1;
-        font-weight: 800;
-        color: #0A5C2F;
-        margin-bottom: 10px;
-        letter-spacing: -0.03em;
-    }
-    .stat-panel-help {
-        font-size: 12px;
-        color: #64748b;
-        font-weight: 500;
-        margin-bottom: 12px;
-    }
-    .stat-sparkline {
-        height: 32px;
-        margin-top: 8px;
-        position: relative;
-    }
-    .stat-sparkline canvas {
-        width: 100%;
-        height: 100%;
-    }
-    .dashboard-charts-row {
-        display: grid;
-        grid-template-columns: 50% 50%;
-        gap: 24px;
-        margin-bottom: 24px;
-        align-items: stretch;
-    }
-    .section-card {
-        background: linear-gradient(to bottom, #ffffff 0%, #fafffe 100%);
-        border: 1px solid #d4e8dc;
-        border-radius: 20px;
-        padding: 24px;
-        box-shadow: 0 4px 12px rgba(6, 68, 32, 0.06), 0 12px 32px rgba(6, 68, 32, 0.08);
-        transition: all 0.3s ease;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-    }
-    .section-card:hover {
-        box-shadow: 0 8px 20px rgba(6, 68, 32, 0.08), 0 16px 40px rgba(6, 68, 32, 0.1);
-        border-color: #c0dcc8;
-    }
-    .section-card-title {
-        font-size: 18px;
-        font-weight: 800;
-        color: #0A5C2F;
-        margin-bottom: 6px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .section-card-title::before {
-        content: '';
-        width: 4px;
-        height: 20px;
-        background: linear-gradient(to bottom, #0A5C2F, #1a8f50);
-        border-radius: 4px;
-    }
-    .section-card-subtitle {
-        font-size: 13px;
-        color: #64748b;
-        margin-bottom: 18px;
-        font-weight: 500;
     }
 
-    @media (max-width: 992px) {
+    /* ---------- Page head ---------- */
+    .page-head {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 2px;
+    }
+    .page-head .page-title {
+        margin: 4px 0 0;
+        font-size: 21px;
+        line-height: 1.15;
+    }
+    .page-date {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        color: var(--muted);
+        white-space: nowrap;
+        padding-bottom: 3px;
+    }
+
+    /* ---------- Stat cards ---------- */
+    .dstat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+    }
+    .dstat-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: var(--shadow-card);
+        min-width: 0;
+    }
+    .dstat-label {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+    .dstat-value {
+        font-family: var(--font-mono);
+        font-size: 30px;
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+    }
+    .dstat-foot {
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--muted);
+    }
+
+    /* ---------- Chart panels ---------- */
+    .dashboard-charts-row {
+        display: grid;
+        grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        gap: 20px;
+        align-items: start;
+    }
+    .chart-panel {
+        padding: 20px 22px;
+        border-radius: 14px;
+        min-width: 0;
+    }
+    .chart-panel-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        transition: margin-bottom 0.3s ease;
+    }
+    .chart-panel.is-collapsed .chart-panel-head {
+        margin-bottom: 0;
+    }
+    .chart-menu-wrap {
+        position: relative;
+        flex-shrink: 0;
+    }
+    .chart-menu-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .chart-menu-btn:hover,
+    .chart-menu-btn[aria-expanded="true"] {
+        background: var(--pine-soft);
+        color: var(--ink);
+    }
+    .chart-menu-btn:focus-visible {
+        outline: 2px solid rgba(10, 92, 47, 0.45);
+        outline-offset: 2px;
+    }
+    .chart-menu {
+        position: absolute;
+        right: 0;
+        top: 36px;
+        min-width: 176px;
+        z-index: 40;
+        padding: 5px;
+    }
+    .chart-menu[hidden] {
+        display: none;
+    }
+    .chart-menu-item {
+        display: block;
+        width: 100%;
+        border: 0;
+        border-radius: 6px;
+        background: none;
+        padding: 8px 11px;
+        font-family: var(--font-ui);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.12s ease;
+    }
+    .chart-menu-item:hover {
+        background: var(--pine-soft);
+    }
+    .chart-menu-divider {
+        height: 1px;
+        margin: 5px 4px;
+        background: var(--line);
+    }
+    .chart-body {
+        display: grid;
+        grid-template-rows: 1fr;
+        transition: grid-template-rows 0.3s ease;
+    }
+    .chart-body-inner {
+        overflow: hidden;
+        min-height: 0;
+        opacity: 1;
+        transition: opacity 0.25s ease;
+    }
+    .chart-panel.is-collapsed .chart-body {
+        grid-template-rows: 0fr;
+    }
+    .chart-panel.is-collapsed .chart-body-inner {
+        opacity: 0;
+    }
+
+    @media (max-width: 1100px) {
+        .dstat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
         .dashboard-charts-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 640px) {
+        .dstat-grid {
             grid-template-columns: 1fr;
         }
     }
@@ -166,84 +191,80 @@
 @endsection
 
 @section('content')
+    @php
+        $facultyFirstName = \Illuminate\Support\Str::of(auth()->user()?->name ?? 'Faculty')->before(' ');
+    @endphp
+
     <div class="dashboard-page">
-        <div class="stats-row">
-            <div class="stat-panel" data-stat="apps">
-                <div class="stat-panel-header">
-                    <div class="stat-trend-indicator positive">
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                            <path d="M6 2L9 8L3 8L6 2Z" fill="currentColor"/>
-                        </svg>
-                        <span>Active</span>
-                    </div>
-                </div>
-                <div class="stat-panel-label">Total Applications</div>
-                <div class="stat-panel-value" data-target="{{ $totalApplications }}">0</div>
-                <div class="stat-panel-help">All submitted partnership records</div>
-                <div class="stat-sparkline">
-                    <canvas id="sparkline-apps" data-values="{{ max(0, $totalApplications - 5) }},{{ max(0, $totalApplications - 3) }},{{ max(0, $totalApplications - 1) }},{{ $totalApplications }}"></canvas>
-                </div>
+        <div class="page-head">
+            <div>
+                <span class="eyebrow">Faculty overview</span>
+                <h1 class="page-title">Welcome back, {{ $facultyFirstName }}</h1>
             </div>
-            
-            <div class="stat-panel" data-stat="pending">
-                <div class="stat-panel-header">
-                    <div class="stat-trend-indicator neutral">
-                        <span>Awaiting</span>
-                    </div>
-                </div>
-                <div class="stat-panel-label">Pending Review</div>
-                <div class="stat-panel-value" data-target="{{ $pendingCount }}">0</div>
-                <div class="stat-panel-help">Needs faculty/admin action</div>
-                <div class="stat-sparkline">
-                    <canvas id="sparkline-pending" data-values="{{ max(0, $pendingCount + 5) }},{{ max(0, $pendingCount + 2) }},{{ max(0, $pendingCount + 1) }},{{ $pendingCount }}"></canvas>
-                </div>
-            </div>
-
-            <div class="stat-panel" data-stat="approved">
-                <div class="stat-panel-header">
-                    <div class="stat-trend-indicator positive">
-                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                            <path d="M6 2L9 8L3 8L6 2Z" fill="currentColor"/>
-                        </svg>
-                        <span>{{ $totalConcessionaires }} Active</span>
-                    </div>
-                </div>
-                <div class="stat-panel-label">Approved</div>
-                <div class="stat-panel-value" data-target="{{ $approvedCount }}">0</div>
-                <div class="stat-panel-help">Partnerships marked approved</div>
-                <div class="stat-sparkline">
-                    <canvas id="sparkline-approved" data-values="{{ max(0, $approvedCount - 3) }},{{ max(0, $approvedCount - 1) }},{{ $approvedCount }}"></canvas>
-                </div>
-            </div>
-
-            <div class="stat-panel" data-stat="reviewed">
-                <div class="stat-panel-header">
-                    <div class="stat-trend-indicator positive">
-                        <span>By You</span>
-                    </div>
-                </div>
-                <div class="stat-panel-label">Reviewed by Me</div>
-                <div class="stat-panel-value" data-target="{{ $reviewedByMe }}">0</div>
-                <div class="stat-panel-help">Recommendations submitted by you</div>
-                <div class="stat-sparkline">
-                    <canvas id="sparkline-reviewed" data-values="{{ max(0, $reviewedByMe - 2) }},{{ max(0, $reviewedByMe - 1) }},{{ $reviewedByMe }}"></canvas>
-                </div>
-            </div>
+            <span class="page-date">{{ now()->format('l, F d, Y') }}</span>
         </div>
 
+        <section class="dstat-grid" aria-label="Partnership statistics">
+            <article class="dstat-card">
+                <span class="dstat-label">Total applications</span>
+                <span class="dstat-value" data-count-to="{{ $totalApplications }}">0</span>
+                <span class="dstat-foot">All partnership records on file</span>
+            </article>
+
+            <article class="dstat-card">
+                <span class="dstat-label">Pending review</span>
+                <span class="dstat-value" data-count-to="{{ $pendingCount }}">0</span>
+                <span class="dstat-foot">Awaiting faculty or admin action</span>
+            </article>
+
+            <article class="dstat-card">
+                <span class="dstat-label">Approved</span>
+                <span class="dstat-value" data-count-to="{{ $approvedCount }}">0</span>
+                <span class="dstat-foot">{{ number_format($totalConcessionaires) }} active {{ \Illuminate\Support\Str::plural('concessionaire', $totalConcessionaires) }}</span>
+            </article>
+
+            <article class="dstat-card">
+                <span class="dstat-label">Reviewed by me</span>
+                <span class="dstat-value" data-count-to="{{ $reviewedByMe }}">0</span>
+                <span class="dstat-foot">Recommendations you submitted</span>
+            </article>
+        </section>
+
         <div class="dashboard-charts-row">
-            <!-- Chart 3 -->
-            <div class="section-card">
-                <h4 class="section-card-title card-title mb-1">Applications Per Month</h4>
-                <p class="section-card-subtitle text-sm text-gray-500 mb-4">Total submitted in the last 6 months</p>
-                <div id="chart3_spline_area" class="apex-charts" dir="ltr" style="flex:1;min-height:280px;width:100%;" data-labels='@json($appMonthLabels)' data-values='@json($appMonthData)'></div>
+            <div class="panel chart-panel" id="panel_monthly">
+                <div class="chart-panel-head">
+                    <div>
+                        <h2 class="panel-title">Applications per month</h2>
+                        <p class="panel-sub">Submissions over the last 6 months.</p>
+                    </div>
+                    <div class="chart-menu-wrap">
+                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Applications per month options">&#8943;</button>
+                        <div class="chart-menu pop" data-menu hidden></div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-body-inner">
+                        <div id="chart_monthly_applications"></div>
+                    </div>
+                </div>
             </div>
 
-            <!-- Chart 4 -->
-            <div class="section-card">
-                <h4 class="section-card-title card-title mb-1">Application Status Distribution</h4>
-                <p class="section-card-subtitle text-sm text-gray-500 mb-4">Current count per application status</p>
-                <div id="chart4_column" class="apex-charts" dir="ltr" style="flex:1;min-height:280px;width:100%;" data-labels='@json($statusLabelsFormatted)' data-values='@json($statusData)'></div>
+            <div class="panel chart-panel" id="panel_status">
+                <div class="chart-panel-head">
+                    <div>
+                        <h2 class="panel-title">Status distribution</h2>
+                        <p class="panel-sub">Applications by current status.</p>
+                    </div>
+                    <div class="chart-menu-wrap">
+                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Status distribution options">&#8943;</button>
+                        <div class="chart-menu pop" data-menu hidden></div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-body-inner">
+                        <div id="chart_status_distribution"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -252,173 +273,313 @@
 @section('scripts')
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
-    // Animated Number Counter
-    function animateValue(element, start, end, duration, decimals = 0, prefix = '') {
-        const range = end - start;
-        const increment = range / (duration / 16);
-        let current = start;
-        
-        const timer = setInterval(() => {
-            current += increment;
-            if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
-                current = end;
-                clearInterval(timer);
-            }
-            
-            let displayValue = current.toFixed(decimals);
-            if (decimals > 0) {
-                displayValue = Number(current).toFixed(decimals);
-            } else {
-                displayValue = Math.floor(current);
-            }
-            
-            element.textContent = prefix + displayValue;
-        }, 16);
-    }
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    // Draw Sparkline Chart
-    function drawSparkline(canvas, values, color = '#0A5C2F') {
-        const ctx = canvas.getContext('2d');
-        const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
-        
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
-        ctx.scale(dpr, dpr);
-        
-        const width = rect.width;
-        const height = rect.height;
-        const padding = 4;
-        const chartWidth = width - padding * 2;
-        const chartHeight = height - padding * 2;
-        
-        const max = Math.max(...values, 1);
-        const min = Math.min(...values, 0);
-        const range = max - min || 1;
-        
-        const points = values.map((val, i) => {
-            const x = padding + (i / (values.length - 1)) * chartWidth;
-            const y = padding + chartHeight - ((val - min) / range) * chartHeight;
-            return { x, y };
-        });
-        
-        // Draw gradient fill
-        const gradient = ctx.createLinearGradient(0, 0, 0, height);
-        gradient.addColorStop(0, color + '40');
-        gradient.addColorStop(1, color + '08');
-        
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, height - padding);
-        points.forEach((point, i) => {
-            if (i === 0) {
-                ctx.lineTo(point.x, point.y);
-            } else {
-                const prev = points[i - 1];
-                const cpx = (prev.x + point.x) / 2;
-                ctx.quadraticCurveTo(prev.x, prev.y, cpx, (prev.y + point.y) / 2);
-                ctx.quadraticCurveTo(cpx, (prev.y + point.y) / 2, point.x, point.y);
-            }
-        });
-        ctx.lineTo(points[points.length - 1].x, height - padding);
-        ctx.closePath();
-        ctx.fillStyle = gradient;
-        ctx.fill();
-        
-        // Draw line
-        ctx.beginPath();
-        points.forEach((point, i) => {
-            if (i === 0) {
-                ctx.moveTo(point.x, point.y);
-            } else {
-                const prev = points[i - 1];
-                const cpx = (prev.x + point.x) / 2;
-                ctx.quadraticCurveTo(prev.x, prev.y, cpx, (prev.y + point.y) / 2);
-                ctx.quadraticCurveTo(cpx, (prev.y + point.y) / 2, point.x, point.y);
-            }
-        });
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 2;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.stroke();
-        
-        // Draw end point
-        const lastPoint = points[points.length - 1];
-        ctx.beginPath();
-        ctx.arc(lastPoint.x, lastPoint.y, 3, 0, Math.PI * 2);
-        ctx.fillStyle = color;
-        ctx.fill();
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.stroke();
-    }
+    // ---------- Stat counters ----------
+    document.querySelectorAll('.dstat-value[data-count-to]').forEach(function (element) {
+        const target = parseFloat(element.getAttribute('data-count-to')) || 0;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Initialize Counters
-        document.querySelectorAll('.stat-panel-value[data-target]').forEach(element => {
-            const target = parseFloat(element.getAttribute('data-target'));
-            animateValue(element, 0, target, 1200, 0);
-        });
-        
-        // Initialize Sparklines
-        const sparkconfigs = [
-            { id: 'sparkline-apps', color: '#16a34a' },
-            { id: 'sparkline-pending', color: '#f59e0b' },
-            { id: 'sparkline-approved', color: '#10b981' },
-            { id: 'sparkline-reviewed', color: '#3b82f6' }
-        ];
-        
-        sparkconfigs.forEach(config => {
-            const canvas = document.getElementById(config.id);
-            if (canvas) {
-                const values = canvas.getAttribute('data-values').split(',').map(v => parseFloat(v));
-                drawSparkline(canvas, values, config.color);
-            }
-        });
+        const formatValue = function (value) {
+            return Math.round(value).toLocaleString('en-US');
+        };
 
-        // Chart 3 — Spline Area
-        const chart3Element = document.querySelector("#chart3_spline_area");
-        if (chart3Element && typeof ApexCharts !== 'undefined') {
-            const appMonthLabels = JSON.parse(chart3Element.dataset.labels || '[]');
-            const appMonthData = JSON.parse(chart3Element.dataset.values || '[]');
-
-            var options3 = {
-                chart: { height: 350, type: "area", toolbar: { show: false } },
-                dataLabels: { enabled: false },
-                stroke: { curve: "smooth", width: 3 },
-                series: [
-                    { name: "Applications", data: appMonthData }
-                ],
-                colors: ["#34c38f"],
-                xaxis: { categories: appMonthLabels },
-                grid: { borderColor: "#f1f1f1" }
-            };
-            new ApexCharts(chart3Element, options3).render();
+        if (prefersReducedMotion || target === 0) {
+            element.textContent = formatValue(target);
+            return;
         }
 
-        // Chart 4 — Column Bar
-        const chart4Element = document.querySelector("#chart4_column");
-        if (chart4Element && typeof ApexCharts !== 'undefined') {
-            const statusLabelsFormatted = JSON.parse(chart4Element.dataset.labels || '[]');
-            const statusData = JSON.parse(chart4Element.dataset.values || '[]');
+        const duration = 900;
+        const start = performance.now();
+        const tick = function (now) {
+            const progress = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            element.textContent = formatValue(target * eased);
+            if (progress < 1) {
+                requestAnimationFrame(tick);
+            }
+        };
+        requestAnimationFrame(tick);
+    });
 
-            var options4 = {
-                chart: { height: 350, type: "bar", toolbar: { show: false } },
-                plotOptions: { bar: { horizontal: false, columnWidth: "40%", borderRadius: 4 } },
-                dataLabels: { enabled: false },
-                series: [
-                    { name: "Applications", data: statusData }
-                ],
-                colors: ["#f6c23e", "#556ee6", "#34c38f", "#f46a6a", "#74a0fa"],
-                xaxis: { categories: statusLabelsFormatted },
-                grid: { borderColor: "#f1f1f1" },
-                tooltip: {
-                    y: { formatter: function(val) { return val + " application(s)"; } }
-                }
-            };
-            new ApexCharts(chart4Element, options4).render();
+    // ---------- Chart panel menus: collapse + downloads ----------
+    function downloadCSV(filename, headers, rows) {
+        var esc = function (value) {
+            value = String(value === null || value === undefined ? '' : value);
+            return /[",\n]/.test(value) ? '"' + value.replace(/"/g, '""') + '"' : value;
+        };
+        var csv = [headers].concat(rows).map(function (row) {
+            return row.map(esc).join(',');
+        }).join('\r\n');
+        var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    function downloadPNG(getChart, filename) {
+        var chart = typeof getChart === 'function' ? getChart() : getChart;
+        if (!chart) return;
+        chart.dataURI({ scale: 2 }).then(function (output) {
+            var link = document.createElement('a');
+            link.href = output.imgURI;
+            link.download = filename;
+            link.click();
+        });
+    }
+
+    function closeAllChartMenus() {
+        document.querySelectorAll('.chart-menu').forEach(function (menu) {
+            menu.hidden = true;
+        });
+        document.querySelectorAll('.chart-menu-btn').forEach(function (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function wireChartPanel(panelId, actions) {
+        var panel = document.getElementById(panelId);
+        if (!panel) return;
+
+        var btn = panel.querySelector('[data-menu-btn]');
+        var menu = panel.querySelector('[data-menu]');
+        if (!btn || !menu) return;
+
+        var collapseItem = document.createElement('button');
+        collapseItem.type = 'button';
+        collapseItem.className = 'chart-menu-item';
+        collapseItem.textContent = 'Collapse';
+        collapseItem.addEventListener('click', function () {
+            var collapsed = panel.classList.toggle('is-collapsed');
+            collapseItem.textContent = collapsed ? 'Expand' : 'Collapse';
+            closeAllChartMenus();
+        });
+        menu.appendChild(collapseItem);
+
+        var downloads = (actions || []).filter(function (action) { return action.available !== false; });
+        if (downloads.length) {
+            var divider = document.createElement('div');
+            divider.className = 'chart-menu-divider';
+            menu.appendChild(divider);
+
+            downloads.forEach(function (action) {
+                var item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'chart-menu-item';
+                item.textContent = action.label;
+                item.addEventListener('click', function () {
+                    closeAllChartMenus();
+                    action.run();
+                });
+                menu.appendChild(item);
+            });
+        }
+
+        btn.addEventListener('click', function (event) {
+            event.stopPropagation();
+            var willOpen = menu.hidden;
+            closeAllChartMenus();
+            if (willOpen) {
+                menu.hidden = false;
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        });
+    }
+
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.chart-menu-wrap')) {
+            closeAllChartMenus();
         }
     });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeAllChartMenus();
+        }
+    });
+
+    // ---------- Charts ----------
+    var appMonthLabels = @json($appMonthLabels);
+    var appMonthData = @json($appMonthData);
+    var statusLabels = @json($statusLabelsFormatted);
+    var statusData = @json($statusData);
+
+    var chartFont = getComputedStyle(document.documentElement).getPropertyValue('--font-ui').trim() || 'Manrope, sans-serif';
+    var chartBase = {
+        fontFamily: chartFont,
+        foreColor: '#66756C',
+        toolbar: { show: false },
+        animations: { enabled: !prefersReducedMotion }
+    };
+
+    var monthlyChart = null;
+    var statusChart = null;
+
+    if (document.querySelector('#chart_monthly_applications') && typeof ApexCharts !== 'undefined') {
+        var monthlyOptions = {
+            chart: Object.assign({}, chartBase, {
+                height: 320,
+                type: 'area',
+                width: '100%'
+            }),
+            series: [
+                { name: 'Applications', data: appMonthData }
+            ],
+            colors: ['#0A5C2F'],
+            stroke: { curve: 'smooth', width: 2.5, lineCap: 'round' },
+            fill: {
+                type: 'gradient',
+                gradient: {
+                    shadeIntensity: 1,
+                    opacityFrom: 0.26,
+                    opacityTo: 0.02,
+                    stops: [0, 95]
+                }
+            },
+            dataLabels: { enabled: false },
+            markers: {
+                size: 3.5,
+                strokeColors: '#fff',
+                strokeWidth: 2,
+                hover: { size: 5 }
+            },
+            xaxis: {
+                categories: appMonthLabels,
+                labels: { style: { fontSize: '11px', fontWeight: 600 } },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                min: 0,
+                forceNiceScale: true,
+                labels: {
+                    style: { fontSize: '11px' },
+                    formatter: function (value) { return Math.round(value); }
+                }
+            },
+            tooltip: {
+                theme: 'dark',
+                style: { fontSize: '12px' },
+                y: {
+                    formatter: function (value) {
+                        return Math.round(value) + ' ' + (Math.round(value) === 1 ? 'application' : 'applications');
+                    }
+                }
+            },
+            grid: {
+                borderColor: '#EDF2EE',
+                strokeDashArray: 4,
+                padding: { left: 6, right: 6 }
+            }
+        };
+
+        monthlyChart = new ApexCharts(document.querySelector('#chart_monthly_applications'), monthlyOptions);
+
+        // Short delay so the CSS Grid wrapper settles on its final width before drawing
+        setTimeout(function () {
+            monthlyChart.render();
+        }, 50);
+    }
+
+    if (document.querySelector('#chart_status_distribution') && typeof ApexCharts !== 'undefined') {
+        var statusOptions = {
+            chart: Object.assign({}, chartBase, {
+                height: 320,
+                type: 'bar',
+                width: '100%'
+            }),
+            series: [
+                { name: 'Applications', data: statusData }
+            ],
+            colors: ['#D97706', '#64748B', '#0A5C2F', '#B3261E', '#6FAF8D'],
+            plotOptions: {
+                bar: {
+                    columnWidth: '44%',
+                    borderRadius: 4,
+                    borderRadiusApplication: 'end',
+                    distributed: true
+                }
+            },
+            dataLabels: { enabled: false },
+            legend: { show: false },
+            xaxis: {
+                categories: statusLabels,
+                labels: {
+                    style: { fontSize: '11px', fontWeight: 600 },
+                    hideOverlappingLabels: false,
+                    trim: false
+                },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                min: 0,
+                forceNiceScale: true,
+                labels: {
+                    style: { fontSize: '11px' },
+                    formatter: function (value) { return Math.round(value); }
+                }
+            },
+            tooltip: {
+                theme: 'dark',
+                style: { fontSize: '12px' },
+                y: {
+                    formatter: function (value) {
+                        return Math.round(value) + ' ' + (Math.round(value) === 1 ? 'application' : 'applications');
+                    }
+                }
+            },
+            grid: {
+                borderColor: '#EDF2EE',
+                strokeDashArray: 4,
+                padding: { left: 6, right: 6 }
+            }
+        };
+
+        statusChart = new ApexCharts(document.querySelector('#chart_status_distribution'), statusOptions);
+
+        setTimeout(function () {
+            statusChart.render();
+        }, 50);
+    }
+
+    // ---------- Wire the three-dot menus ----------
+    wireChartPanel('panel_monthly', [
+        {
+            label: 'Download PNG',
+            run: function () { downloadPNG(function () { return monthlyChart; }, 'applications-per-month.png'); }
+        },
+        {
+            label: 'Download CSV',
+            run: function () {
+                downloadCSV(
+                    'applications-per-month.csv',
+                    ['Month', 'Applications'],
+                    appMonthLabels.map(function (label, index) {
+                        return [label, appMonthData[index] || 0];
+                    })
+                );
+            }
+        }
+    ]);
+
+    wireChartPanel('panel_status', [
+        {
+            label: 'Download PNG',
+            run: function () { downloadPNG(function () { return statusChart; }, 'status-distribution.png'); }
+        },
+        {
+            label: 'Download CSV',
+            run: function () {
+                downloadCSV(
+                    'status-distribution.csv',
+                    ['Status', 'Applications'],
+                    statusLabels.map(function (label, index) {
+                        return [label, statusData[index] || 0];
+                    })
+                );
+            }
+        }
+    ]);
 </script>
 @endsection
- 
