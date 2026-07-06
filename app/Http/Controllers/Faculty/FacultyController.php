@@ -382,6 +382,8 @@ class FacultyController extends Controller
             'prices' => 'nullable|array',
             'prices.*' => 'nullable|numeric|min:0|max:999999.99',
             'book_price' => 'nullable|numeric|min:0|max:999999.99',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_image' => 'nullable|boolean',
         ]);
 
         $itemType = $validated['item_type'] ?? $stock->item_type;
@@ -411,6 +413,19 @@ class FacultyController extends Controller
         $oldItemName = (string) $stock->item_name;
         $oldQuantity = (int) $stock->quantity;
 
+        $imagePath = $stock->image;
+        if ($request->hasFile('image')) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $imagePath = $request->file('image')->store('stocks', 'public');
+        } elseif ($request->boolean('remove_image')) {
+            if ($imagePath) {
+                Storage::disk('public')->delete($imagePath);
+            }
+            $imagePath = null;
+        }
+
         $stock->update([
             'item_name' => $validated['item_name'],
             'item_type' => $itemType,
@@ -418,6 +433,7 @@ class FacultyController extends Controller
             'prices' => $prices,
             'unit_price' => $unitPrice,
             'quantity' => $newQuantity,
+            'image' => $imagePath,
         ]);
 
         $actor = Auth::user();

@@ -349,12 +349,12 @@
         flex-shrink: 0;
     }
     .stock-status-badge-active {
-        background: #E9EDF1;
-        color: #1F2937;
-        border-color: #D6DCE3;
+        background: #dcfce7;
+        color: #15803d;
+        border-color: #bbf7d0;
     }
     .stock-status-badge-active .stock-status-badge-dot {
-        background: #1F2937;
+        background: #16a34a;
     }
     .stock-status-badge-archived {
         background: #ffe4e6;
@@ -478,6 +478,64 @@
         color: #64748b;
         line-height: 1.4;
     }
+
+    .image-dropzone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        background: #fcfcfd;
+        padding: 26px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .image-dropzone:hover {
+        border-color: #1F2937;
+        background: #f8fafc;
+    }
+    .image-dropzone-preview {
+        width: 88px;
+        height: 88px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 0 auto 14px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+    }
+    .image-dropzone-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .image-dropzone-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1F2937;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .image-dropzone-hint {
+        margin-top: 6px;
+        font-size: 12px;
+        color: #94a3b8;
+    }
+    .image-dropzone-status {
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+    }
+    .image-dropzone-remove {
+        margin-top: 8px;
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
+        color: #dc2626;
+        cursor: pointer;
+    }
+    .image-dropzone-remove:hover {
+        text-decoration: underline;
+    }
+
     .add-visible-row {
         display: flex;
         align-items: center;
@@ -650,8 +708,27 @@
 <div class="stocks-grid" x-data="{
     isAddModalOpen: false,
     type: '',
+    quantity: {{ (int) old('quantity', 0) }},
     prices: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 },
-    quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }
+    quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 },
+    imagePreview: '',
+    imageName: '',
+    get totalQuantity() {
+        return Object.values(this.quantities).reduce((sum, val) => sum + (Number(val) || 0), 0);
+    },
+    handleImage(input) {
+        const file = input.files && input.files[0];
+        if (!file) { return; }
+        this.imageName = file.name;
+        const reader = new FileReader();
+        reader.onload = (e) => { this.imagePreview = e.target.result; };
+        reader.readAsDataURL(file);
+    },
+    clearImage(input) {
+        this.imagePreview = '';
+        this.imageName = '';
+        if (input) { input.value = ''; }
+    }
 }">
     <section class="card stocks-table-card">
         <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -660,7 +737,7 @@
         <div style="font-size:13px;color:#64748b;margin-top:4px;">Manage your inventory items</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
-        <button type="button" class="btn btn-green" @click="isAddModalOpen = true; type = ''; prices = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; quantities = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; if ($refs.addForm) $refs.addForm.reset(); refreshBodyScrollLock()">
+        <button type="button" class="btn btn-green" @click="isAddModalOpen = true; type = ''; quantity = 0; prices = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; quantities = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; imagePreview = ''; imageName = ''; if ($refs.addForm) $refs.addForm.reset(); refreshBodyScrollLock()">
             <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width:14px;height:14px;">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/>
             </svg>
@@ -688,6 +765,7 @@
                     <tr>
                         <th style="width:60px;">Image</th>
                         <th style="width:200px;">Item Name</th>
+                        <th style="width:120px;">Item Type</th>
                         <th style="width:100px;">Quantity</th>
                         <th style="width:130px;">STOCK LEVEL</th>
                         <th style="width:110px;">STATUS</th>
@@ -711,6 +789,13 @@
                                 </span>
                             </td>
                             <td style="font-weight:700;color:#0f172a;">{{ $stock->item_name }}</td>
+                            <td>
+                                @if($stock->item_type)
+                                    <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;background:#f1f5f9;color:#334155;font-size:12px;font-weight:700;text-transform:capitalize;">{{ $stock->item_type }}</span>
+                                @else
+                                    <span style="color:#94a3b8;font-size:13px;">—</span>
+                                @endif
+                            </td>
                             <td style="font-weight:700;color:#0f172a;">{{ number_format($stock->quantity) }}</td>
                             <td>
                                  @if($stock->quantity === 0)
@@ -724,8 +809,8 @@
                                     Low Stock
                                     </span>
                                  @else
-                                    <span style="color:#1F2937;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
-                                         <span style="width:7px;height:7px;border-radius:50%;background:#1F2937;display:inline-block;flex-shrink:0;"></span>
+                                    <span style="color:#15803d;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
+                                         <span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;flex-shrink:0;"></span>
                                     Healthy
                                     </span>
                                 @endif
@@ -763,6 +848,7 @@
                                             data-prices='@json($stock->prices ?? [])'
                                             data-sizes='@json($stock->sizes ?? [])'
                                             data-unit-price="{{ $stock->unit_price ?? '' }}"
+                                            data-image="{{ $stock->image ? asset('storage/' . $stock->image) : '' }}"
                                             onclick="openEditModalFromButton(this)"
                                         >
                                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;flex-shrink:0;">
@@ -801,11 +887,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align:center;padding:32px;color:#94a3b8;">No stock items found.</td>
+                            <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No stock items found.</td>
                         </tr>
                     @endforelse
                     <tr id="stocks-no-results-row" style="display:none;">
-                        <td colspan="6" style="text-align:center;padding:32px;color:#94a3b8;">No results found.</td>
+                        <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No results found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -842,7 +928,7 @@
                     </div>
 
                     <div class="add-modal-field" x-show="type === 'uniforms'" x-cloak>
-                        <label>Prices by Size</label>
+                        <label>Prices and Sizes</label>
                         <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
                             <span></span>
                             <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
@@ -867,13 +953,34 @@
 
                     <div class="add-modal-field">
                         <label for="add_quantity">Quantity</label>
-                        <input type="number" id="add_quantity" name="quantity" min="0" max="3000" value="{{ old('quantity', 0) }}" required>
+                        <input
+                            type="number"
+                            id="add_quantity"
+                            name="quantity"
+                            min="0"
+                            max="3000"
+                            x-model.number="quantity"
+                            x-effect="if (type === 'uniforms') quantity = totalQuantity"
+                            :readonly="type === 'uniforms'"
+                            :style="type === 'uniforms' ? 'background:#f1f5f9;color:#64748b;cursor:not-allowed;' : ''"
+                            required
+                        >
+                        <p class="add-modal-help" x-show="type === 'uniforms'" x-cloak>Automatically totals the stocks entered per size above.</p>
                     </div>
 
                     <div class="add-modal-field">
-                        <label for="add_image">Choose Image</label>
-                        <input type="file" id="add_image" name="image" accept=".jpg,.jpeg,.png,.webp">
-                        <p class="add-modal-help">Optional. If not provided, a placeholder is shown on the public page.</p>
+                        <label>Item Image</label>
+                        <div class="image-dropzone" @click="$refs.addImageInput.click()">
+                            <template x-if="imagePreview">
+                                <div class="image-dropzone-preview"><img :src="imagePreview" alt="Selected image preview"></div>
+                            </template>
+                            <div class="image-dropzone-title" x-text="imagePreview ? 'Click to change item image' : 'Click to upload item image'"></div>
+                            <div class="image-dropzone-hint">JPG, PNG, or WebP — max 2 MB</div>
+                            <div class="image-dropzone-status" x-text="imageName || 'No file selected'"></div>
+                            <span class="image-dropzone-remove" x-show="imagePreview" x-cloak @click.stop="clearImage($refs.addImageInput)">Remove image</span>
+                        </div>
+                        <input type="file" id="add_image" x-ref="addImageInput" name="image" accept=".jpg,.jpeg,.png,.webp" style="display:none;" @change="handleImage($refs.addImageInput)">
+                        <p class="add-modal-help">Optional. A placeholder is shown on the public page if none is provided.</p>
                     </div>
 
                     <label class="add-visible-row">
@@ -894,16 +1001,50 @@
 <div id="editStockModal" x-data="{
     itemType: '',
     bookPrice: 0,
+    quantity: 0,
     prices: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 },
     quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 },
-    setEditData(type, incomingPrices, incomingQuantities, incomingUnitPrice) {
+    currentImage: '',
+    imagePreview: '',
+    imageName: '',
+    removeImage: false,
+    get totalQuantity() {
+        return Object.values(this.quantities).reduce((sum, val) => sum + (Number(val) || 0), 0);
+    },
+    get hasImage() {
+        return !!this.imagePreview || (!!this.currentImage && !this.removeImage);
+    },
+    handleImage(input) {
+        const file = input.files && input.files[0];
+        if (!file) { return; }
+        this.imageName = file.name;
+        this.removeImage = false;
+        const reader = new FileReader();
+        reader.onload = (e) => { this.imagePreview = e.target.result; };
+        reader.readAsDataURL(file);
+    },
+    clearImage(input) {
+        if (input) { input.value = ''; }
+        if (this.imagePreview) {
+            this.imagePreview = '';
+            this.imageName = '';
+        } else {
+            this.removeImage = true;
+        }
+    },
+    setEditData(type, incomingPrices, incomingQuantities, incomingUnitPrice, incomingQuantity, incomingImage) {
         this.itemType = type || '';
         this.bookPrice = parseFloat(incomingUnitPrice ?? 0) || 0;
+        this.quantity = parseInt(incomingQuantity ?? 0) || 0;
+        this.currentImage = incomingImage || '';
+        this.imagePreview = '';
+        this.imageName = '';
+        this.removeImage = false;
         const defaults = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 };
         this.prices = { ...defaults, ...(incomingPrices || {}) };
         this.quantities = { ...defaults, ...(incomingQuantities || {}) };
     }
-}" x-on:edit-stock-data.window="setEditData($event.detail.itemType, $event.detail.prices, $event.detail.quantities, $event.detail.unitPrice)">
+}" x-on:edit-stock-data.window="setEditData($event.detail.itemType, $event.detail.prices, $event.detail.quantities, $event.detail.unitPrice, $event.detail.quantity, $event.detail.image)">
     <div class="edit-modal-content">
         <div class="edit-modal-header">
             <h3>Edit Stock Item</h3>
@@ -913,17 +1054,18 @@
                 </svg>
             </button>
         </div>
-        <form id="editStockForm" method="POST">
+        <form id="editStockForm" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PATCH')
             <div class="edit-modal-body">
                 <input type="hidden" id="modalItemType" name="item_type" x-model="itemType">
+                <input type="hidden" name="remove_image" :value="removeImage ? '1' : '0'">
                 <div class="edit-modal-field">
                     <label for="modalItemName">Item Name</label>
                     <input type="text" id="modalItemName" name="item_name" maxlength="100" required>
                 </div>
                 <div class="edit-modal-field" x-show="itemType === 'uniforms'" x-cloak>
-                    <label>Prices by Size</label>
+                    <label>Prices and Sizes</label>
                     <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
                         <span></span>
                         <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
@@ -945,7 +1087,39 @@
                 </div>
                 <div class="edit-modal-field">
                     <label for="modalQuantity">Quantity</label>
-                    <input type="number" id="modalQuantity" name="quantity" min="0" max="3000" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+                    <input
+                        type="number"
+                        id="modalQuantity"
+                        name="quantity"
+                        min="0"
+                        max="3000"
+                        pattern="\d*"
+                        inputmode="numeric"
+                        x-model.number="quantity"
+                        x-effect="if (itemType === 'uniforms') quantity = totalQuantity"
+                        :readonly="itemType === 'uniforms'"
+                        :style="itemType === 'uniforms' ? 'background:#f1f5f9;color:#64748b;cursor:not-allowed;' : ''"
+                        oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                        required
+                    >
+                    <p class="add-modal-help" x-show="itemType === 'uniforms'" x-cloak>Automatically totals the stocks entered per size above.</p>
+                </div>
+                <div class="edit-modal-field">
+                    <label>Item Image</label>
+                    <div class="image-dropzone" @click="$refs.editImageInput.click()">
+                        <template x-if="imagePreview">
+                            <div class="image-dropzone-preview"><img :src="imagePreview" alt="Selected image preview"></div>
+                        </template>
+                        <template x-if="!imagePreview && currentImage && !removeImage">
+                            <div class="image-dropzone-preview"><img :src="currentImage" alt="Current item image"></div>
+                        </template>
+                        <div class="image-dropzone-title" x-text="hasImage ? 'Click to change item image' : 'Click to upload item image'"></div>
+                        <div class="image-dropzone-hint">JPG, PNG, or WebP — max 2 MB</div>
+                        <div class="image-dropzone-status" x-text="imageName || (currentImage && !removeImage ? 'Current image' : 'No file selected')"></div>
+                        <span class="image-dropzone-remove" x-show="hasImage" x-cloak @click.stop="clearImage($refs.editImageInput)">Remove image</span>
+                    </div>
+                    <input type="file" x-ref="editImageInput" name="image" accept=".jpg,.jpeg,.png,.webp" style="display:none;" @change="handleImage($refs.editImageInput)">
+                    <p class="add-modal-help">Leave unchanged to keep the current image.</p>
                 </div>
             </div>
             <div class="edit-modal-footer">
@@ -1064,7 +1238,8 @@
             button.dataset.itemType || '',
             button.dataset.prices || '{}',
             button.dataset.sizes || '{}',
-            button.dataset.unitPrice || ''
+            button.dataset.unitPrice || '',
+            button.dataset.image || ''
         );
     }
 
@@ -1076,11 +1251,10 @@
         );
     }
 
-    function openEditModal(updateUrl, stockName, stockQuantity, stockItemType, stockPricesJson, stockSizesJson, stockUnitPrice) {
+    function openEditModal(updateUrl, stockName, stockQuantity, stockItemType, stockPricesJson, stockSizesJson, stockUnitPrice, stockImage) {
         const modal = document.getElementById('editStockModal');
         const form = document.getElementById('editStockForm');
         const nameEl = document.getElementById('modalItemName');
-        const quantityEl = document.getElementById('modalQuantity');
         const itemTypeEl = document.getElementById('modalItemType');
 
         if (!modal || !form) return;
@@ -1101,7 +1275,6 @@
 
         form.action = updateUrl;
         if (nameEl) nameEl.value = stockName;
-        if (quantityEl) quantityEl.value = stockQuantity;
         if (itemTypeEl) itemTypeEl.value = stockItemType || '';
 
         window.dispatchEvent(new CustomEvent('edit-stock-data', {
@@ -1110,6 +1283,8 @@
                 prices: parsedPrices,
                 quantities: parsedSizes,
                 unitPrice: stockUnitPrice || '',
+                quantity: stockQuantity || 0,
+                image: stockImage || '',
             },
         }));
 
