@@ -89,12 +89,96 @@ class CashierController extends Controller
             'bank_transfer' => ConcessionairePayment::where('payment_type', 'bank_transfer')->count(),
         ];
 
+        // ---- Real 6-month sparkline series for the stat cards ----
+        $sparkMonths = collect(range(5, 0))->map(function ($i) {
+            $month = now()->subMonths($i);
+
+            return [
+                'start' => $month->copy()->startOfMonth(),
+                'end' => $month->copy()->endOfMonth(),
+            ];
+        });
+
+        $windowPayments = ConcessionairePayment::where('payment_date', '>=', $sparkMonths->first()['start'])
+            ->get(['concessionaire_id', 'amount', 'payment_date']);
+
+        // All approved concessionaires (not only currently active) so historical
+        // months are counted by the contract that actually covered them.
+        $approvedConcessionaires = User::query()
+            ->where('role', 'concessionaire')
+            ->where('is_approved', true)
+            ->with('latestPartnershipApplication')
+            ->get(['id', 'monthly_fee', 'is_active_concessionaire']);
+
+        $lastMonthIndex = $sparkMonths->count() - 1;
+        $collectionsSpark = [];
+        $activeSpark = [];
+        $readySpark = [];
+        $overdueSpark = [];
+
+        $sparkMonths->each(function ($month, $index) use (
+            $windowPayments,
+            $approvedConcessionaires,
+            $lastMonthIndex,
+            $activeConcessionairesCount,
+            $readyToRecordCount,
+            $overdueCount,
+            &$collectionsSpark,
+            &$activeSpark,
+            &$readySpark,
+            &$overdueSpark
+        ) {
+            $inMonth = $windowPayments->filter(function ($payment) use ($month) {
+                return $payment->payment_date
+                    && $payment->payment_date->between($month['start'], $month['end']);
+            });
+            $paidIds = $inMonth->pluck('concessionaire_id')->unique();
+
+            $collectionsSpark[] = round((float) $inMonth->sum('amount'), 2);
+
+            $activeThisMonth = $approvedConcessionaires->filter(function ($concessionaire) use ($month) {
+                $application = $concessionaire->latestPartnershipApplication;
+                $start = $application?->contract_period_start;
+                $end = $application?->contract_period_end;
+
+                if (! $start) {
+                    return false;
+                }
+
+                return $start->lte($month['end']) && ($end === null || $end->gte($month['start']));
+            });
+
+            $unpaidBacklog = $activeThisMonth->filter(function ($concessionaire) use ($paidIds) {
+                return (float) ($concessionaire->monthly_fee ?? 0) > 0
+                    && ! $paidIds->contains($concessionaire->id);
+            })->count();
+
+            if ($index === $lastMonthIndex) {
+                // Current month: mirror the live figures shown on the cards.
+                $activeSpark[] = $activeConcessionairesCount;
+                $readySpark[] = $readyToRecordCount;
+                $overdueSpark[] = $overdueCount;
+            } else {
+                $activeSpark[] = $activeThisMonth->count();
+                $readySpark[] = $unpaidBacklog;
+                $overdueSpark[] = $unpaidBacklog;
+            }
+        });
+
+        $statSparklines = [
+            'collections' => $collectionsSpark,
+            'active' => $activeSpark,
+            'ready' => $readySpark,
+            'overdue' => $overdueSpark,
+        ];
+
         return view('cashier.dashboard', compact(
             'activeConcessionairesCount',
             'overdueCount',
             'readyToRecordCount',
             'cashierMonthlyPayments',
-            'cashierPaymentTypes'
+            'cashierPaymentTypes',
+            'statSparklines'
         ));
     }
 

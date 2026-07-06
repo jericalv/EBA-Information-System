@@ -20,23 +20,45 @@
         gap: 16px;
     }
     .dstat-card {
+        position: relative;
         background: #fff;
         border: 1px solid var(--line);
         border-radius: 14px;
-        padding: 20px;
+        padding: 18px 18px 0;
         display: flex;
         flex-direction: column;
-        gap: 8px;
         box-shadow: var(--shadow-card);
         min-width: 0;
+        overflow: hidden;
     }
+    .dstat-top {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 14px;
+    }
+    .dstat-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        background: var(--pine-soft);
+        color: var(--pine);
+    }
+    .dstat-icon svg { width: 16px; height: 16px; }
+    .dstat-card.tone-amber .dstat-icon { background: #FDF8EC; color: #B45309; }
+    .dstat-card.tone-red .dstat-icon { background: #FBEAEA; color: #B3261E; }
     .dstat-label {
         font-family: var(--font-mono);
         font-size: 10.5px;
         font-weight: 600;
-        letter-spacing: 0.12em;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
         color: var(--muted);
+        line-height: 1.2;
     }
     .dstat-value-row {
         display: flex;
@@ -45,9 +67,9 @@
     }
     .dstat-value {
         font-family: var(--font-mono);
-        font-size: 30px;
+        font-size: 32px;
         font-weight: 600;
-        line-height: 1.1;
+        line-height: 1.05;
         letter-spacing: -0.03em;
         color: var(--ink);
         font-variant-numeric: tabular-nums;
@@ -57,21 +79,16 @@
         font-size: 13px;
         color: var(--faint);
     }
-    .dstat-foot-row {
+    .dstat-delta-row {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         gap: 8px;
-        margin-top: auto;
-        padding-top: 12px;
-        border-top: 1px solid var(--line);
-    }
-    .dstat-foot {
-        font-size: 12px;
-        color: var(--muted);
-        min-width: 0;
+        margin-top: 10px;
+        margin-bottom: 14px;
     }
     .dstat-chip {
+        display: inline-flex;
+        align-items: center;
         font-family: var(--font-mono);
         font-size: 11px;
         font-weight: 600;
@@ -84,6 +101,19 @@
     .dstat-chip.warn { background: #FDF8EC; color: #92400E; }
     .dstat-chip.bad { background: #FBEAEA; color: #B3261E; }
     .dstat-chip.neutral { background: #F0F2F0; color: var(--muted); }
+    .dstat-context {
+        font-size: 12px;
+        color: var(--muted);
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .dstat-spark {
+        margin: auto -18px 0;
+        height: 46px;
+        min-height: 46px;
+    }
 
     /* ---------- Chart panels ---------- */
     .dashboard-charts-row {
@@ -231,47 +261,79 @@
 
         <section class="dstat-grid" aria-label="Collection statistics">
             <article class="dstat-card">
-                <span class="dstat-label">Active concessionaires</span>
-                <div class="dstat-value-row">
-                    <span class="dstat-value" data-count-to="{{ $activeCount }}">0</span>
+                <div class="dstat-top">
+                    <span class="dstat-icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </span>
+                    <span class="dstat-label">Collected this month</span>
                 </div>
-                <div class="dstat-foot-row">
-                    <span class="dstat-foot">Approved with active contracts</span>
-                    <span class="dstat-chip neutral">Total</span>
-                </div>
-            </article>
-
-            <article class="dstat-card">
-                <span class="dstat-label">Ready to record</span>
-                <div class="dstat-value-row">
-                    <span class="dstat-value" data-count-to="{{ $readyCount }}">0</span>
-                </div>
-                <div class="dstat-foot-row">
-                    <span class="dstat-foot">Awaiting this month&rsquo;s payment</span>
-                    <span class="dstat-chip {{ $readyCount > 0 ? 'warn' : 'ok' }}">{{ $readyCount > 0 ? 'Pending' : 'Clear' }}</span>
-                </div>
-            </article>
-
-            <article class="dstat-card">
-                <span class="dstat-label">Overdue this month</span>
-                <div class="dstat-value-row">
-                    <span class="dstat-value" data-count-to="{{ $overdue }}">0</span>
-                </div>
-                <div class="dstat-foot-row">
-                    <span class="dstat-foot">No payment past the due date</span>
-                    <span class="dstat-chip {{ $overdue > 0 ? 'bad' : 'ok' }}">{{ $overdue > 0 ? 'Action needed' : 'All settled' }}</span>
-                </div>
-            </article>
-
-            <article class="dstat-card">
-                <span class="dstat-label">Collected this month</span>
                 <div class="dstat-value-row">
                     <span class="dstat-value" data-count-to="{{ number_format($collectedThisMonth, 2, '.', '') }}" data-decimals="2" data-prefix="&#8369;">&#8369;0.00</span>
                 </div>
-                <div class="dstat-foot-row">
-                    <span class="dstat-foot">All payments recorded in {{ now()->format('F') }}</span>
-                    <span class="dstat-chip" id="chip_collections"></span>
+                <div class="dstat-delta-row">
+                    <span class="dstat-chip" id="chip_collected"></span>
+                    <span class="dstat-context">vs last month</span>
                 </div>
+                <div class="dstat-spark" id="spark_collected"></div>
+            </article>
+
+            <article class="dstat-card">
+                <div class="dstat-top">
+                    <span class="dstat-icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                    </span>
+                    <span class="dstat-label">Active concessionaires</span>
+                </div>
+                <div class="dstat-value-row">
+                    <span class="dstat-value" data-count-to="{{ $activeCount }}">0</span>
+                </div>
+                <div class="dstat-delta-row">
+                    <span class="dstat-chip" id="chip_active"></span>
+                    <span class="dstat-context">Approved &amp; under contract</span>
+                </div>
+                <div class="dstat-spark" id="spark_active"></div>
+            </article>
+
+            <article class="dstat-card tone-amber">
+                <div class="dstat-top">
+                    <span class="dstat-icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                        </svg>
+                    </span>
+                    <span class="dstat-label">Ready to record</span>
+                </div>
+                <div class="dstat-value-row">
+                    <span class="dstat-value" data-count-to="{{ $readyCount }}">0</span>
+                </div>
+                <div class="dstat-delta-row">
+                    <span class="dstat-chip" id="chip_ready"></span>
+                    <span class="dstat-context">Awaiting this month&rsquo;s payment</span>
+                </div>
+                <div class="dstat-spark" id="spark_ready"></div>
+            </article>
+
+            <article class="dstat-card tone-red">
+                <div class="dstat-top">
+                    <span class="dstat-icon">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                        </svg>
+                    </span>
+                    <span class="dstat-label">Overdue this month</span>
+                </div>
+                <div class="dstat-value-row">
+                    <span class="dstat-value" data-count-to="{{ $overdue }}">0</span>
+                </div>
+                <div class="dstat-delta-row">
+                    <span class="dstat-chip" id="chip_overdue"></span>
+                    <span class="dstat-context">No payment past due date</span>
+                </div>
+                <div class="dstat-spark" id="spark_overdue"></div>
             </article>
         </section>
 
@@ -351,23 +413,68 @@
         requestAnimationFrame(tick);
     });
 
-    // ---------- Month-over-month chip on collections ----------
     var cashierMonthly = @json($cashierMonthlyPayments);
+    var statSparklines = @json($statSparklines);
 
-    (function () {
-        var el = document.getElementById('chip_collections');
+    // ---------- Month-over-month delta chips ----------
+    function setTrendChip(id, data, options) {
+        options = options || {};
+        var el = document.getElementById(id);
         if (!el) return;
-        if (!Array.isArray(cashierMonthly) || cashierMonthly.length < 2) {
+        if (!Array.isArray(data) || data.length < 2) {
             el.style.display = 'none';
             return;
         }
-        var delta = Number(cashierMonthly[cashierMonthly.length - 1].total) - Number(cashierMonthly[cashierMonthly.length - 2].total);
-        var cls = delta > 0 ? 'ok' : (delta < 0 ? 'bad' : 'neutral');
+
+        var delta = Number(data[data.length - 1]) - Number(data[data.length - 2]);
+        var upClass = options.upClass || 'ok';
+        var downClass = options.downClass || 'bad';
+        var cls = delta > 0 ? upClass : (delta < 0 ? downClass : 'neutral');
         var arrow = delta > 0 ? '↑' : (delta < 0 ? '↓' : '—');
+        var magnitude = Math.abs(delta).toLocaleString('en-US', {
+            minimumFractionDigits: options.decimals || 0,
+            maximumFractionDigits: options.decimals || 0
+        });
+
         el.classList.add(cls);
-        el.textContent = delta === 0 ? '— steady' : arrow + ' ₱' + Math.abs(delta).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        el.textContent = delta === 0 ? '— steady' : arrow + ' ' + (options.prefix || '') + magnitude;
         el.title = 'Compared with last month';
-    })();
+    }
+
+    setTrendChip('chip_collected', statSparklines.collections, { prefix: '₱', decimals: 2 });
+    setTrendChip('chip_active', statSparklines.active);
+    setTrendChip('chip_ready', statSparklines.ready, { upClass: 'warn', downClass: 'ok' });
+    setTrendChip('chip_overdue', statSparklines.overdue, { upClass: 'bad', downClass: 'ok' });
+
+    // ---------- Stat-card sparklines ----------
+    function renderSpark(selector, data, color) {
+        var target = document.querySelector(selector);
+        if (!target || typeof ApexCharts === 'undefined') return;
+        if (!Array.isArray(data) || !data.length) return;
+
+        new ApexCharts(target, {
+            chart: {
+                type: 'area',
+                height: 46,
+                sparkline: { enabled: true },
+                animations: { enabled: !prefersReducedMotion }
+            },
+            stroke: { curve: 'smooth', width: 2, lineCap: 'round' },
+            fill: {
+                type: 'gradient',
+                gradient: { shadeIntensity: 1, opacityFrom: 0.32, opacityTo: 0.02, stops: [0, 100] }
+            },
+            series: [{ name: '', data: data }],
+            colors: [color],
+            dataLabels: { enabled: false },
+            tooltip: { enabled: false }
+        }).render();
+    }
+
+    renderSpark('#spark_collected', statSparklines.collections, '#0A5C2F');
+    renderSpark('#spark_active', statSparklines.active, '#0A5C2F');
+    renderSpark('#spark_ready', statSparklines.ready, '#B45309');
+    renderSpark('#spark_overdue', statSparklines.overdue, '#B3261E');
 
     // ---------- Chart panel menus: collapse + downloads ----------
     function downloadCSV(filename, headers, rows) {
