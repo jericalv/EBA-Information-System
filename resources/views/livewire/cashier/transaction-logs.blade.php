@@ -31,15 +31,12 @@
             >
         </div>
 
-        <button
-            type="button"
-            wire:click="exportToExcel"
-            wire:loading.attr="disabled"
-            class="inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-md bg-[#1a3c2e] px-4 text-xs font-semibold text-white transition hover:bg-[#214837] disabled:cursor-not-allowed disabled:opacity-70"
+        <a
+            href="{{ route('staff.transaction-logs', ['start_date' => $startDate, 'end_date' => $endDate, 'export' => 'csv']) }}"
+            class="inline-flex h-9 shrink-0 items-center whitespace-nowrap rounded-md bg-[#1a3c2e] px-4 text-xs font-semibold text-white transition hover:bg-[#214837]"
         >
-            <span wire:loading.remove wire:target="exportToExcel">Export to Excel</span>
-            <span wire:loading wire:target="exportToExcel">Exporting…</span>
-        </button>
+            Export to Excel
+        </a>
     </div>
 
     <div class="w-full overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
@@ -88,7 +85,7 @@
                                     <div class="flex flex-wrap gap-1.5">
                                         @forelse ($order->items as $item)
                                             <span class="inline-flex items-center gap-1 rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] font-medium text-slate-700">
-                                                {{ \Illuminate\Support\Str::lower(\Illuminate\Support\Str::substr($item->uniformStock?->item_name ?? 'item', 0, 2)) }}
+                                                {{ $item->uniformStock?->item_name ?? 'Unknown Item' }}
                                                 <span class="rounded bg-slate-200 px-1 py-0 text-[9px] font-bold text-slate-800">x{{ $item->quantity }}</span>
                                                 <span class="text-slate-400">@ ₱{{ number_format((float) $item->price_at_sale, 2) }}</span>
                                             </span>
