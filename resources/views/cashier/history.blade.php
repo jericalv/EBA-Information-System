@@ -3,24 +3,39 @@
 @section('title', 'Payment History')
 
 @section('content')
-    <div class="card payment-history-section">
+    <div class="page-head">
+        <div>
+            <span class="eyebrow">Collections</span>
+            <h1 class="page-title">Payment History</h1>
+        </div>
+        <span class="page-date">{{ now()->format('l, F d, Y') }}</span>
+    </div>
+
+    <div class="card">
         <div class="card-header">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
-                <strong style="font-size:16px;color:#111827;">Recent Payment History</strong>
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+                <div>
+                    <h2 class="panel-title">Recent payment history</h2>
+                    <p class="panel-sub">Every payment recorded across all concessionaires.</p>
+                </div>
                 <div style="display:inline-flex;align-items:center;gap:8px;">
-                    <a href="{{ route('cashier.payments.history.view') }}" target="_blank" rel="noopener" class="btn btn-outline"> View History</a>
-                    <a href="{{ route('cashier.payments.history.pdf') }}" class="btn btn-green">📂 Download History</a>
+                    <a href="{{ route('cashier.payments.history.view') }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">View History</a>
+                    <a href="{{ route('cashier.payments.history.pdf') }}" class="btn btn-primary btn-sm">
+                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/>
+                        </svg>
+                        Download History
+                    </a>
                 </div>
             </div>
         </div>
         <div class="card-body">
-            @php
-                $historyFilterConcessionaires = $filterConcessionaires ?? [];
-            @endphp
-
             <div class="history-filter-bar">
-                <div>
-                    <input type="text" id="search_box" placeholder="Search Concessionaire..." style="width: 100%; max-width: 400px; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; outline: none; transition: border-color 0.2s;" onfocus="this.style.borderColor='#3b82f6'" onblur="this.style.borderColor='#d1d5db'">
+                <div class="table-search">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <input type="text" id="search_box" placeholder="Search concessionaire&hellip;" autocomplete="off">
                 </div>
             </div>
 
@@ -40,21 +55,26 @@
                     </thead>
                     <tbody id="payments_tbody">
                         @foreach ($recentPayments as $payment)
-                            <tr class="payment-row" 
+                            <tr class="payment-row"
                                 data-name="{{ strtolower($payment->concessionaire?->business_name ?: $payment->concessionaire?->name) }}">
-                                <td>{{ $payment->concessionaire?->business_name ?: $payment->concessionaire?->name }}</td>
-                                <td style="font-weight:800;color:#0a5c2f;">₱{{ number_format((float) $payment->amount, 2) }}</td>
-                                <td>{{ $payment->payment_date?->format('M d, Y') ?: '—' }}</td>
+                                <td><span class="table-strong">{{ $payment->concessionaire?->business_name ?: $payment->concessionaire?->name }}</span></td>
+                                <td><span class="table-num is-pine">&#8369;{{ number_format((float) $payment->amount, 2) }}</span></td>
+                                <td><span class="table-num">{{ $payment->payment_date?->format('M d, Y') ?: '—' }}</span></td>
                                 <td>{{ ucfirst(str_replace('_', ' ', $payment->payment_type)) }}</td>
-                                <td>{{ $payment->created_at?->setTimezone('Asia/Manila')->format('M d, Y h:i A') ?? '—' }}</td>
+                                <td><span class="table-num">{{ $payment->created_at?->setTimezone('Asia/Manila')->format('M d, Y h:i A') ?? '—' }}</span></td>
                                 <td>
-                                    <a class="history-receipt-link" href="{{ route('cashier.payments.receipt', $payment->id) }}">📂 Download Receipt</a>
+                                    <a class="btn btn-secondary btn-xs" href="{{ route('cashier.payments.receipt', $payment->id) }}">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/>
+                                        </svg>
+                                        Receipt
+                                    </a>
                                 </td>
                             </tr>
                         @endforeach
                     </tbody>
                 </table>
-                <div id="no_results_message" style="display:none; text-align:center; padding: 20px; color: #6b7280;">No payments match your filters.</div>
+                <div id="no_results_message" style="display:none;text-align:center;padding:24px;color:var(--muted);font-size:13.5px;">No payments match your search.</div>
             @endif
         </div>
     </div>
@@ -73,8 +93,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let visibleCount = 0;
 
         rows.forEach(row => {
-            const name = row.getAttribute('data-name');
-            
+            const name = row.getAttribute('data-name') || '';
+
             if (name.includes(query)) {
                 row.style.display = '';
                 visibleCount++;
@@ -96,6 +116,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (searchBox) {
         searchBox.addEventListener('input', filterRows);
+
+        // Prefill from the navbar search palette (?q=…) and filter immediately
+        const initialQuery = new URLSearchParams(window.location.search).get('q');
+        if (initialQuery) {
+            searchBox.value = initialQuery;
+            filterRows();
+        }
     }
 });
 </script>
