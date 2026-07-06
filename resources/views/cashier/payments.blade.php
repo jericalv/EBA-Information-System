@@ -15,9 +15,18 @@
         </div>
     @endif
 
+    <div class="page-head">
+        <div>
+            <span class="eyebrow">Collections</span>
+            <h1 class="page-title">Record Payment</h1>
+        </div>
+        <span class="page-date">{{ now()->format('l, F d, Y') }}</span>
+    </div>
+
     <div class="card">
         <div class="card-header">
-            <strong style="font-size:16px;color:#111827;">Active Approved Concessionaires</strong>
+            <h2 class="panel-title">Active approved concessionaires</h2>
+            <p class="panel-sub">Record this month&rsquo;s fee or review a concessionaire&rsquo;s payment record.</p>
         </div>
         <div class="card-body">
             @if ($concessionaires->isEmpty())
@@ -43,10 +52,10 @@
                                 $contractEnd = $latestApplication?->contract_period_end;
                                 $statusKey = $concessionaireStatuses[$concessionaire->id] ?? 'no_contract';
                                 $statusLabel = match ($statusKey) {
-                                    'paid' => 'Paid ✓',
+                                    'paid' => 'Paid',
                                     'due_soon' => 'Due on 1st',
                                     'overdue' => 'Overdue',
-                                    default => '—',
+                                    default => 'No contract',
                                 };
                                 $statusClass = match ($statusKey) {
                                     'paid' => 'status-badge-paid',
@@ -62,34 +71,45 @@
                                         <div class="user-avatar">{{ $concessionaire->initials() }}</div>
                                         <div>
                                             <div class="user-name">{{ $concessionaire->business_name ?: $concessionaire->name }}</div>
+                                            <div class="user-email">{{ $concessionaire->name }} &middot; {{ $concessionaire->email }}</div>
                                             <span class="status-badge {{ $statusClass }}">{{ $statusLabel }}</span>
-                                            <div class="user-email">{{ $concessionaire->name }} · {{ $concessionaire->email }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
                                     @if ($contractStart && $contractEnd)
-                                        <span style="font-weight:700;color:#334155;">{{ $contractStart->format('M d, Y') }} → {{ $contractEnd->format('M d, Y') }}</span>
+                                        <span class="table-num">{{ $contractStart->format('M d, Y') }} &rarr; {{ $contractEnd->format('M d, Y') }}</span>
                                     @else
-                                        <span style="color:#94a3b8;">—</span>
+                                        <span class="table-dim">&mdash;</span>
                                     @endif
                                 </td>
                                 <td>
                                     @if (! is_null($concessionaire->monthly_fee))
-                                        <span style="font-weight:700;color:#334155;">PHP {{ number_format((float) $concessionaire->monthly_fee, 2) }}</span>
+                                        <span class="table-num">&#8369;{{ number_format((float) $concessionaire->monthly_fee, 2) }}</span>
                                     @else
-                                        <span style="color:#94a3b8;">—</span>
+                                        <span class="table-dim">&mdash;</span>
                                     @endif
                                 </td>
-                                <td style="font-weight:800;color:#0a5c2f;">₱{{ number_format((float) ($concessionaire->total_paid ?? 0), 2) }}</td>
-                                <td>{{ $concessionaire->last_payment_date ? \Illuminate\Support\Carbon::parse($concessionaire->last_payment_date)->format('M d, Y') : '—' }}</td>
-                                <td class="payments-cell">
+                                <td><span class="table-num is-pine">&#8369;{{ number_format((float) ($concessionaire->total_paid ?? 0), 2) }}</span></td>
+                                <td>
+                                    @if ($concessionaire->last_payment_date)
+                                        <span class="table-num">{{ \Illuminate\Support\Carbon::parse($concessionaire->last_payment_date)->format('M d, Y') }}</span>
+                                    @else
+                                        <span class="table-dim">&mdash;</span>
+                                    @endif
+                                </td>
+                                <td style="white-space:nowrap;">
                                     @if ($hasPaidThisMonth)
-                                        <span class="paid-month-badge">Paid This Month</span>
+                                        <span class="paid-month-badge">
+                                            <svg style="width:13px;height:13px;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                            Paid this month
+                                        </span>
                                     @else
                                         <button
                                             type="button"
-                                            class="btn record-payment-btn"
+                                            class="btn btn-primary btn-sm record-payment-btn"
                                             data-user-id="{{ $concessionaire->id }}"
                                             data-business-name="{{ e($concessionaire->business_name ?: $concessionaire->name) }}"
                                             data-concessionaire-name="{{ e($concessionaire->name) }}"
@@ -104,15 +124,18 @@
                                             href="{{ route('cashier.payments.concessionaire.history.view', $concessionaire->id) }}"
                                             target="_blank"
                                             rel="noopener"
-                                            class="btn btn-outline btn-xs"
+                                            class="btn btn-secondary btn-xs"
                                         >
-                                             View
+                                            View
                                         </a>
                                         <a
                                             href="{{ route('cashier.payments.concessionaire.history.pdf', $concessionaire->id) }}"
-                                            class="btn btn-outline btn-xs"
+                                            class="btn btn-secondary btn-xs"
                                         >
-                                            📂 History
+                                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/>
+                                            </svg>
+                                            History
                                         </a>
                                     </div>
                                 </td>
@@ -155,7 +178,7 @@
                 <div class="field">
                     <label for="or_number">OR Number</label>
                     <input id="or_number" name="or_number" type="text" maxlength="255" placeholder="e.g. 7919825 T">
-                    <small style="display:block;margin-top:6px;color:#64748b;font-style:italic;">Enter the OR number from the physical AF No. 51-C receipt.</small>
+                    <small class="field-help">Enter the OR number from the physical AF No. 51-C receipt.</small>
                 </div>
 
                 <div class="field">
@@ -166,8 +189,8 @@
                 <div id="paymentFeedback" class="modal-feedback"></div>
 
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-outline" id="closePaymentModalButton">Cancel</button>
-                    <button type="submit" class="btn btn-green" id="submitPaymentButton">Save Payment</button>
+                    <button type="button" class="btn btn-secondary" id="closePaymentModalButton">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitPaymentButton">Save Payment</button>
                 </div>
             </form>
         </div>
@@ -176,10 +199,15 @@
     @if (session('success'))
         <div class="flash-modal-backdrop active" id="successFlashModal" role="dialog" aria-modal="true" aria-labelledby="successFlashTitle">
             <div class="flash-modal">
-                <div class="flash-modal-head" id="successFlashTitle">Payment Recorded</div>
+                <div class="flash-modal-head" id="successFlashTitle">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                    </svg>
+                    Payment Recorded
+                </div>
                 <div class="flash-modal-body">{{ session('success') }}</div>
                 <div class="flash-modal-actions">
-                    <button type="button" class="btn btn-green" id="successFlashCloseButton">OK</button>
+                    <button type="button" class="btn btn-primary" id="successFlashCloseButton">OK</button>
                 </div>
             </div>
         </div>

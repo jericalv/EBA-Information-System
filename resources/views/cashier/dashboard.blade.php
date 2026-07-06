@@ -2,178 +2,670 @@
 
 @section('title', 'Dashboard')
 
+@section('extra-css')
+<style>
+    .dashboard-page {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    .dashboard-page .page-head {
+        margin-bottom: 2px;
+    }
+
+    /* ---------- Stat cards ---------- */
+    .dstat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 16px;
+    }
+    .dstat-card {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        box-shadow: var(--shadow-card);
+        min-width: 0;
+    }
+    .dstat-label {
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+    .dstat-value-row {
+        display: flex;
+        align-items: baseline;
+        gap: 5px;
+    }
+    .dstat-value {
+        font-family: var(--font-mono);
+        font-size: 30px;
+        font-weight: 600;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+    }
+    .dstat-unit {
+        font-family: var(--font-mono);
+        font-size: 13px;
+        color: var(--faint);
+    }
+    .dstat-foot-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+    }
+    .dstat-foot {
+        font-size: 12px;
+        color: var(--muted);
+        min-width: 0;
+    }
+    .dstat-chip {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 5px;
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .dstat-chip.ok { background: #E5F3EA; color: var(--pine); }
+    .dstat-chip.warn { background: #FDF8EC; color: #92400E; }
+    .dstat-chip.bad { background: #FBEAEA; color: #B3261E; }
+    .dstat-chip.neutral { background: #F0F2F0; color: var(--muted); }
+
+    /* ---------- Chart panels ---------- */
+    .dashboard-charts-row {
+        display: grid;
+        grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+        gap: 20px;
+        align-items: start;
+    }
+    .chart-panel {
+        padding: 20px 22px;
+        border-radius: 14px;
+        min-width: 0;
+    }
+    .chart-panel-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 16px;
+        transition: margin-bottom 0.3s ease;
+    }
+    .chart-panel.is-collapsed .chart-panel-head {
+        margin-bottom: 0;
+    }
+    .chart-menu-wrap {
+        position: relative;
+        flex-shrink: 0;
+    }
+    .chart-menu-btn {
+        width: 30px;
+        height: 30px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1;
+        cursor: pointer;
+        transition: background-color 0.15s ease, color 0.15s ease;
+    }
+    .chart-menu-btn:hover,
+    .chart-menu-btn[aria-expanded="true"] {
+        background: var(--pine-soft);
+        color: var(--ink);
+    }
+    .chart-menu-btn:focus-visible {
+        outline: 2px solid rgba(10, 92, 47, 0.45);
+        outline-offset: 2px;
+    }
+    .chart-menu {
+        position: absolute;
+        right: 0;
+        top: 36px;
+        min-width: 176px;
+        z-index: 40;
+        padding: 5px;
+    }
+    .chart-menu[hidden] {
+        display: none;
+    }
+    .chart-menu-item {
+        display: block;
+        width: 100%;
+        border: 0;
+        border-radius: 6px;
+        background: none;
+        padding: 8px 11px;
+        font-family: var(--font-ui);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ink);
+        text-align: left;
+        cursor: pointer;
+        transition: background-color 0.12s ease;
+    }
+    .chart-menu-item:hover {
+        background: var(--pine-soft);
+    }
+    .chart-menu-divider {
+        height: 1px;
+        margin: 5px 4px;
+        background: var(--line);
+    }
+    .chart-body {
+        display: grid;
+        grid-template-rows: 1fr;
+        transition: grid-template-rows 0.3s ease;
+    }
+    .chart-body-inner {
+        overflow: hidden;
+        min-height: 0;
+        opacity: 1;
+        transition: opacity 0.25s ease;
+    }
+    .chart-panel.is-collapsed .chart-body {
+        grid-template-rows: 0fr;
+    }
+    .chart-panel.is-collapsed .chart-body-inner {
+        opacity: 0;
+    }
+    .chart-empty {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 13.5px;
+    }
+
+    @media (max-width: 1100px) {
+        .dstat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+        .dashboard-charts-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    @media (max-width: 640px) {
+        .dstat-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+@endsection
+
 @section('content')
-    <div class="summary-grid">
-        <!-- Active Concessionaires Card -->
-        <div class="summary-card bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
-            <div class="flex justify-between items-start mb-3">
-                <div>
-                    <div class="summary-label text-blue-700">Active Concessionaires</div>
-                    <div class="summary-value text-blue-900">{{ $activeConcessionairesCount ?? 0 }}</div>
-                </div>
-                <div class="p-3 bg-blue-500 rounded-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                    </svg>
-                </div>
+    @php
+        $cashierFirstName = \Illuminate\Support\Str::of(auth()->user()?->name ?? 'Cashier')->before(' ');
+        $monthlySeries = collect($cashierMonthlyPayments ?? []);
+        $collectedThisMonth = (float) ($monthlySeries->last()['total'] ?? 0);
+        $activeCount = (int) ($activeConcessionairesCount ?? 0);
+        $readyCount = (int) ($readyToRecordCount ?? 0);
+        $overdue = (int) ($overdueCount ?? 0);
+    @endphp
+
+    <div class="dashboard-page">
+        @if (session('success'))
+            <div class="alert alert-success" style="margin-bottom:0;">{{ session('success') }}</div>
+        @endif
+
+        <div class="page-head">
+            <div>
+                <span class="eyebrow">Cashier overview</span>
+                <h1 class="page-title">Welcome back, {{ $cashierFirstName }}</h1>
             </div>
-            <div id="sparkline-active" class="mt-2" style="height: 50px;"></div>
+            <span class="page-date">{{ now()->format('l, F d, Y') }}</span>
         </div>
 
-        <!-- Ready to Record Card -->
-        <div class="summary-card bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200 hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
-            <div class="flex justify-between items-start mb-3">
-                <div>
-                    <div class="summary-label text-emerald-700">Ready to Record</div>
-                    <div class="summary-value text-emerald-900">{{ $readyToRecordCount ?? 0 }}</div>
+        <section class="dstat-grid" aria-label="Collection statistics">
+            <article class="dstat-card">
+                <span class="dstat-label">Active concessionaires</span>
+                <div class="dstat-value-row">
+                    <span class="dstat-value" data-count-to="{{ $activeCount }}">0</span>
                 </div>
-                <div class="p-3 bg-emerald-500 rounded-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div class="dstat-foot-row">
+                    <span class="dstat-foot">Approved with active contracts</span>
+                    <span class="dstat-chip neutral">Total</span>
+                </div>
+            </article>
+
+            <article class="dstat-card">
+                <span class="dstat-label">Ready to record</span>
+                <div class="dstat-value-row">
+                    <span class="dstat-value" data-count-to="{{ $readyCount }}">0</span>
+                </div>
+                <div class="dstat-foot-row">
+                    <span class="dstat-foot">Awaiting this month&rsquo;s payment</span>
+                    <span class="dstat-chip {{ $readyCount > 0 ? 'warn' : 'ok' }}">{{ $readyCount > 0 ? 'Pending' : 'Clear' }}</span>
+                </div>
+            </article>
+
+            <article class="dstat-card">
+                <span class="dstat-label">Overdue this month</span>
+                <div class="dstat-value-row">
+                    <span class="dstat-value" data-count-to="{{ $overdue }}">0</span>
+                </div>
+                <div class="dstat-foot-row">
+                    <span class="dstat-foot">No payment past the due date</span>
+                    <span class="dstat-chip {{ $overdue > 0 ? 'bad' : 'ok' }}">{{ $overdue > 0 ? 'Action needed' : 'All settled' }}</span>
+                </div>
+            </article>
+
+            <article class="dstat-card">
+                <span class="dstat-label">Collected this month</span>
+                <div class="dstat-value-row">
+                    <span class="dstat-value" data-count-to="{{ number_format($collectedThisMonth, 2, '.', '') }}" data-decimals="2" data-prefix="&#8369;">&#8369;0.00</span>
+                </div>
+                <div class="dstat-foot-row">
+                    <span class="dstat-foot">All payments recorded in {{ now()->format('F') }}</span>
+                    <span class="dstat-chip" id="chip_collections"></span>
+                </div>
+            </article>
+        </section>
+
+        <div class="dashboard-charts-row">
+            <div class="panel chart-panel" id="panel_collections">
+                <div class="chart-panel-head">
+                    <div>
+                        <h2 class="panel-title">Collections trend</h2>
+                        <p class="panel-sub">Payments recorded over the last 6 months.</p>
+                    </div>
+                    <div class="chart-menu-wrap">
+                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Collections trend options">&#8943;</button>
+                        <div class="chart-menu pop" data-menu hidden></div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-body-inner">
+                        <div id="chart_cashier_monthly"></div>
+                    </div>
                 </div>
             </div>
-            <div id="sparkline-ready" class="mt-2" style="height: 50px;"></div>
-        </div>
 
-        <!-- Overdue This Month Card -->
-        <div class="summary-card bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 hover:-translate-y-1 hover:shadow-xl transition-all duration-200">
-            <div class="flex justify-between items-start mb-3">
-                <div>
-                    <div class="summary-label text-amber-700">Overdue This Month</div>
-                    <div class="summary-value text-amber-900">{{ $overdueCount ?? 0 }}</div>
+            <div class="panel chart-panel" id="panel_types">
+                <div class="chart-panel-head">
+                    <div>
+                        <h2 class="panel-title">Payment methods</h2>
+                        <p class="panel-sub">How recorded payments were made.</p>
+                    </div>
+                    <div class="chart-menu-wrap">
+                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Payment methods options">&#8943;</button>
+                        <div class="chart-menu pop" data-menu hidden></div>
+                    </div>
                 </div>
-                <div class="p-3 bg-amber-500 rounded-lg">
-                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <div class="chart-body">
+                    <div class="chart-body-inner">
+                        <div id="chart_cashier_types"></div>
+                    </div>
                 </div>
             </div>
-            <div id="sparkline-overdue" class="mt-2" style="height: 50px;"></div>
-        </div>
-    </div>
-
-    <div class="charts-grid">
-        <div class="chart-card">
-            <div id="chart_cashier_monthly"></div>
-        </div>
-        <div class="chart-card">
-            <div id="chart_cashier_types"></div>
         </div>
     </div>
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-    <script>
-        (() => {
-            if (typeof ApexCharts !== 'undefined') {
-                // Sparkline for Active Concessionaires
-                var sparklineActive = new ApexCharts(document.querySelector("#sparkline-active"), {
-                    chart: { type: 'area', height: 50, sparkline: { enabled: true } },
-                    stroke: { curve: 'smooth', width: 2 },
-                    fill: { opacity: 0.3, type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.1 } },
-                    series: [{ data: [3, 4, 3, 5, 4, 5, 5] }],
-                    colors: ['#3b82f6'],
-                    tooltip: { enabled: false }
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+<script>
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // ---------- Count-up statcard values ----------
+    document.querySelectorAll('.dstat-value[data-count-to]').forEach(function (element) {
+        const target = parseFloat(element.getAttribute('data-count-to')) || 0;
+        const decimals = parseInt(element.getAttribute('data-decimals') || '0', 10);
+        const prefix = element.getAttribute('data-prefix') || '';
+
+        const formatValue = function (value) {
+            return prefix + Number(value).toLocaleString('en-US', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        };
+
+        if (prefersReducedMotion) {
+            element.textContent = formatValue(target);
+            return;
+        }
+
+        const duration = 900;
+        const start = performance.now();
+        const tick = function (now) {
+            const progress = Math.min(1, (now - start) / duration);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            element.textContent = formatValue(target * eased);
+            if (progress < 1) {
+                requestAnimationFrame(tick);
+            }
+        };
+        requestAnimationFrame(tick);
+    });
+
+    // ---------- Month-over-month chip on collections ----------
+    var cashierMonthly = @json($cashierMonthlyPayments);
+
+    (function () {
+        var el = document.getElementById('chip_collections');
+        if (!el) return;
+        if (!Array.isArray(cashierMonthly) || cashierMonthly.length < 2) {
+            el.style.display = 'none';
+            return;
+        }
+        var delta = Number(cashierMonthly[cashierMonthly.length - 1].total) - Number(cashierMonthly[cashierMonthly.length - 2].total);
+        var cls = delta > 0 ? 'ok' : (delta < 0 ? 'bad' : 'neutral');
+        var arrow = delta > 0 ? '↑' : (delta < 0 ? '↓' : '—');
+        el.classList.add(cls);
+        el.textContent = delta === 0 ? '— steady' : arrow + ' ₱' + Math.abs(delta).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        el.title = 'Compared with last month';
+    })();
+
+    // ---------- Chart panel menus: collapse + downloads ----------
+    function downloadCSV(filename, headers, rows) {
+        var esc = function (value) {
+            value = String(value === null || value === undefined ? '' : value);
+            return /[",\n]/.test(value) ? '"' + value.replace(/"/g, '""') + '"' : value;
+        };
+        var csv = [headers].concat(rows).map(function (row) {
+            return row.map(esc).join(',');
+        }).join('\r\n');
+        var blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' });
+        var link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+        URL.revokeObjectURL(link.href);
+    }
+
+    function downloadPNG(getChart, filename) {
+        var chart = typeof getChart === 'function' ? getChart() : getChart;
+        if (!chart) return;
+        chart.dataURI({ scale: 2 }).then(function (output) {
+            var link = document.createElement('a');
+            link.href = output.imgURI;
+            link.download = filename;
+            link.click();
+        });
+    }
+
+    function closeAllChartMenus() {
+        document.querySelectorAll('.chart-menu').forEach(function (menu) {
+            menu.hidden = true;
+        });
+        document.querySelectorAll('.chart-menu-btn').forEach(function (btn) {
+            btn.setAttribute('aria-expanded', 'false');
+        });
+    }
+
+    function wireChartPanel(panelId, actions) {
+        var panel = document.getElementById(panelId);
+        if (!panel) return;
+
+        var btn = panel.querySelector('[data-menu-btn]');
+        var menu = panel.querySelector('[data-menu]');
+        if (!btn || !menu) return;
+
+        var collapseItem = document.createElement('button');
+        collapseItem.type = 'button';
+        collapseItem.className = 'chart-menu-item';
+        collapseItem.textContent = 'Collapse';
+        collapseItem.addEventListener('click', function () {
+            var collapsed = panel.classList.toggle('is-collapsed');
+            collapseItem.textContent = collapsed ? 'Expand' : 'Collapse';
+            closeAllChartMenus();
+        });
+        menu.appendChild(collapseItem);
+
+        var downloads = (actions || []).filter(function (action) { return action.available !== false; });
+        if (downloads.length) {
+            var divider = document.createElement('div');
+            divider.className = 'chart-menu-divider';
+            menu.appendChild(divider);
+
+            downloads.forEach(function (action) {
+                var item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'chart-menu-item';
+                item.textContent = action.label;
+                item.addEventListener('click', function () {
+                    closeAllChartMenus();
+                    action.run();
                 });
-                sparklineActive.render();
+                menu.appendChild(item);
+            });
+        }
 
-                // Sparkline for Ready to Record
-                var sparklineReady = new ApexCharts(document.querySelector("#sparkline-ready"), {
-                    chart: { type: 'area', height: 50, sparkline: { enabled: true } },
-                    stroke: { curve: 'smooth', width: 2 },
-                    fill: { opacity: 0.3, type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.1 } },
-                    series: [{ data: [1, 2, 1, 3, 2, 1, 1] }],
-                    colors: ['#10b981'],
-                    tooltip: { enabled: false }
-                });
-                sparklineReady.render();
+        btn.addEventListener('click', function (event) {
+            event.stopPropagation();
+            var willOpen = menu.hidden;
+            closeAllChartMenus();
+            if (willOpen) {
+                menu.hidden = false;
+                btn.setAttribute('aria-expanded', 'true');
+            }
+        });
+    }
 
-                // Sparkline for Overdue
-                var sparklineOverdue = new ApexCharts(document.querySelector("#sparkline-overdue"), {
-                    chart: { type: 'area', height: 50, sparkline: { enabled: true } },
-                    stroke: { curve: 'smooth', width: 2 },
-                    fill: { opacity: 0.3, type: 'gradient', gradient: { shadeIntensity: 1, opacityFrom: 0.5, opacityTo: 0.1 } },
-                    series: [{ data: [2, 1, 2, 1, 0, 1, 1] }],
-                    colors: ['#f59e0b'],
-                    tooltip: { enabled: false }
-                });
-                sparklineOverdue.render();
+    document.addEventListener('click', function (event) {
+        if (!event.target.closest('.chart-menu-wrap')) {
+            closeAllChartMenus();
+        }
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeAllChartMenus();
+        }
+    });
 
-                var cashierMonthly = @json($cashierMonthlyPayments);
-                var options1 = {
-                    chart: { 
-                        height: 350, 
-                        type: "line", 
-                        width: "100%", 
-                        toolbar: { show: false },
-                        dropShadow: { enabled: true, top: 4, left: 0, blur: 3, opacity: 0.1 }
-                    },
-                    series: [
-                        { name: "Volume (Bar)", type: 'column', data: cashierMonthly.map(m => m.total) },
-                        { name: "Trend (Line)", type: 'line', data: cashierMonthly.map(m => m.total) }
-                    ],
-                    stroke: { width: [0, 4], curve: 'smooth' },
-                    plotOptions: { bar: { columnWidth: "35%", borderRadius: 6 } },
-                    colors: ["#bae6fd", "#2563eb"],
-                    fill: { type: ['solid', 'solid'] },
-                    markers: { size: [0, 6], strokeColors: '#ffffff', strokeWidth: 2, hover: { size: 8 } },
-                    xaxis: { 
-                        categories: cashierMonthly.map(m => m.month),
-                        axisBorder: { show: false },
-                        axisTicks: { show: false },
-                        labels: { style: { colors: '#64748b' } }
-                    },
-                    yaxis: { 
-                        labels: { formatter: function(val) { return "₱" + Number(val).toLocaleString(); }, style: { colors: '#64748b' } }
-                    },
-                    grid: { borderColor: "#f1f5f9", strokeDashArray: 4 },
-                    title: { text: "Revenue Growth Combo", align: "left", style: { fontWeight: "700", color: '#1e293b', fontSize: '16px' } },
-                    legend: { show: false },
-                    tooltip: { shared: true, intersect: false, theme: 'dark', y: { formatter: function(val) { return "₱" + Number(val).toLocaleString(); } } }
-                };
-                var chart1 = new ApexCharts(document.querySelector("#chart_cashier_monthly"), options1);
-                chart1.render();
+    // ---------- Charts ----------
+    const chartFont = getComputedStyle(document.documentElement).getPropertyValue('--font-ui').trim() || 'Manrope, sans-serif';
+    const chartBase = {
+        fontFamily: chartFont,
+        foreColor: '#66756C',
+        toolbar: { show: false },
+        animations: { enabled: !prefersReducedMotion }
+    };
 
-                var cashierTypes = @json($cashierPaymentTypes);
-                var tCash = cashierTypes.cash || 0;
-                var tCheck = cashierTypes.check || 0;
-                var tBank = cashierTypes.bank_transfer || 0;
-                var tTotal = tCash + tCheck + tBank;
-                var pCash = tTotal ? Math.round((tCash/tTotal)*100) : 0;
-                var pCheck = tTotal ? Math.round((tCheck/tTotal)*100) : 0;
-                var pBank = tTotal ? Math.round((tBank/tTotal)*100) : 0;
+    var monthlyChart = null;
+    var typesChart = null;
 
-                var options2 = {
-                    chart: { 
-                        height: 370, 
-                        type: "radialBar",
-                        dropShadow: { enabled: true, top: 3, left: 0, blur: 4, opacity: 0.1 }
-                    },
-                    series: [pCash, pCheck, pBank],
-                    labels: ['Cash', 'Check', 'Bank Transfer'],
-                    colors: ["#10b981", "#3b82f6", "#f59e0b"],
-                    plotOptions: {
-                        radialBar: {
-                            startAngle: -135,
-                            endAngle: 135,
-                            hollow: { size: '40%' },
-                            track: { background: '#f1f5f9', strokeWidth: '100%', margin: 12 },
-                            dataLabels: {
-                                name: { fontSize: '14px', color: '#64748b', offsetY: 20 },
-                                value: { fontSize: '26px', fontWeight: 800, color: '#0f172a', offsetY: -12, formatter: function(val) { return val + "%"; } },
-                                total: { show: true, label: 'Transactions', color: '#64748b', fontSize: '12px', formatter: function(w) { return tTotal; } }
+    if (document.querySelector('#chart_cashier_monthly') && typeof ApexCharts !== 'undefined') {
+        var monthlyOptions = {
+            chart: Object.assign({}, chartBase, {
+                height: 340,
+                type: 'line',
+                width: '100%'
+            }),
+            series: [
+                {
+                    name: 'Collected',
+                    type: 'column',
+                    data: cashierMonthly.map(function (m) { return m.total; })
+                },
+                {
+                    name: 'Trend',
+                    type: 'line',
+                    data: cashierMonthly.map(function (m) { return m.total; })
+                }
+            ],
+            stroke: { width: [0, 2.5], curve: 'smooth', lineCap: 'round' },
+            plotOptions: {
+                bar: { columnWidth: '42%', borderRadius: 4, borderRadiusApplication: 'end' }
+            },
+            colors: ['#9CC5AC', '#0A5C2F'],
+            fill: { opacity: [1, 1], type: 'solid' },
+            dataLabels: { enabled: false },
+            labels: cashierMonthly.map(function (m) { return m.month; }),
+            markers: {
+                size: [0, 3.5],
+                strokeColors: '#fff',
+                strokeWidth: 2,
+                hover: { size: 5 }
+            },
+            xaxis: {
+                type: 'category',
+                labels: { style: { fontSize: '11px', fontWeight: 600 } },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                labels: {
+                    style: { fontSize: '11px' },
+                    formatter: function (value) { return '₱' + Number(value).toLocaleString(); }
+                }
+            },
+            legend: { show: false },
+            tooltip: {
+                shared: true,
+                intersect: false,
+                theme: 'dark',
+                style: { fontSize: '12px' },
+                y: { formatter: function (value) { return '₱' + Number(value).toLocaleString('en-US', { minimumFractionDigits: 2 }); } }
+            },
+            grid: {
+                borderColor: '#EDF2EE',
+                strokeDashArray: 4,
+                padding: { left: 6, right: 6 }
+            }
+        };
+
+        monthlyChart = new ApexCharts(document.querySelector('#chart_cashier_monthly'), monthlyOptions);
+
+        // Short delay so the CSS Grid wrapper settles on its final width before drawing
+        setTimeout(function () {
+            monthlyChart.render();
+        }, 50);
+    }
+
+    var cashierTypes = @json($cashierPaymentTypes);
+    var typesTarget = document.querySelector('#chart_cashier_types');
+    var typesTotal = (cashierTypes.cash || 0) + (cashierTypes.check || 0) + (cashierTypes.bank_transfer || 0);
+
+    if (typesTarget && typeof ApexCharts !== 'undefined') {
+        if (typesTotal === 0) {
+            typesTarget.innerHTML = '<p class="chart-empty">No payments recorded yet.</p>';
+        } else {
+            var typesOptions = {
+                chart: Object.assign({}, chartBase, {
+                    height: 300,
+                    type: 'donut',
+                    width: '100%'
+                }),
+                series: [
+                    cashierTypes.cash || 0,
+                    cashierTypes.check || 0,
+                    cashierTypes.bank_transfer || 0
+                ],
+                labels: ['Cash', 'Check', 'Bank Transfer'],
+                colors: ['#0A5C2F', '#6FAF8D', '#D97706'],
+                stroke: { colors: ['#ffffff'], width: 3 },
+                dataLabels: { enabled: false },
+                plotOptions: {
+                    pie: {
+                        expandOnClick: false,
+                        donut: {
+                            size: '76%',
+                            labels: {
+                                show: true,
+                                name: { fontSize: '12px', color: '#66756C', offsetY: 18 },
+                                value: {
+                                    fontSize: '26px',
+                                    fontWeight: 600,
+                                    color: '#1A2B21',
+                                    offsetY: -12,
+                                    formatter: function (value) { return value; }
+                                },
+                                total: {
+                                    show: true,
+                                    label: 'Payments',
+                                    fontSize: '12px',
+                                    color: '#66756C',
+                                    formatter: function (w) {
+                                        return w.globals.seriesTotals.reduce(function (a, b) { return a + b; }, 0);
+                                    }
+                                }
                             }
                         }
-                    },
-                    stroke: { lineCap: 'round' },
-                    legend: { show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '14px', markers: { radius: 12 } },
-                    title: { text: "Payment Distribution Gauge", align: "left", style: { fontWeight: "700", color: '#1e293b', fontSize: '16px' } }
-                };
-                var chart2 = new ApexCharts(document.querySelector("#chart_cashier_types"), options2);
-                chart2.render();
+                    }
+                },
+                tooltip: {
+                    theme: 'dark',
+                    style: { fontSize: '12px' },
+                    y: {
+                        formatter: function (value) {
+                            return value + ' ' + (value === 1 ? 'payment' : 'payments');
+                        }
+                    }
+                },
+                legend: {
+                    show: true,
+                    position: 'bottom',
+                    horizontalAlign: 'center',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    markers: { size: 5, shape: 'circle' },
+                    itemMargin: { horizontal: 10 }
+                },
+                responsive: [
+                    {
+                        breakpoint: 600,
+                        options: {
+                            chart: { height: 260 }
+                        }
+                    }
+                ]
+            };
+
+            typesChart = new ApexCharts(typesTarget, typesOptions);
+            setTimeout(function () {
+                typesChart.render();
+            }, 50);
+        }
+    }
+
+    // ---------- Wire the three-dot menus ----------
+    wireChartPanel('panel_collections', [
+        {
+            label: 'Download PNG',
+            run: function () { downloadPNG(function () { return monthlyChart; }, 'collections-trend.png'); }
+        },
+        {
+            label: 'Download CSV',
+            run: function () {
+                downloadCSV(
+                    'collections-trend.csv',
+                    ['Month', 'Collected'],
+                    cashierMonthly.map(function (m) { return [m.month, m.total]; })
+                );
             }
-        })();
-    </script>
+        }
+    ]);
+
+    wireChartPanel('panel_types', [
+        {
+            label: 'Download PNG',
+            available: typesTotal > 0,
+            run: function () { downloadPNG(function () { return typesChart; }, 'payment-methods.png'); }
+        },
+        {
+            label: 'Download CSV',
+            run: function () {
+                downloadCSV('payment-methods.csv', ['Method', 'Payments'], [
+                    ['Cash', cashierTypes.cash || 0],
+                    ['Check', cashierTypes.check || 0],
+                    ['Bank Transfer', cashierTypes.bank_transfer || 0]
+                ]);
+            }
+        }
+    ]);
+</script>
 @endsection
