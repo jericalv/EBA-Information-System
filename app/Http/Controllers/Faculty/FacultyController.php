@@ -10,6 +10,7 @@ use App\Models\ActivityLog;
 use App\Models\ConcessionairePayment;
 use App\Models\PartnershipApplication;
 use App\Models\SalesOrder;
+use App\Models\SalesOrderItem;
 use App\Models\UniformStock;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -100,6 +101,55 @@ class FacultyController extends Controller
             ->toArray();
         $statusLabelsFormatted = ['Pending', 'Under Review', 'Approved', 'Rejected', 'Registered'];
 
+        // ---------- Sales analytics (last 6 months) ----------
+        $monthlyRevenueMap = SalesOrder::query()
+            ->selectRaw("DATE_FORMAT(created_at, '%Y-%m') as month_key, SUM(total_amount) as total")
+            ->whereDate('created_at', '>=', $startMonth)
+            ->groupBy('month_key')
+            ->pluck('total', 'month_key');
+
+        // Units sold per month, split by item type (books vs uniforms).
+        $monthlyUnitsRows = SalesOrderItem::query()
+            ->join('sales_orders', 'sales_order_items.sales_order_id', '=', 'sales_orders.id')
+            ->join('uniform_stocks', 'sales_order_items.uniform_stock_id', '=', 'uniform_stocks.id')
+            ->whereDate('sales_orders.created_at', '>=', $startMonth)
+            ->selectRaw("DATE_FORMAT(sales_orders.created_at, '%Y-%m') as month_key, uniform_stocks.item_type as item_type, SUM(sales_order_items.quantity) as units")
+            ->groupBy('month_key', 'item_type')
+            ->get();
+
+        // Index units by [month_key][bucket] where bucket is 'books' or 'uniforms'.
+        $unitsByMonth = [];
+        foreach ($monthlyUnitsRows as $row) {
+            $bucket = $row->item_type === 'books' ? 'books' : 'uniforms';
+            $unitsByMonth[$row->month_key][$bucket] = ($unitsByMonth[$row->month_key][$bucket] ?? 0) + (int) $row->units;
+        }
+
+        $salesMonthLabels = [];
+        $revenueData = [];
+        $unitsUniformsData = [];
+        $unitsBooksData = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $month = $now->copy()->startOfMonth()->subMonths($i);
+            $monthKey = $month->format('Y-m');
+
+            $salesMonthLabels[] = $month->format('M Y');
+            $revenueData[] = round((float) ($monthlyRevenueMap[$monthKey] ?? 0), 2);
+            $unitsUniformsData[] = (int) ($unitsByMonth[$monthKey]['uniforms'] ?? 0);
+            $unitsBooksData[] = (int) ($unitsByMonth[$monthKey]['books'] ?? 0);
+        }
+
+        // Top items by total quantity sold (all time).
+        $topItemsRows = SalesOrderItem::query()
+            ->join('uniform_stocks', 'sales_order_items.uniform_stock_id', '=', 'uniform_stocks.id')
+            ->selectRaw('uniform_stocks.item_name as item_name, SUM(sales_order_items.quantity) as units')
+            ->groupBy('uniform_stocks.id', 'uniform_stocks.item_name')
+            ->orderByDesc('units')
+            ->limit(8)
+            ->get();
+
+        $topItemLabels = $topItemsRows->pluck('item_name')->map(fn ($name) => (string) $name)->toArray();
+        $topItemData = $topItemsRows->pluck('units')->map(fn ($units) => (int) $units)->toArray();
+
         return $this->facultyView('faculty.dashboard', compact(
             'totalApplications',
             'pendingCount',
@@ -109,7 +159,13 @@ class FacultyController extends Controller
             'appMonthLabels',
             'appMonthData',
             'statusData',
-            'statusLabelsFormatted'
+            'statusLabelsFormatted',
+            'salesMonthLabels',
+            'revenueData',
+            'unitsUniformsData',
+            'unitsBooksData',
+            'topItemLabels',
+            'topItemData'
         ));
     }
 
