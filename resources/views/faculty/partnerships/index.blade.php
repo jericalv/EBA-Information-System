@@ -5,8 +5,19 @@
 
 @section('extra-css')
 <style>
-    .table { width: 100%; border-collapse: collapse; min-width: 820px; }
-    .table th, .table td { padding: 14px 18px; border-bottom: 1px solid #eef2f7; text-align: left; vertical-align: top; }
+    .table { width: 100%; border-collapse: collapse; min-width: 900px; table-layout: fixed; }
+    .table td .cell-muted { font-size: 13px; color: #64748b; }
+    .type-badge {
+        display: inline-flex;
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        background: #EEF0F3;
+        color: #1F2937;
+    }
+    .table th, .table td { padding: 12px 12px; border-bottom: 1px solid #eef2f7; text-align: left; vertical-align: top; overflow-wrap: break-word; word-break: break-word; }
+    .business-badge, .type-badge { max-width: 100%; white-space: normal; overflow-wrap: break-word; word-break: break-word; }
     .table th { background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
 
     .business-badge {
@@ -489,11 +500,15 @@
             <table class="table" style="width:100%;">
                 <thead>
                     <tr>
-                        <th style="width:30%;">Applicant</th>
-                        <th style="width:22%;">Business</th>
-                        <th style="width:18%;">Status</th>
-                        <th style="width:18%;">Submitted</th>
-                        <th style="width:12%;">Action</th>
+                        <th style="width:17%;">Applicant</th>
+                        <th style="width:13%;">Business</th>
+                        <th style="width:9%;">Type of Business</th>
+                        <th style="width:12%;">Proposed Location</th>
+                        <th style="width:11%;">Contact</th>
+                        <th style="width:13%;">Status</th>
+                        <th style="width:9%;">Submitted</th>
+                        <th style="width:8%;">Last Updated</th>
+                        <th style="width:8%;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -527,6 +542,18 @@
                                 $statusLabel = 'Rejected';
                             }
 
+                            $businessTypeLabel = collect(explode(',', (string) $application->type_of_business))
+                                ->map(fn ($value) => trim($value))
+                                ->filter()
+                                ->map(fn ($value) => match ($value) {
+                                    'food' => 'Food',
+                                    'non_food' => 'Non-Food',
+                                    default => $value,
+                                })
+                                ->implode(', ');
+
+                            $applicantPhone = $application->phone_number ?: $application->phone;
+
                             [$wizardBadgeColor, $wizardBadgeLabel, $wizardNeedsAction] = match ($wizardStatus) {
                                 'loi_submitted' => ['step-1', 'Step 1: Action Needed', true],
                                 'form_submitted' => ['step-2', 'Step 2: Action Needed', true],
@@ -546,6 +573,21 @@
                             </td>
                             <td><span class="business-badge">{{ $application->business_name }}</span></td>
                             <td>
+                                @if ($businessTypeLabel !== '')
+                                    <span class="type-badge">{{ $businessTypeLabel }}</span>
+                                @else
+                                    <span class="cell-muted">—</span>
+                                @endif
+                            </td>
+                            <td>{{ $application->proposed_location ?: '—' }}</td>
+                            <td>
+                                @if ($applicantPhone)
+                                    {{ $applicantPhone }}
+                                @else
+                                    <span class="cell-muted">—</span>
+                                @endif
+                            </td>
+                            <td>
                                 <span class="badge {{ $statusClass }}">{{ $statusLabel }}</span>
                                 @if ($wizardStatus !== 'final_approved')
                                     <div>
@@ -561,10 +603,14 @@
                                 <div style="font-size:13px;color:#64748b;">{{ $application->created_at->format('g:i A') }}</div>
                             </td>
                             <td>
+                                <div>{{ $application->updated_at->format('M d, Y') }}</div>
+                                <div style="font-size:13px;color:#64748b;">{{ $application->updated_at->format('g:i A') }}</div>
+                            </td>
+                            <td>
                                 <button
                                     type="button"
                                     class="btn btn-green"
-                                    style="padding:10px 20px;font-size:14px;"
+                                    style="padding:8px 14px;font-size:13px;"
                                     onclick="openViewModalFromButton(this)"
                                     data-app-id="{{ $application->id }}"
                                     data-app-status="{{ $application->status }}"
@@ -608,11 +654,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" style="text-align:center;color:#64748b;padding:24px;">No partnership applications found.</td>
+                            <td colspan="9" style="text-align:center;color:#64748b;padding:24px;">No partnership applications found.</td>
                         </tr>
                     @endforelse
                     <tr id="partnership-no-match" style="display:none;">
-                        <td colspan="5" style="text-align:center;color:#64748b;padding:24px;">No matching partnership applications found.</td>
+                        <td colspan="9" style="text-align:center;color:#64748b;padding:24px;">No matching partnership applications found.</td>
                     </tr>
                 </tbody>
             </table>
