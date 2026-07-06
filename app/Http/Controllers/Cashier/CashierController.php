@@ -3,16 +3,18 @@
 namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
-use App\Mail\PaymentRecordedMail;
+use App\Mail\PaymentsRecordedMail;
 use App\Models\ActivityLog;
 use App\Models\ConcessionairePayment;
 use App\Models\PartnershipApplication;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
 
 class CashierController extends Controller
 {
@@ -27,8 +29,8 @@ class CashierController extends Controller
             ->where('is_active_concessionaire', true)
             ->count();
 
-        $paidThisMonth = ConcessionairePayment::whereYear('payment_date', now()->year)
-            ->whereMonth('payment_date', now()->month)
+        $paidThisMonth = ConcessionairePayment::whereYear('period_month', now()->year)
+            ->whereMonth('period_month', now()->month)
             ->pluck('concessionaire_id')
             ->toArray();
 
@@ -89,96 +91,21 @@ class CashierController extends Controller
             'bank_transfer' => ConcessionairePayment::where('payment_type', 'bank_transfer')->count(),
         ];
 
-        // ---- Real 6-month sparkline series for the stat cards ----
-        $sparkMonths = collect(range(5, 0))->map(function ($i) {
-            $month = now()->subMonths($i);
+        // ---- Current-month collection totals for the stat cards ----
+        $collectedThisMonth = (float) (collect($cashierMonthlyPayments)->last()['total'] ?? 0);
 
-            return [
-                'start' => $month->copy()->startOfMonth(),
-                'end' => $month->copy()->endOfMonth(),
-            ];
-        });
-
-        $windowPayments = ConcessionairePayment::where('payment_date', '>=', $sparkMonths->first()['start'])
-            ->get(['concessionaire_id', 'amount', 'payment_date']);
-
-        // All approved concessionaires (not only currently active) so historical
-        // months are counted by the contract that actually covered them.
-        $approvedConcessionaires = User::query()
-            ->where('role', 'concessionaire')
-            ->where('is_approved', true)
-            ->with('latestPartnershipApplication')
-            ->get(['id', 'monthly_fee', 'is_active_concessionaire']);
-
-        $lastMonthIndex = $sparkMonths->count() - 1;
-        $collectionsSpark = [];
-        $activeSpark = [];
-        $readySpark = [];
-        $overdueSpark = [];
-
-        $sparkMonths->each(function ($month, $index) use (
-            $windowPayments,
-            $approvedConcessionaires,
-            $lastMonthIndex,
-            $activeConcessionairesCount,
-            $readyToRecordCount,
-            $overdueCount,
-            &$collectionsSpark,
-            &$activeSpark,
-            &$readySpark,
-            &$overdueSpark
-        ) {
-            $inMonth = $windowPayments->filter(function ($payment) use ($month) {
-                return $payment->payment_date
-                    && $payment->payment_date->between($month['start'], $month['end']);
-            });
-            $paidIds = $inMonth->pluck('concessionaire_id')->unique();
-
-            $collectionsSpark[] = round((float) $inMonth->sum('amount'), 2);
-
-            $activeThisMonth = $approvedConcessionaires->filter(function ($concessionaire) use ($month) {
-                $application = $concessionaire->latestPartnershipApplication;
-                $start = $application?->contract_period_start;
-                $end = $application?->contract_period_end;
-
-                if (! $start) {
-                    return false;
-                }
-
-                return $start->lte($month['end']) && ($end === null || $end->gte($month['start']));
-            });
-
-            $unpaidBacklog = $activeThisMonth->filter(function ($concessionaire) use ($paidIds) {
-                return (float) ($concessionaire->monthly_fee ?? 0) > 0
-                    && ! $paidIds->contains($concessionaire->id);
-            })->count();
-
-            if ($index === $lastMonthIndex) {
-                // Current month: mirror the live figures shown on the cards.
-                $activeSpark[] = $activeConcessionairesCount;
-                $readySpark[] = $readyToRecordCount;
-                $overdueSpark[] = $overdueCount;
-            } else {
-                $activeSpark[] = $activeThisMonth->count();
-                $readySpark[] = $unpaidBacklog;
-                $overdueSpark[] = $unpaidBacklog;
-            }
-        });
-
-        $statSparklines = [
-            'collections' => $collectionsSpark,
-            'active' => $activeSpark,
-            'ready' => $readySpark,
-            'overdue' => $overdueSpark,
-        ];
+        $paymentsThisMonthCount = ConcessionairePayment::whereYear('payment_date', now()->year)
+            ->whereMonth('payment_date', now()->month)
+            ->count();
 
         return view('cashier.dashboard', compact(
             'activeConcessionairesCount',
             'overdueCount',
             'readyToRecordCount',
+            'collectedThisMonth',
+            'paymentsThisMonthCount',
             'cashierMonthlyPayments',
-            'cashierPaymentTypes',
-            'statSparklines'
+            'cashierPaymentTypes'
         ));
     }
 
@@ -202,20 +129,12 @@ class CashierController extends Controller
             ->orderBy('name')
             ->get();
 
-        $thisMonthCounts = ConcessionairePayment::query()
-            ->selectRaw('concessionaire_id, COUNT(*) as payment_count')
-            ->whereYear('payment_date', now()->year)
-            ->whereMonth('payment_date', now()->month)
-            ->groupBy('concessionaire_id')
-            ->pluck('payment_count', 'concessionaire_id');
+        $now = now();
+        $today = $now->day;
+        $currentMonthKey = $now->format('Y-m');
 
-        $paidThisMonth = ConcessionairePayment::whereYear('payment_date', now()->year)
-            ->whereMonth('payment_date', now()->month)
-            ->pluck('concessionaire_id')
-            ->toArray();
-
-        $today = now()->day;
         $concessionaireStatuses = [];
+        $paymentPlans = [];
 
         if ($concessionaires->isNotEmpty()) {
             $latestApplications = PartnershipApplication::query()
@@ -241,23 +160,29 @@ class CashierController extends Controller
                 ->get()
                 ->keyBy('user_id');
 
-            $concessionaires->each(function (User $concessionaire) use (
-                $latestApplications,
-                $paidThisMonth,
-                $today,
-                &$concessionaireStatuses
-            ) {
+            // Every covered month per concessionaire, so we can flag arrears/advances.
+            $paidMonthsByConcessionaire = ConcessionairePayment::query()
+                ->whereIn('concessionaire_id', $concessionaires->pluck('id'))
+                ->get(['concessionaire_id', 'period_month', 'payment_date'])
+                ->groupBy('concessionaire_id')
+                ->map(function ($payments) {
+                    return $payments
+                        ->map(function ($payment) {
+                            $covered = $payment->period_month ?? $payment->payment_date;
+
+                            return $covered ? Carbon::parse($covered)->format('Y-m') : null;
+                        })
+                        ->filter()
+                        ->flip();
+                });
+
+            foreach ($concessionaires as $concessionaire) {
                 $latestApplication = $latestApplications->get($concessionaire->id);
+                $concessionaire->setRelation('latestPartnershipApplication', $latestApplication);
 
-                $concessionaire->setRelation(
-                    'latestPartnershipApplication',
-                    $latestApplication
-                );
-
-                $hasContractPeriod = filled($latestApplication?->contract_period_start)
-                    && filled($latestApplication?->contract_period_end);
-                $hasPaymentThisMonth = in_array($concessionaire->id, $paidThisMonth, true);
                 $monthlyFee = (float) ($concessionaire->monthly_fee ?? 0);
+                $paidKeys = $paidMonthsByConcessionaire->get($concessionaire->id) ?? collect();
+                $hasPaymentThisMonth = $paidKeys->has($currentMonthKey);
 
                 if ($hasPaymentThisMonth) {
                     $status = 'paid';
@@ -270,14 +195,71 @@ class CashierController extends Controller
                 }
 
                 $concessionaireStatuses[$concessionaire->id] = $status;
-            });
+
+                // Build the selectable month list (only when there is a fee to charge).
+                $months = [];
+                $owedCount = 0;
+
+                if ($monthlyFee > 0) {
+                    $contractStart = $latestApplication?->contract_period_start;
+                    $contractEnd = $latestApplication?->contract_period_end;
+
+                    // Arrears: unpaid months from contract start (capped to 24 months back) to last month.
+                    if ($contractStart) {
+                        $cursor = $contractStart->copy()->startOfMonth();
+                        $floor = $now->copy()->subMonths(24)->startOfMonth();
+                        if ($cursor->lt($floor)) {
+                            $cursor = $floor;
+                        }
+                        $lastMonth = $now->copy()->subMonthNoOverflow()->startOfMonth();
+
+                        while ($cursor->lte($lastMonth)) {
+                            $key = $cursor->format('Y-m');
+                            $withinContract = ! $contractEnd || $cursor->lte($contractEnd);
+                            if ($withinContract && ! $paidKeys->has($key)) {
+                                $months[] = ['month' => $key, 'label' => $cursor->format('F Y'), 'group' => 'arrears'];
+                                $owedCount++;
+                            }
+                            $cursor = $cursor->addMonthNoOverflow();
+                        }
+                    }
+
+                    // Current month (if unpaid and still within the contract).
+                    $currentCursor = $now->copy()->startOfMonth();
+                    if (! $hasPaymentThisMonth && (! $contractEnd || $currentCursor->lte($contractEnd))) {
+                        $months[] = ['month' => $currentMonthKey, 'label' => $currentCursor->format('F Y'), 'group' => 'current'];
+                    }
+
+                    // Advance: up to 12 unpaid future months, not past the contract end.
+                    $advanceCursor = $now->copy()->addMonthNoOverflow()->startOfMonth();
+                    $advanceLimit = $now->copy()->addMonths(12)->startOfMonth();
+                    while ($advanceCursor->lte($advanceLimit)) {
+                        if ($contractEnd && $advanceCursor->gt($contractEnd)) {
+                            break;
+                        }
+                        $key = $advanceCursor->format('Y-m');
+                        if (! $paidKeys->has($key)) {
+                            $months[] = ['month' => $key, 'label' => $advanceCursor->format('F Y'), 'group' => 'advance'];
+                        }
+                        $advanceCursor = $advanceCursor->addMonthNoOverflow();
+                    }
+                }
+
+                $paymentPlans[$concessionaire->id] = [
+                    'monthly_fee' => $monthlyFee,
+                    'business' => $concessionaire->business_name ?: $concessionaire->name,
+                    'name' => $concessionaire->name,
+                    'owed_count' => $owedCount,
+                    'current_unpaid' => ! $hasPaymentThisMonth && $monthlyFee > 0,
+                    'months' => $months,
+                ];
+            }
         }
 
         return view('cashier.payments', compact(
             'concessionaires',
-            'thisMonthCounts',
-            'paidThisMonth',
-            'concessionaireStatuses'
+            'concessionaireStatuses',
+            'paymentPlans'
         ));
     }
 
@@ -424,27 +406,18 @@ class CashierController extends Controller
     {
         $validated = $request->validate([
             'concessionaire_id' => ['required', 'integer', 'exists:users,id'],
-            'amount' => ['required', 'numeric', 'min:1'],
             'payment_date' => ['required', 'date'],
+            'months' => ['required', 'array', 'min:1', 'max:24'],
+            'months.*' => ['required', 'string', 'regex:/^\d{4}-\d{2}$/'],
+            'amounts' => ['required', 'array'],
             'or_number' => ['nullable', 'string', 'max:255'],
             'notes' => ['nullable', 'string', 'max:500'],
         ]);
 
-        $concessionaireId = (int) $validated['concessionaire_id'];
-
-        $concessionaire = User::findOrFail($concessionaireId);
+        $concessionaire = User::findOrFail((int) $validated['concessionaire_id']);
 
         if ($concessionaire->role !== 'concessionaire' || ! $concessionaire->is_approved || ! $concessionaire->is_active_concessionaire) {
             return back()->with('error', 'Selected user is not an active approved concessionaire.');
-        }
-
-        $existingPayment = ConcessionairePayment::where('concessionaire_id', $concessionaireId)
-            ->whereYear('payment_date', now()->year)
-            ->whereMonth('payment_date', now()->month)
-            ->exists();
-
-        if ($existingPayment) {
-            return back()->withErrors(['limit' => 'Payment already recorded for this concessionaire this month.'])->withInput();
         }
 
         $partnershipApplication = PartnershipApplication::query()
@@ -453,28 +426,76 @@ class CashierController extends Controller
             ->latest()
             ->first();
 
-        $payment = ConcessionairePayment::create([
-            'partnership_application_id' => $partnershipApplication?->id,
-            'concessionaire_id' => $concessionaire->id,
-            'recorded_by' => Auth::id(),
-            'amount' => $validated['amount'],
-            'payment_date' => $validated['payment_date'],
-            'payment_type' => 'cash',
-            'or_number' => $validated['or_number'] ?? null,
-            'notes' => $validated['notes'] ?? null,
-        ]);
+        $receivedDate = Carbon::parse($validated['payment_date']);
+        $monthKeys = collect($validated['months'])->unique()->values();
 
-        $formattedAmount = number_format((float) $payment->amount, 2);
+        $created = collect();
+        $skipped = [];
+        $invalid = [];
+
+        foreach ($monthKeys as $monthKey) {
+            $period = Carbon::createFromFormat('Y-m', $monthKey)->startOfMonth();
+            $rawAmount = $request->input("amounts.$monthKey");
+
+            if (! is_numeric($rawAmount) || (float) $rawAmount < 1) {
+                $invalid[] = $period->format('F Y') . ' needs a valid amount.';
+
+                continue;
+            }
+
+            $alreadyPaid = ConcessionairePayment::where('concessionaire_id', $concessionaire->id)
+                ->whereYear('period_month', $period->year)
+                ->whereMonth('period_month', $period->month)
+                ->exists();
+
+            if ($alreadyPaid) {
+                $skipped[] = $period->format('F Y');
+
+                continue;
+            }
+
+            $created->push(ConcessionairePayment::create([
+                'partnership_application_id' => $partnershipApplication?->id,
+                'concessionaire_id' => $concessionaire->id,
+                'recorded_by' => Auth::id(),
+                'amount' => (float) $rawAmount,
+                'payment_date' => $receivedDate->toDateString(),
+                'period_month' => $period->toDateString(),
+                'payment_type' => 'cash',
+                'or_number' => $validated['or_number'] ?? null,
+                'notes' => $validated['notes'] ?? null,
+            ]));
+        }
+
         $businessName = $concessionaire->business_name ?: $concessionaire->name;
+
+        if ($created->isEmpty()) {
+            $messages = [];
+            if ($skipped) {
+                $messages[] = 'Already recorded for: ' . implode(', ', $skipped) . '.';
+            }
+            $messages = array_merge($messages, $invalid);
+            if (empty($messages)) {
+                $messages[] = 'No payments were recorded.';
+            }
+
+            return back()->withErrors(['months' => $messages])->withInput();
+        }
+
+        $totalAmount = $created->sum(fn ($payment) => (float) $payment->amount);
+        $monthsCovered = $created
+            ->map(fn ($payment) => Carbon::parse($payment->period_month)->format('M Y'))
+            ->implode(', ');
 
         ActivityLog::log(
             'payment_recorded',
             'payment',
-            (string) $payment->id,
-            "Cashier recorded payment of ₱{$formattedAmount} for {$businessName}",
+            (string) $created->first()->id,
+            'Cashier recorded ₱' . number_format($totalAmount, 2) . " for {$businessName} covering {$monthsCovered}",
             [
-                'amount' => (string) $payment->amount,
-                'payment_type' => $payment->payment_type,
+                'total_amount' => (string) $totalAmount,
+                'payment_ids' => $created->pluck('id')->all(),
+                'months' => $created->map(fn ($payment) => Carbon::parse($payment->period_month)->format('Y-m'))->all(),
                 'concessionaire_id' => $concessionaire->id,
                 'recorded_by' => Auth::id(),
             ]
@@ -482,16 +503,27 @@ class CashierController extends Controller
 
         try {
             Mail::to($concessionaire->email)->send(
-                new PaymentRecordedMail($payment->fresh(['concessionaire', 'recordedBy', 'partnershipApplication']))
+                new PaymentsRecordedMail(
+                    $concessionaire,
+                    $created->map->fresh(['recordedBy'])->values(),
+                    $receivedDate
+                )
             );
         } catch (\Exception $e) {
             Log::warning('Payment notification mail failed: ' . $e->getMessage(), [
                 'controller' => self::class,
-                'payment_id' => $payment->id,
+                'payment_ids' => $created->pluck('id')->all(),
                 'recipient' => $concessionaire->email,
             ]);
         }
 
-        return back()->with('success', "Payment of ₱{$formattedAmount} recorded for {$businessName}.");
+        $count = $created->count();
+        $summary = '₱' . number_format($totalAmount, 2) . " recorded for {$businessName} — {$count} "
+            . Str::plural('month', $count) . " ({$monthsCovered}).";
+        if ($skipped) {
+            $summary .= ' Skipped already-paid: ' . implode(', ', $skipped) . '.';
+        }
+
+        return back()->with('success', $summary);
     }
 }

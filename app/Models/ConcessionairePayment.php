@@ -16,6 +16,7 @@ class ConcessionairePayment extends Model
         'recorded_by',
         'amount',
         'payment_date',
+        'period_month',
         'payment_type',
         'or_number',
         'notes',
@@ -24,6 +25,7 @@ class ConcessionairePayment extends Model
     protected $casts = [
         'amount' => 'decimal:2',
         'payment_date' => 'date',
+        'period_month' => 'date',
     ];
 
     public function concessionaire(): BelongsTo
