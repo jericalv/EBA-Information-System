@@ -196,15 +196,16 @@ class CashierController extends Controller
 
                 $concessionaireStatuses[$concessionaire->id] = $status;
 
-                // Build the selectable month list (only when there is a fee to charge).
-                $months = [];
+                // The calendar classifies every month itself, so we only need to
+                // hand it the contract window, which months are already paid, and
+                // which unpaid months to pre-select (arrears + the current month).
+                $contractStart = $latestApplication?->contract_period_start;
+                $contractEnd = $latestApplication?->contract_period_end;
                 $owedCount = 0;
+                $preselect = [];
 
                 if ($monthlyFee > 0) {
-                    $contractStart = $latestApplication?->contract_period_start;
-                    $contractEnd = $latestApplication?->contract_period_end;
-
-                    // Arrears: unpaid months from contract start (capped to 24 months back) to last month.
+                    // Arrears: unpaid in-contract months from contract start to last month.
                     if ($contractStart) {
                         $cursor = $contractStart->copy()->startOfMonth();
                         $floor = $now->copy()->subMonths(24)->startOfMonth();
@@ -217,7 +218,7 @@ class CashierController extends Controller
                             $key = $cursor->format('Y-m');
                             $withinContract = ! $contractEnd || $cursor->lte($contractEnd);
                             if ($withinContract && ! $paidKeys->has($key)) {
-                                $months[] = ['month' => $key, 'label' => $cursor->format('F Y'), 'group' => 'arrears'];
+                                $preselect[] = $key;
                                 $owedCount++;
                             }
                             $cursor = $cursor->addMonthNoOverflow();
@@ -227,23 +228,14 @@ class CashierController extends Controller
                     // Current month (if unpaid and still within the contract).
                     $currentCursor = $now->copy()->startOfMonth();
                     if (! $hasPaymentThisMonth && (! $contractEnd || $currentCursor->lte($contractEnd))) {
-                        $months[] = ['month' => $currentMonthKey, 'label' => $currentCursor->format('F Y'), 'group' => 'current'];
-                    }
-
-                    // Advance: up to 12 unpaid future months, not past the contract end.
-                    $advanceCursor = $now->copy()->addMonthNoOverflow()->startOfMonth();
-                    $advanceLimit = $now->copy()->addMonths(12)->startOfMonth();
-                    while ($advanceCursor->lte($advanceLimit)) {
-                        if ($contractEnd && $advanceCursor->gt($contractEnd)) {
-                            break;
-                        }
-                        $key = $advanceCursor->format('Y-m');
-                        if (! $paidKeys->has($key)) {
-                            $months[] = ['month' => $key, 'label' => $advanceCursor->format('F Y'), 'group' => 'advance'];
-                        }
-                        $advanceCursor = $advanceCursor->addMonthNoOverflow();
+                        $preselect[] = $currentMonthKey;
                     }
                 }
+
+                // A concessionaire can still be selectable when arrears exist but
+                // the current month is already paid, so key the button off the fee.
+                $hasSelectableMonths = $monthlyFee > 0
+                    && ($contractStart !== null || ! $hasPaymentThisMonth);
 
                 $paymentPlans[$concessionaire->id] = [
                     'monthly_fee' => $monthlyFee,
@@ -251,7 +243,12 @@ class CashierController extends Controller
                     'name' => $concessionaire->name,
                     'owed_count' => $owedCount,
                     'current_unpaid' => ! $hasPaymentThisMonth && $monthlyFee > 0,
-                    'months' => $months,
+                    'has_selectable' => $hasSelectableMonths,
+                    'current_month' => $currentMonthKey,
+                    'contract_start' => $contractStart?->format('Y-m'),
+                    'contract_end' => $contractEnd?->format('Y-m'),
+                    'paid_months' => $paidKeys->keys()->values()->all(),
+                    'preselect' => $preselect,
                 ];
             }
         }
