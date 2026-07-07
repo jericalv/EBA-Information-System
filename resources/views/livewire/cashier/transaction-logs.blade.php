@@ -102,7 +102,7 @@
 
             <div class="border-t border-slate-100 px-4 py-2.5">
                 {{-- Faculty portal uses its own styled pagination; cashier keeps the default. --}}
-                {{ $orders->links(auth()->user()?->role === 'faculty' ? 'faculty.partials.pagination' : null) }}
+                {{ $orders->links(auth()->user()?->role === 'faculty' ? 'faculty.partials.livewire-pagination' : null) }}
             </div>
         @endif
     </div>

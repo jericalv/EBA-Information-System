@@ -1844,7 +1844,11 @@ class AdminController extends Controller
             return response()->streamDownload(function () use ($startDate, $endDate): void {
                 $output = fopen('php://output', 'w');
 
+                // UTF-8 BOM so Excel renders the ₱ symbol correctly.
+                fwrite($output, "\xEF\xBB\xBF");
+
                 fputcsv($output, [
+                    'Items',
                     'Quantity',
                     'Cashier Name',
                     'Payment Method',
@@ -1853,18 +1857,32 @@ class AdminController extends Controller
                 ]);
 
                 SalesOrder::query()
-                    ->with(['cashier', 'items'])
+                    ->with(['cashier', 'items.uniformStock'])
                     ->whereDate('created_at', '>=', $startDate)
                     ->whereDate('created_at', '<=', $endDate)
                     ->latest('id')
                     ->chunkById(200, function ($orders) use ($output): void {
                         foreach ($orders as $order) {
+                            $items = $order->items->map(function ($item) {
+                                $name = $item->uniformStock?->item_name ?? 'Unknown Item';
+                                $type = $item->uniformStock?->item_type;
+                                $label = $type ? $name . ' (' . $type . ')' : $name;
+
+                                return $label . ' x' . (int) $item->quantity
+                                    . ' @ ₱' . number_format((float) $item->price_at_sale, 2);
+                            })->implode('; ');
+
+                            // Wrap the date as an Excel string formula so it is treated as
+                            // text (prevents the "######" too-narrow-date-column display).
+                            $date = optional($order->created_at)->format('M d, Y g:i A');
+
                             fputcsv($output, [
+                                $items,
                                 $order->items->sum('quantity'),
                                 $order->cashier?->name ?? 'N/A',
                                 $order->payment_type,
                                 number_format((float) $order->total_amount, 2, '.', ''),
-                                optional($order->created_at)->format('M d, Y g:i A'),
+                                '="' . $date . '"',
                             ]);
                         }
                     });
