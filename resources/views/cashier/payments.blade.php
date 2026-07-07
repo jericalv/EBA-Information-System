@@ -4,124 +4,163 @@
 
 @section('extra-css')
 <style>
-    /* ---------- Owed indicator ---------- */
-    .owed-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 9px;
-        border-radius: 5px;
-        font-family: var(--font-mono);
-        font-size: 11px;
-        font-weight: 600;
-        background: #FBEAEA;
-        color: #B3261E;
-        white-space: nowrap;
-    }
-    .uptodate-chip {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 4px 9px;
-        border-radius: 5px;
-        font-family: var(--font-mono);
-        font-size: 11px;
-        font-weight: 600;
-        background: #E5F3EA;
-        color: #14532D;
-        white-space: nowrap;
-    }
-
-    /* ---------- Month checklist (modal) ---------- */
-    .month-picker {
+    /* ---------- Month calendar (modal) ---------- */
+    .mcal {
         border: 1px solid var(--line);
-        border-radius: 8px;
+        border-radius: 10px;
         background: #FAFCFA;
-        padding: 8px;
-        max-height: 280px;
-        overflow-y: auto;
-        display: flex;
-        flex-direction: column;
-        gap: 6px;
+        padding: 12px;
     }
-    .month-group-label {
-        font-family: var(--font-mono);
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--faint);
-        padding: 8px 4px 2px;
-    }
-    .month-group-label:first-child { padding-top: 2px; }
-    .month-row {
+    .mcal-head {
         display: flex;
         align-items: center;
+        justify-content: space-between;
         gap: 10px;
-        padding: 8px 10px;
-        border: 1px solid var(--line);
+        margin-bottom: 12px;
+    }
+    .mcal-year {
+        font-family: var(--font-mono);
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
+    }
+    .mcal-nav {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 30px;
+        height: 30px;
+        border: 1px solid var(--line-strong);
         border-radius: 6px;
         background: #fff;
-        transition: opacity 0.12s ease, border-color 0.12s ease;
-    }
-    .month-row.is-arrear { border-color: #F0D6D6; }
-    .month-row.is-off { opacity: 0.5; }
-    .month-row label {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        margin: 0;
-        font-size: 13.5px;
-        font-weight: 600;
         color: var(--ink);
         cursor: pointer;
-        min-width: 0;
+        transition: background-color 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
     }
-    .month-row input[type="checkbox"] {
-        width: 16px;
-        height: 16px;
-        accent-color: var(--pine);
-        flex-shrink: 0;
+    .mcal-nav svg { width: 15px; height: 15px; }
+    .mcal-nav:hover:not(:disabled) { background: #F0F4F1; border-color: #AEC1B4; }
+    .mcal-nav:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .mcal-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 6px;
+    }
+    .mcal-cell {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 3px;
+        padding: 9px 10px;
+        border: 1px solid var(--line-strong);
+        border-radius: 7px;
+        background: #fff;
+        color: var(--ink);
         cursor: pointer;
+        text-align: left;
+        transition: border-color 0.12s ease, background-color 0.12s ease, box-shadow 0.12s ease;
     }
-    .month-row .month-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .month-tag {
+    .mcal-cell:hover:not(.is-locked):not(.is-selected) {
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.08);
+    }
+    .mcal-m {
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1;
+    }
+    .mcal-sub {
+        display: inline-flex;
+        align-items: center;
+        gap: 3px;
         font-family: var(--font-mono);
         font-size: 9px;
         font-weight: 600;
         letter-spacing: 0.06em;
         text-transform: uppercase;
-        padding: 2px 6px;
-        border-radius: 4px;
-        flex-shrink: 0;
+        color: var(--faint);
+        line-height: 1;
     }
-    .month-tag.arrear { background: #FBEAEA; color: #B3261E; }
-    .month-tag.advance { background: #EAF1FB; color: #1E40AF; }
-    .month-amount {
-        width: 118px;
-        padding: 7px 10px;
-        border: 1px solid var(--line-strong);
-        border-radius: 6px;
-        font-family: var(--font-mono);
-        font-size: 13px;
-        font-variant-numeric: tabular-nums;
-        text-align: right;
-        background: #fff;
-        color: var(--ink);
-        flex-shrink: 0;
+    .mcal-sub svg { width: 10px; height: 10px; }
+
+    /* Unpaid past months — draw attention. */
+    .mcal-cell.st-arrears { border-color: #EBC7C7; background: #FDF5F5; }
+    .mcal-cell.st-arrears .mcal-sub { color: #B3261E; }
+    /* Current month. */
+    .mcal-cell.st-current { border-color: #E6D6AE; background: #FDFAF0; }
+    .mcal-cell.st-current .mcal-sub { color: #92400E; }
+    /* Future months available to prepay. */
+    .mcal-cell.st-advance .mcal-sub { color: var(--muted); }
+
+    /* Already recorded — locked. */
+    .mcal-cell.st-paid,
+    .mcal-cell.is-locked {
+        cursor: default;
     }
-    .month-amount:focus {
-        outline: none;
+    .mcal-cell.st-paid {
+        border-color: #CDE3D4;
+        background: #EFF6F1;
+        color: #14532D;
+    }
+    .mcal-cell.st-paid .mcal-sub { color: #2E7D4F; }
+    /* Outside the contract window. */
+    .mcal-cell.st-before,
+    .mcal-cell.st-after {
+        background: #F6F7F6;
+        border-style: dashed;
+        border-color: var(--line);
+        color: var(--faint);
+    }
+    .mcal-cell.st-before .mcal-sub,
+    .mcal-cell.st-after .mcal-sub { color: var(--faint); }
+
+    /* Chosen to be recorded — overrides the state tint. */
+    .mcal-cell.is-selected {
         border-color: var(--pine);
-        box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+        background: var(--pine);
+        color: #fff;
+        box-shadow: 0 1px 2px rgba(10, 92, 47, 0.25);
     }
-    .month-empty {
-        padding: 18px 12px;
-        text-align: center;
+    .mcal-cell.is-selected .mcal-sub { color: rgba(255, 255, 255, 0.85); }
+
+    .mcal-legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 16px;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+    }
+    .mcal-legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 11.5px;
+        font-weight: 600;
         color: var(--muted);
-        font-size: 13px;
     }
+    .mcal-legend .sw {
+        width: 12px;
+        height: 12px;
+        border-radius: 3px;
+        border: 1px solid;
+        flex-shrink: 0;
+    }
+    .mcal-legend .sw-selected { background: var(--pine); border-color: var(--pine); }
+    .mcal-legend .sw-arrears { background: #FDF5F5; border-color: #EBC7C7; }
+    .mcal-legend .sw-current { background: #FDFAF0; border-color: #E6D6AE; }
+    .mcal-legend .sw-advance { background: #fff; border-color: var(--line-strong); }
+    .mcal-legend .sw-paid { background: #EFF6F1; border-color: #CDE3D4; }
+
+    .mcal-summary {
+        margin-top: 10px;
+        font-size: 12.5px;
+        color: var(--muted);
+        line-height: 1.5;
+    }
+    .mcal-summary strong { color: var(--ink); font-weight: 700; }
     .payment-total {
         display: flex;
         align-items: baseline;
@@ -150,6 +189,37 @@
         font-variant-numeric: tabular-nums;
     }
     .modal-wide { width: min(600px, 100%); }
+
+    /* ---------- Row action three-dot menu ---------- */
+    .row-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    .row-menu-btn svg { width: 17px; height: 17px; }
+    .row-menu-btn:hover,
+    .row-menu-btn.is-open {
+        background: var(--pine-soft);
+        color: var(--pine);
+        border-color: var(--line-strong);
+    }
+    .row-menu-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
+
+    #rowActionMenu {
+        position: fixed;
+        z-index: 2400;
+        width: 172px;
+        display: none;
+    }
+    #rowActionMenu.is-open { display: block; }
 </style>
 @endsection
 
@@ -191,8 +261,8 @@
                             <th>Monthly Fee</th>
                             <th>Total Paid</th>
                             <th>Last Payment</th>
-                            <th>Standing</th>
-                            <th>Action</th>
+                            <th>Record</th>
+                            <th style="text-align:right;">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -214,9 +284,7 @@
                                     'overdue' => 'status-badge-overdue',
                                     default => 'status-badge-none',
                                 };
-                                $hasPaidThisMonth = $statusKey === 'paid';
                                 $plan = $paymentPlans[$concessionaire->id] ?? null;
-                                $owedCount = (int) ($plan['owed_count'] ?? 0);
                                 $monthlyFee = (float) ($plan['monthly_fee'] ?? ($concessionaire->monthly_fee ?? 0));
                             @endphp
                             <tr>
@@ -253,50 +321,31 @@
                                     @endif
                                 </td>
                                 <td style="white-space:nowrap;">
-                                    @if ($owedCount > 0)
-                                        <span class="owed-chip">
-                                            {{ $owedCount }} {{ \Illuminate\Support\Str::plural('month', $owedCount) }} owed
-                                        </span>
-                                    @elseif ($hasPaidThisMonth)
-                                        <span class="uptodate-chip">
-                                            <svg style="width:12px;height:12px;flex-shrink:0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                                            </svg>
-                                            Up to date
-                                        </span>
+                                    @if ($monthlyFee > 0 && ! empty($plan['has_selectable']))
+                                        <button
+                                            type="button"
+                                            class="btn btn-primary btn-sm record-payment-btn"
+                                            data-user-id="{{ $concessionaire->id }}"
+                                        >
+                                            Payment
+                                        </button>
                                     @else
                                         <span class="table-dim">&mdash;</span>
                                     @endif
                                 </td>
-                                <td>
-                                    <div class="row-action-links">
-                                        @if ($monthlyFee > 0 && ! empty($plan['months']))
-                                            <button
-                                                type="button"
-                                                class="btn btn-primary btn-sm record-payment-btn"
-                                                data-user-id="{{ $concessionaire->id }}"
-                                            >
-                                                Record Payment
-                                            </button>
-                                        @endif
-                                        <a
-                                            href="{{ route('cashier.payments.concessionaire.history.view', $concessionaire->id) }}"
-                                            target="_blank"
-                                            rel="noopener"
-                                            class="btn btn-secondary btn-xs"
-                                        >
-                                            View
-                                        </a>
-                                        <a
-                                            href="{{ route('cashier.payments.concessionaire.history.pdf', $concessionaire->id) }}"
-                                            class="btn btn-secondary btn-xs"
-                                        >
-                                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/>
-                                            </svg>
-                                            History
-                                        </a>
-                                    </div>
+                                <td style="text-align:right;">
+                                    <button
+                                        type="button"
+                                        class="row-menu-btn"
+                                        aria-label="More actions"
+                                        aria-haspopup="menu"
+                                        data-view-url="{{ route('cashier.payments.concessionaire.history.view', $concessionaire->id) }}"
+                                        data-download-url="{{ route('cashier.payments.concessionaire.history.pdf', $concessionaire->id) }}"
+                                    >
+                                        <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
+                                        </svg>
+                                    </button>
                                 </td>
                             </tr>
                         @endforeach
@@ -304,6 +353,22 @@
                 </table>
             @endif
         </div>
+    </div>
+
+    <div id="rowActionMenu" class="pop" role="menu">
+        <a id="rowActionView" class="pop-item" role="menuitem" target="_blank" rel="noopener" href="#">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <span>View history</span>
+        </a>
+        <a id="rowActionDownload" class="pop-item" role="menuitem" href="#">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/>
+            </svg>
+            <span>Download PDF</span>
+        </a>
     </div>
 
     <div class="modal-backdrop" id="paymentModal">
@@ -321,8 +386,28 @@
 
                 <div class="field">
                     <label>Months to pay <span class="required">*</span></label>
-                    <div class="month-picker" id="monthPicker"></div>
-                    <small class="field-help">Tick every month this payment covers. Arrears and the current month are pre-selected; tick advance months to pay ahead.</small>
+                    <div class="mcal">
+                        <div class="mcal-head">
+                            <button type="button" class="mcal-nav" id="mcalPrev" aria-label="Previous year">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+                            </button>
+                            <span class="mcal-year" id="mcalYear">—</span>
+                            <button type="button" class="mcal-nav" id="mcalNext" aria-label="Next year">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </div>
+                        <div class="mcal-grid" id="mcalGrid"></div>
+                        <div class="mcal-legend">
+                            <span><i class="sw sw-selected"></i>Selected</span>
+                            <span><i class="sw sw-arrears"></i>Unpaid / arrears</span>
+                            <span><i class="sw sw-current"></i>This month</span>
+                            <span><i class="sw sw-advance"></i>Advance</span>
+                            <span><i class="sw sw-paid"></i>Paid</span>
+                        </div>
+                    </div>
+                    <div class="mcal-summary" id="mcalSummary"></div>
+                    <small class="field-help">Click any month to add or remove it. Overdue and the current month start selected; pick future months to pay in advance. Paid months are locked.</small>
+                    <div id="selectedInputs"></div>
                 </div>
 
                 <div class="payment-total">
@@ -396,11 +481,21 @@
             const paymentSubtitle = document.getElementById('paymentModalSubtitle');
             const paymentConcessionaireName = document.getElementById('paymentConcessionaireName');
             const paymentConcessionaireId = document.getElementById('paymentConcessionaireId');
-            const monthPicker = document.getElementById('monthPicker');
             const paymentTotal = document.getElementById('paymentTotal');
             const paymentCountLabel = document.getElementById('paymentCountLabel');
             const successFlashModal = document.getElementById('successFlashModal');
             const successFlashCloseButton = document.getElementById('successFlashCloseButton');
+
+            const mcalGrid = document.getElementById('mcalGrid');
+            const mcalYear = document.getElementById('mcalYear');
+            const mcalPrev = document.getElementById('mcalPrev');
+            const mcalNext = document.getElementById('mcalNext');
+            const mcalSummary = document.getElementById('mcalSummary');
+            const selectedInputs = document.getElementById('selectedInputs');
+
+            const MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const CHECK_SVG = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>';
+            const SUB_LABEL = { paid: 'Paid', arrears: 'Arrears', current: 'This month', advance: 'Advance', before: '—', after: '—' };
 
             const peso = (value) => '₱' + Number(value || 0).toLocaleString('en-US', {
                 minimumFractionDigits: 2,
@@ -411,59 +506,80 @@
                 '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
             }[ch]));
 
-            const groupMeta = [
-                { key: 'arrears', title: 'Unpaid past months', tag: 'arrear', tagText: 'Arrears', checked: true, arrear: true },
-                { key: 'current', title: 'This month', tag: null, tagText: '', checked: true, arrear: false },
-                { key: 'advance', title: 'Pay in advance', tag: 'advance', tagText: 'Advance', checked: false, arrear: false },
-            ];
+            const monthKey = (year, monthIndex) => year + '-' + String(monthIndex + 1).padStart(2, '0');
+            const keyLabel = (key) => MONTHS_SHORT[Number(key.slice(5, 7)) - 1] + ' ' + key.slice(0, 4);
 
-            function renderMonths(plan) {
-                const fee = Number(plan.monthly_fee || 0).toFixed(2);
-                const byGroup = { arrears: [], current: [], advance: [] };
-                (plan.months || []).forEach((m) => {
-                    if (byGroup[m.group]) byGroup[m.group].push(m);
-                });
+            // Holds the modal's working state while it is open.
+            let cal = null;
+
+            function classify(plan, key) {
+                if (plan.contract_start && key < plan.contract_start) return 'before';
+                if (plan.contract_end && key > plan.contract_end) return 'after';
+                if (plan.paidSet.has(key)) return 'paid';
+                if (key < plan.current_month) return 'arrears';
+                if (key === plan.current_month) return 'current';
+                return 'advance';
+            }
+
+            const isSelectable = (state) => state === 'arrears' || state === 'current' || state === 'advance';
+
+            function renderCalendar() {
+                if (!cal) return;
+                mcalYear.textContent = cal.year;
+                mcalPrev.disabled = cal.year <= cal.minYear;
+                mcalNext.disabled = cal.year >= cal.maxYear;
 
                 let html = '';
-                groupMeta.forEach((meta) => {
-                    const list = byGroup[meta.key];
-                    if (!list.length) return;
-                    html += '<div class="month-group-label">' + meta.title + '</div>';
-                    list.forEach((m) => {
-                        html += '<div class="month-row' + (meta.arrear ? ' is-arrear' : '') + (meta.checked ? '' : ' is-off') + '">'
-                            + '<label>'
-                            + '<input type="checkbox" name="months[]" value="' + escapeHtml(m.month) + '"' + (meta.checked ? ' checked' : '') + '>'
-                            + '<span class="month-name">' + escapeHtml(m.label) + '</span>'
-                            + (meta.tag ? '<span class="month-tag ' + meta.tag + '">' + meta.tagText + '</span>' : '')
-                            + '</label>'
-                            + '<input type="number" class="month-amount" name="amounts[' + escapeHtml(m.month) + ']" step="0.01" min="1" value="' + fee + '" aria-label="Amount for ' + escapeHtml(m.label) + '">'
-                            + '</div>';
-                    });
-                });
-
-                if (!html) {
-                    html = '<div class="month-empty">This concessionaire is fully paid up — no months are due right now.</div>';
+                for (let mi = 0; mi < 12; mi++) {
+                    const key = monthKey(cal.year, mi);
+                    const state = classify(cal.plan, key);
+                    const selectable = isSelectable(state);
+                    const selected = cal.selected.has(key);
+                    const classes = ['mcal-cell', 'st-' + state];
+                    if (selected) classes.push('is-selected');
+                    if (!selectable) classes.push('is-locked');
+                    const sub = selected
+                        ? CHECK_SVG + 'Selected'
+                        : (state === 'paid' ? CHECK_SVG + 'Paid' : SUB_LABEL[state]);
+                    html += '<button type="button" class="' + classes.join(' ') + '" data-key="' + key + '"'
+                        + (selectable ? '' : ' disabled') + '>'
+                        + '<span class="mcal-m">' + MONTHS_SHORT[mi] + '</span>'
+                        + '<span class="mcal-sub">' + sub + '</span>'
+                        + '</button>';
                 }
-                return html;
+                mcalGrid.innerHTML = html;
+                refreshTotal();
             }
 
             function refreshTotal() {
-                let total = 0;
-                let count = 0;
-                monthPicker.querySelectorAll('.month-row').forEach((row) => {
-                    const checkbox = row.querySelector('input[type="checkbox"]');
-                    const amount = row.querySelector('.month-amount');
-                    if (checkbox && checkbox.checked) {
-                        row.classList.remove('is-off');
-                        count += 1;
-                        total += parseFloat(amount && amount.value) || 0;
-                    } else {
-                        row.classList.add('is-off');
-                    }
-                });
+                const count = cal ? cal.selected.size : 0;
+                const total = cal ? count * cal.fee : 0;
                 paymentTotal.textContent = peso(total);
                 paymentCountLabel.textContent = count + ' ' + (count === 1 ? 'month' : 'months') + ' selected';
                 submitPaymentButton.disabled = count === 0;
+                renderSummary();
+                syncHiddenInputs();
+            }
+
+            function renderSummary() {
+                if (!cal || cal.selected.size === 0) {
+                    mcalSummary.innerHTML = 'No months selected yet.';
+                    return;
+                }
+                const labels = [...cal.selected].sort().map(keyLabel);
+                mcalSummary.innerHTML = '<strong>Recording:</strong> ' + escapeHtml(labels.join(', '));
+            }
+
+            function syncHiddenInputs() {
+                if (!cal) {
+                    selectedInputs.innerHTML = '';
+                    return;
+                }
+                const fee = cal.fee.toFixed(2);
+                selectedInputs.innerHTML = [...cal.selected].sort().map((key) =>
+                    '<input type="hidden" name="months[]" value="' + escapeHtml(key) + '">'
+                    + '<input type="hidden" name="amounts[' + escapeHtml(key) + ']" value="' + fee + '">'
+                ).join('');
             }
 
             function setPaymentFeedback(message, type) {
@@ -481,13 +597,33 @@
             function closePaymentModal() {
                 paymentModal.classList.remove('active');
                 paymentForm.reset();
-                monthPicker.innerHTML = '';
+                cal = null;
+                mcalGrid.innerHTML = '';
+                selectedInputs.innerHTML = '';
                 setPaymentFeedback('', 'error');
             }
 
-            monthPicker.addEventListener('change', refreshTotal);
-            monthPicker.addEventListener('input', (event) => {
-                if (event.target.classList.contains('month-amount')) refreshTotal();
+            mcalGrid.addEventListener('click', (event) => {
+                const cell = event.target.closest('.mcal-cell');
+                if (!cell || cell.disabled || !cal) return;
+                const key = cell.dataset.key;
+                if (cal.selected.has(key)) {
+                    cal.selected.delete(key);
+                } else {
+                    cal.selected.add(key);
+                }
+                renderCalendar();
+            });
+
+            mcalPrev.addEventListener('click', () => {
+                if (!cal || cal.year <= cal.minYear) return;
+                cal.year -= 1;
+                renderCalendar();
+            });
+            mcalNext.addEventListener('click', () => {
+                if (!cal || cal.year >= cal.maxYear) return;
+                cal.year += 1;
+                renderCalendar();
             });
 
             document.querySelectorAll('.record-payment-btn').forEach((button) => {
@@ -506,10 +642,23 @@
                     }
                     paymentSubtitle.textContent = subtitle;
 
-                    monthPicker.innerHTML = renderMonths(plan);
+                    const currentYear = Number(plan.current_month.slice(0, 4));
+                    const minYear = plan.contract_start ? Number(plan.contract_start.slice(0, 4)) : currentYear;
+                    const maxYear = plan.contract_end ? Number(plan.contract_end.slice(0, 4)) : currentYear + 1;
+                    const initYear = Math.min(Math.max(currentYear, minYear), maxYear);
+
+                    cal = {
+                        plan: Object.assign({}, plan, { paidSet: new Set(plan.paid_months || []) }),
+                        fee: Number(plan.monthly_fee || 0),
+                        year: initYear,
+                        minYear,
+                        maxYear,
+                        selected: new Set(plan.preselect || []),
+                    };
+
                     paymentDateInput.value = new Date().toISOString().slice(0, 10);
                     setPaymentFeedback('', 'error');
-                    refreshTotal();
+                    renderCalendar();
                     paymentModal.classList.add('active');
                 });
             });
@@ -521,8 +670,7 @@
             });
 
             paymentForm.addEventListener('submit', function (event) {
-                const anyChecked = monthPicker.querySelector('input[type="checkbox"]:checked');
-                if (!anyChecked) {
+                if (!cal || cal.selected.size === 0) {
                     event.preventDefault();
                     setPaymentFeedback('Select at least one month to record.', 'error');
                     return;
@@ -550,6 +698,67 @@
                     if (paymentModal.classList.contains('active')) closePaymentModal();
                 }
             });
+        })();
+
+        // ---- Row action three-dot menu (shared, fixed-position popover) ----
+        (() => {
+            const menu = document.getElementById('rowActionMenu');
+            const viewLink = document.getElementById('rowActionView');
+            const downloadLink = document.getElementById('rowActionDownload');
+            if (!menu) return;
+
+            let activeButton = null;
+
+            function closeMenu() {
+                menu.classList.remove('is-open');
+                if (activeButton) activeButton.classList.remove('is-open');
+                activeButton = null;
+            }
+
+            function openMenu(button) {
+                viewLink.href = button.dataset.viewUrl;
+                downloadLink.href = button.dataset.downloadUrl;
+
+                const rect = button.getBoundingClientRect();
+                const width = menu.offsetWidth || 172;
+                // Right-align the menu to the button, keeping it on-screen.
+                let left = rect.right - width;
+                if (left < 8) left = 8;
+                let top = rect.bottom + 6;
+
+                menu.style.left = left + 'px';
+                menu.style.top = top + 'px';
+                menu.classList.add('is-open');
+
+                // Flip above if it would overflow the viewport bottom.
+                const menuRect = menu.getBoundingClientRect();
+                if (menuRect.bottom > window.innerHeight - 8) {
+                    menu.style.top = (rect.top - menuRect.height - 6) + 'px';
+                }
+
+                button.classList.add('is-open');
+                activeButton = button;
+            }
+
+            document.querySelectorAll('.row-menu-btn').forEach((button) => {
+                button.addEventListener('click', function (event) {
+                    event.stopPropagation();
+                    if (activeButton === this) {
+                        closeMenu();
+                    } else {
+                        closeMenu();
+                        openMenu(this);
+                    }
+                });
+            });
+
+            menu.addEventListener('click', (event) => event.stopPropagation());
+            document.addEventListener('click', closeMenu);
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeMenu();
+            });
+            window.addEventListener('resize', closeMenu);
+            window.addEventListener('scroll', closeMenu, true);
         })();
     </script>
 @endsection
