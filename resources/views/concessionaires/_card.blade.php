@@ -14,11 +14,9 @@
    data-name="{{ strtolower($name) }}"
    data-location="{{ strtolower($location) }}">
 
-    <div class="cc-poster"
+    <div class="cc-poster {{ $poster ? '' : 'cc-poster--empty' }}"
          @if ($poster)
              style="background-image:url('{{ asset('storage/' . $poster) }}');"
-         @else
-             style="background:{{ $gradients[$gi] }};"
          @endif>
 
         @unless ($poster)

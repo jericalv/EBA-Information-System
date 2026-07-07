@@ -143,6 +143,39 @@
         justify-content: center;
     }
 
+    /* ===== Row action kebab menu ===== */
+    .row-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    .row-menu-btn svg { width: 17px; height: 17px; }
+    .row-menu-btn:hover,
+    .row-menu-btn.is-open {
+        background: var(--pine-soft);
+        color: var(--pine);
+        border-color: var(--line-strong);
+    }
+    .row-menu-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
+    .actions-dropdown-container { position: relative; display: inline-block; text-align: left; }
+    .actions-dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 4px);
+        width: 180px;
+        z-index: 60;
+        display: none;
+    }
+    .actions-dropdown-menu.active { display: block; }
+
     /* ===== Review Modal (premium ledger) ===== */
     :root {
         --wiz-green: #16A34A;
@@ -670,10 +703,17 @@
                                 @endif
                             </td>
                             <td class="actions-col">
-                                <div class="action-btns">
+                                <div class="actions-dropdown-container">
+                                    <button type="button" class="row-menu-btn" aria-label="More actions" aria-haspopup="menu" onclick="toggleActionsMenu(this)">
+                                        <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
+                                        </svg>
+                                    </button>
+                                    <div class="actions-dropdown-menu pop" role="menu">
                                     <button
                                         type="button"
-                                        class="btn btn-outline btn-sm"
+                                        class="pop-item"
+                                        role="menuitem"
                                         onclick="openViewModalFromButton(this)"
                                         data-app-id="{{ $application->id }}"
                                         data-app-status="{{ $application->status }}"
@@ -714,6 +754,7 @@
                                         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                                         View
                                     </button>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -772,6 +813,27 @@
         tickDoc: (id) => `{{ route('admin.partnerships.wizard.tick-doc', ['application' => '__ID__']) }}`.replace('__ID__', id),
         finalApprove: (id) => `{{ route('admin.partnerships.wizard.final-approve', ['application' => '__ID__']) }}`.replace('__ID__', id),
     };
+
+    function toggleActionsMenu(button) {
+        const menu = button.closest('.actions-dropdown-container')?.querySelector('.actions-dropdown-menu');
+        if (!menu) return;
+        const willOpen = !menu.classList.contains('active');
+        document.querySelectorAll('.actions-dropdown-menu.active').forEach((openMenu) => {
+            openMenu.classList.remove('active');
+            openMenu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
+        });
+        menu.classList.toggle('active', willOpen);
+        button.classList.toggle('is-open', willOpen);
+    }
+
+    document.addEventListener('click', function (e) {
+        if (!e.target.closest('.actions-dropdown-container')) {
+            document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
+                menu.classList.remove('active');
+                menu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
+            });
+        }
+    });
 
     function filterRows() {
         const input = document.getElementById('partnerships-search-input');
@@ -889,6 +951,10 @@
     function openViewModalFromButton(buttonEl) {
         const id = Number(buttonEl?.dataset?.appId || 0);
         if (!id) return;
+        document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
+            menu.classList.remove('active');
+            menu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
+        });
         openViewModal(id, buttonEl);
     }
 

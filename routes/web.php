@@ -72,6 +72,8 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('users.updateRole');
     Route::patch('/users/{user}/business-name', [AdminController::class, 'updateBusinessName'])->name('users.updateBusinessName');
     Route::patch('/users/{user}/monthly-fee', [AdminController::class, 'updateMonthlyFee'])->name('users.monthly-fee');
+    Route::get('/users/{user}/details', [AdminController::class, 'userDetails'])->name('users.details');
+    Route::post('/users/{user}/send-password-reset', [AdminController::class, 'sendPasswordReset'])->name('users.sendPasswordReset');
     Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
     
     // Uniform Stocks

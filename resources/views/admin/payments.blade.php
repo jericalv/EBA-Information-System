@@ -82,6 +82,19 @@
     .status-badge-paid { background: #E5F3EA; color: #14532D; }
     .status-badge-due { background: #FDF8EC; color: #92400E; }
     .status-badge-none { background: #F0F2F0; color: var(--muted); }
+    .period-cell {
+        white-space: nowrap;
+    }
+    .period-cell .status-badge {
+        margin-left: 6px;
+        vertical-align: 1px;
+    }
+    .paid-through-note {
+        display: block;
+        margin-top: 4px;
+        font-size: 12px;
+        color: var(--muted);
+    }
     .fee-form {
         display: flex;
         align-items: center;
@@ -163,6 +176,80 @@
     tbody tr.hidden {
         display: none;
     }
+
+    /* Kebab actions menu (same pattern as the Users page) */
+    #payments-table th.actions-col,
+    #payments-table td.actions-col {
+        text-align: center;
+        width: 56px;
+    }
+    .kebab-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: 1px solid transparent;
+        border-radius: 6px;
+        background: transparent;
+        color: #64748b;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        line-height: 1;
+        cursor: pointer;
+        transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    }
+    .kebab-btn:hover,
+    .kebab-btn[aria-expanded="true"] {
+        background: #f1f5f9;
+        border-color: #e2e8f0;
+        color: #0f172a;
+    }
+    .kebab-btn:focus-visible {
+        outline: 2px solid var(--green);
+        outline-offset: 2px;
+    }
+    .kebab-menu {
+        position: fixed;
+        z-index: 1200;
+        min-width: 200px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        box-shadow: 0 12px 32px rgba(15,23,42,0.14);
+        padding: 6px;
+        display: none;
+    }
+    .kebab-menu.active {
+        display: block;
+    }
+    .kebab-menu button {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        width: 100%;
+        padding: 8px 10px;
+        border: none;
+        border-radius: 6px;
+        background: transparent;
+        font: inherit;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: #1e293b;
+        text-align: left;
+        cursor: pointer;
+        transition: background 0.12s ease;
+    }
+    .kebab-menu button:hover {
+        background: #f1f5f9;
+    }
+    .kebab-menu button svg {
+        width: 14px;
+        height: 14px;
+        flex-shrink: 0;
+        color: #64748b;
+    }
 </style>
 @endsection
 
@@ -203,6 +290,7 @@
                             <th>Concessionaire</th>
                             <th>Monthly Fee</th>
                             <th>Status</th>
+                            <th>Paid Through</th>
                             <th>Last Payment</th>
                             <th>Total Paid</th>
                             <th>Set Fee</th>
@@ -214,6 +302,13 @@
                                 $monthlyFee = (float) ($concessionaire->monthly_fee ?? 0);
                                 $paidThisMonth = (int) ($concessionaire->current_month_payment_count ?? 0) > 0;
                                 $today = now()->day;
+
+                                $paidThrough = $concessionaire->paid_through_month
+                                    ? \Illuminate\Support\Carbon::parse($concessionaire->paid_through_month)->startOfMonth()
+                                    : null;
+                                $monthsAhead = $paidThrough
+                                    ? now()->startOfMonth()->diffInMonths($paidThrough, false)
+                                    : 0;
 
                                 if ($monthlyFee <= 0) {
                                     $statusKey = 'no_contract';
@@ -254,6 +349,16 @@
                                 </td>
                                 <td>
                                     <span class="status-badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                                </td>
+                                <td class="period-cell">
+                                    @if ($paidThrough)
+                                        {{ $paidThrough->format('M Y') }}
+                                        @if ($monthsAhead > 0)
+                                            <span class="status-badge status-badge-paid">+{{ $monthsAhead }} mo advance</span>
+                                        @endif
+                                    @else
+                                        —
+                                    @endif
                                 </td>
                                 <td>
                                     {{ $concessionaire->last_payment_date ? \Illuminate\Support\Carbon::parse($concessionaire->last_payment_date)->format('M d, Y') : '—' }}
@@ -301,10 +406,11 @@
                         <th>Amount</th>
                         <th>Payment Type</th>
                         <th>OR Number</th>
+                        <th>For Month</th>
                         <th>Payment Date</th>
                         <th>Recorded By</th>
                         <th>Notes</th>
-                        <th>Action</th>
+                        <th class="actions-col">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -327,20 +433,44 @@
                             <td style="font-weight:700;color:#0f172a;">₱{{ number_format((float) $payment->amount, 2) }}</td>
                             <td>{{ ucfirst(str_replace('_', ' ', $payment->payment_type)) }}</td>
                             <td>{{ $payment->or_number ?: '—' }}</td>
+                            @php
+                                $periodMonth = $payment->period_month?->copy()->startOfMonth();
+                                $paidMonth = $payment->payment_date?->copy()->startOfMonth();
+                                $periodOffset = ($periodMonth && $paidMonth) ? $paidMonth->diffInMonths($periodMonth, false) : 0;
+                            @endphp
+                            <td class="period-cell">
+                                @if ($periodMonth)
+                                    {{ $periodMonth->format('M Y') }}
+                                    @if ($periodOffset > 0)
+                                        <span class="status-badge status-badge-paid">Advance</span>
+                                    @elseif ($periodOffset < 0)
+                                        <span class="status-badge status-badge-due">Arrears</span>
+                                    @endif
+                                @else
+                                    —
+                                @endif
+                            </td>
                             <td>{{ $payment->payment_date?->format('M d, Y') }}</td>
                             <td>{{ $payment->recordedBy?->name ?: '—' }}</td>
                             <td style="max-width:260px;">{{ $payment->notes ?: '—' }}</td>
-                            <td>
-                                <a href="{{ route('admin.payments.receipt', $payment->id) }}" class="btn btn-outline btn-xs">Download Invoice</a>
+                            <td class="actions-col">
+                                <button
+                                    type="button"
+                                    class="kebab-btn"
+                                    aria-haspopup="true"
+                                    aria-expanded="false"
+                                    aria-label="Actions for payment {{ $payment->or_number ?: $payment->id }}"
+                                    data-invoice-url="{{ route('admin.payments.receipt', $payment->id) }}"
+                                >⋯</button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" style="text-align:center;padding:32px;color:#94a3b8;">No payment records found.</td>
+                            <td colspan="9" style="text-align:center;padding:32px;color:#94a3b8;">No payment records found.</td>
                         </tr>
                     @endforelse
                     <tr id="payments-no-results-row" style="display:none;">
-                        <td colspan="8" style="text-align:center;padding:32px;color:#94a3b8;">No results found.</td>
+                        <td colspan="9" style="text-align:center;padding:32px;color:#94a3b8;">No results found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -351,6 +481,14 @@
                 {{ $payments->links('pagination::bootstrap-5') }}
             </div>
         @endif
+    </div>
+
+    {{-- Shared row-actions menu (positioned next to the clicked ⋯ button) --}}
+    <div class="kebab-menu" id="paymentActionsMenu" role="menu">
+        <button type="button" id="menuDownloadInvoice" role="menuitem">
+            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Invoice
+        </button>
     </div>
 @endsection
 
@@ -417,5 +555,71 @@
 
         filterRows();
     });
+
+    // === Row actions (kebab) menu ===
+    const paymentActionsMenu = document.getElementById('paymentActionsMenu');
+    const menuDownloadInvoice = document.getElementById('menuDownloadInvoice');
+
+    let activeKebab = null;
+    let menuInvoiceUrl = null;
+
+    function closeActionsMenu() {
+        paymentActionsMenu.classList.remove('active');
+        if (activeKebab) {
+            activeKebab.setAttribute('aria-expanded', 'false');
+            activeKebab = null;
+        }
+    }
+
+    function openActionsMenu(button) {
+        menuInvoiceUrl = button.dataset.invoiceUrl;
+
+        paymentActionsMenu.classList.add('active');
+        activeKebab = button;
+        button.setAttribute('aria-expanded', 'true');
+
+        const rect = button.getBoundingClientRect();
+        const menuRect = paymentActionsMenu.getBoundingClientRect();
+        let left = rect.right - menuRect.width;
+        let top = rect.bottom + 6;
+        if (left < 8) left = 8;
+        if (top + menuRect.height > window.innerHeight - 8) {
+            top = rect.top - menuRect.height - 6;
+        }
+        paymentActionsMenu.style.left = `${left}px`;
+        paymentActionsMenu.style.top = `${top}px`;
+    }
+
+    document.querySelectorAll('.kebab-btn').forEach((button) => {
+        button.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (activeKebab === button) {
+                closeActionsMenu();
+            } else {
+                closeActionsMenu();
+                openActionsMenu(button);
+            }
+        });
+    });
+
+    menuDownloadInvoice.addEventListener('click', () => {
+        if (menuInvoiceUrl) {
+            window.location.href = menuInvoiceUrl;
+        }
+        closeActionsMenu();
+    });
+
+    document.addEventListener('click', (event) => {
+        if (paymentActionsMenu.classList.contains('active') && !paymentActionsMenu.contains(event.target)) {
+            closeActionsMenu();
+        }
+    });
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            closeActionsMenu();
+        }
+    });
+    window.addEventListener('scroll', closeActionsMenu, true);
+    window.addEventListener('resize', closeActionsMenu);
 </script>
 @endsection

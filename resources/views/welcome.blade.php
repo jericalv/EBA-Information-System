@@ -256,14 +256,14 @@
             top: -60px;
             right: -150px;
             width: 940px;
-            opacity: 0.36;
+            opacity: 0.11;
             transform: rotate(-14deg);
         }
         .flow-hero-bl {
             bottom: -130px;
             left: -200px;
             width: 720px;
-            opacity: 0.28;
+            opacity: 0.08;
             transform: rotate(10deg);
         }
         .flow-uniforms {
@@ -312,10 +312,20 @@
         .hero {
             position: relative;
             padding: 150px 0 0;
-            background: var(--paper);
+            background: var(--green-deep);
             overflow: hidden;
         }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            pointer-events: none;
+        }
         .hero > .wrap, .hero .registry-strip { position: relative; z-index: 1; }
+        /* recolor the green flow-line art to white on the dark hero */
+        .hero .flow-img { filter: brightness(0) invert(1); }
 
         .hero-grid {
             display: grid;
@@ -325,20 +335,28 @@
             padding-bottom: 64px;
         }
 
+        .hero-text .eyebrow { color: var(--gold-soft); }
+        .hero-text .eyebrow::before { background: var(--gold-soft); }
+        .hero-title .text-green-700 { color: var(--gold-soft); }
+        .hero .frame-panel {
+            border-color: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.32);
+        }
+
         .hero-title {
             font-family: var(--font-display);
             font-weight: 800;
             font-size: clamp(38px, 5.4vw, 66px);
             line-height: 1.02;
             letter-spacing: -1.6px;
-            color: var(--ink);
+            color: #fff;
             margin: 18px 0 20px;
         }
 
         .hero-description {
             font-size: 17px;
             line-height: 1.75;
-            color: var(--ink-soft);
+            color: rgba(255, 255, 255, 0.75);
             max-width: 520px;
             margin-bottom: 30px;
         }
@@ -394,11 +412,10 @@
             color: var(--ink-faint);
         }
 
-        /* Registry strip — live counts under the hero */
+        /* Registry strip — live counts under the hero (dark band) */
         .registry-strip {
-            border-top: 1px solid var(--line-strong);
-            border-bottom: 1px solid var(--line-strong);
-            background: var(--paper);
+            border-top: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.04);
         }
         .registry-strip-inner {
             display: grid;
@@ -406,7 +423,7 @@
         }
         .strip-item {
             padding: 22px 28px;
-            border-left: 1px solid var(--line);
+            border-left: 1px solid rgba(255, 255, 255, 0.12);
             display: flex;
             flex-direction: column;
             gap: 3px;
@@ -416,17 +433,17 @@
             font-family: var(--font-mono);
             font-size: 26px;
             font-weight: 600;
-            color: var(--ink);
+            color: #fff;
             line-height: 1.1;
         }
-        .strip-num .strip-unit { color: var(--gold); }
+        .strip-num .strip-unit { color: var(--gold-soft); }
         .strip-label {
             font-family: var(--font-mono);
             font-size: 10.5px;
             font-weight: 500;
             letter-spacing: 1.6px;
             text-transform: uppercase;
-            color: var(--ink-faint);
+            color: rgba(255, 255, 255, 0.55);
         }
 
         /* ===== Section shell ===== */
@@ -528,6 +545,7 @@
             flex-direction: column;
             transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), border-color .3s ease, box-shadow .3s ease;
         }
+        .stock-card[hidden] { display: none; }
         .stock-card:hover {
             transform: translateY(-5px);
             border-color: rgba(10, 92, 47, 0.4);
@@ -653,8 +671,45 @@
             gap: 5px;
             transition: color .2s ease;
         }
+        .stock-foot--end { justify-content: flex-end; }
         .stock-view svg { width: 12px; height: 12px; }
         .stock-card:hover .stock-view { color: var(--green); }
+
+        .rail-foot {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .rail-filter {
+            display: inline-flex;
+            gap: 2px;
+            padding: 3px;
+            background: var(--card);
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+        }
+        .rail-filter button {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            padding: 7px 14px;
+            border: 0;
+            border-radius: 4px;
+            background: transparent;
+            color: var(--ink-faint);
+            cursor: pointer;
+            transition: color .2s ease, background-color .2s ease;
+        }
+        .rail-filter button:hover { color: var(--ink); }
+        .rail-filter button.active {
+            background: var(--green);
+            color: #fff;
+        }
 
         .rail-empty {
             border: 1px dashed var(--line-strong);
@@ -773,6 +828,34 @@
             color: rgba(255, 255, 255, 0.82);
         }
         .cc-loc svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+        /* No-image concessionaire cards: uniform-card treatment */
+        .cc-card--plain {
+            flex-direction: column;
+            align-items: stretch;
+            background: var(--card);
+            transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1), border-color .3s ease, box-shadow .3s ease;
+        }
+        .cc-card--plain:hover {
+            transform: translateY(-5px);
+            border-color: rgba(10, 92, 47, 0.4);
+            box-shadow: 0 18px 40px rgba(24, 36, 32, 0.12);
+        }
+        .cc-card--plain::before { content: none; }
+        .cc-media {
+            flex: 1;
+            background-color: var(--paper-deep);
+            background-image: radial-gradient(rgba(24, 36, 32, 0.1) 1px, transparent 1px);
+            background-size: 15px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--line);
+        }
+        .cc-media-placeholder { width: 56px; height: 56px; color: var(--line-strong); }
+        .cc-card--plain .cc-card-info { color: var(--ink); flex: none; }
+        .cc-card--plain .cc-tag { color: var(--gold); }
+        .cc-card--plain .cc-loc { color: var(--ink-soft); }
 
         .cc-empty {
             border: 1px dashed var(--line-strong);
@@ -1321,11 +1404,11 @@
                         {{ \App\Models\SiteSetting::get('hero_subtitle', 'Browse products, discover concessionaires, and stay connected with everything CvSU Trece Martires has to offer.') }}
                     </p>
                     <div class="hero-actions hero-rise d3">
-                        <a href="{{ route('products.index') }}" class="btn btn-primary">
+                        <a href="{{ route('products.index') }}" class="btn btn-gold">
                             Browse Products
                             <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                         </a>
-                        <a href="{{ route('concessionaires.index') }}" class="btn btn-ghost">View Concessionaires</a>
+                        <a href="{{ route('concessionaires.index') }}" class="btn btn-white-outline">View Concessionaires</a>
                     </div>
                 </div>
 
@@ -1369,15 +1452,18 @@
     @php
         $sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
 
-        $landingUniforms = \App\Models\UniformStock::query()
+        $landingStockQuery = fn () => \App\Models\UniformStock::query()
             ->where('is_visible', true)
+            ->orderByRaw('(quantity > 0) desc')
+            ->orderBy('item_name');
+
+        $landingUniforms = $landingStockQuery()
             ->where(function ($q) {
                 $q->whereNull('item_type')->orWhere('item_type', '!=', 'books');
             })
-            ->orderByRaw('(quantity > 0) desc')
-            ->orderBy('item_name')
             ->take(10)
-            ->get();
+            ->get()
+            ->concat($landingStockQuery()->where('item_type', 'books')->take(10)->get());
     @endphp
     <section class="uniforms-sec" id="uniforms">
         <img class="flow-img flow-uniforms" src="{{ asset('images/flowlines1-green.png') }}" alt="" aria-hidden="true" loading="lazy">
@@ -1424,13 +1510,9 @@
                                         $sizeRun[$sizeKey] = (int) $sizeVal;
                                     }
                                 }
-
-                                $rawPrices = is_array($stock->prices) ? $stock->prices : [];
-                                $positivePrices = array_values(array_filter(array_map('floatval', $rawPrices), fn ($p) => $p > 0));
-                                $minPrice = $positivePrices !== [] ? min($positivePrices) : (float) $stock->unit_price;
-                                $maxPrice = $positivePrices !== [] ? max($positivePrices) : (float) $stock->unit_price;
                             @endphp
-                            <a href="{{ route('stocks.show', $stock) }}" class="stock-card {{ $isOut ? 'is-out' : '' }}">
+                            @php $isBook = $stock->item_type === 'books'; @endphp
+                            <a href="{{ route('stocks.show', $stock) }}" class="stock-card {{ $isOut ? 'is-out' : '' }}" data-type="{{ $isBook ? 'books' : 'uniforms' }}">
                                 <div class="stock-media">
                                     <span class="stock-status {{ $isOut ? 'out' : ($isLow ? 'low' : '') }}">
                                         <span class="dot" aria-hidden="true"></span>
@@ -1438,6 +1520,10 @@
                                     </span>
                                     @if ($stock->image)
                                         <img src="{{ asset('storage/' . $stock->image) }}" alt="{{ $stock->item_name }}" loading="lazy">
+                                    @elseif ($isBook)
+                                        <svg class="stock-media-placeholder" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"/>
+                                        </svg>
                                     @else
                                         <svg class="stock-media-placeholder" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5 12 3l8.25 4.5L12 12 3.75 7.5Z"/>
@@ -1447,7 +1533,7 @@
                                     @endif
                                 </div>
                                 <div class="stock-body">
-                                    <div class="stock-kicker">Campus attire</div>
+                                    <div class="stock-kicker">{{ $isBook ? 'Books & Modules' : 'Campus attire' }}</div>
                                     <h3 class="stock-name">{{ $stock->item_name }}</h3>
                                     @if ($sizeRun !== [])
                                         <div class="size-run" aria-label="Sizes">
@@ -1457,14 +1543,7 @@
                                         </div>
                                     @endif
                                 </div>
-                                <div class="stock-foot">
-                                    @if ($minPrice > 0)
-                                        <span class="stock-price">
-                                            @if ($maxPrice > $minPrice)<span class="from">From</span>@endif&#8369;{{ number_format($minPrice, 2) }}
-                                        </span>
-                                    @else
-                                        <span class="stock-price"><span class="from">Priced at the office</span></span>
-                                    @endif
+                                <div class="stock-foot stock-foot--end">
                                     <span class="stock-view">
                                         Details
                                         <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
@@ -1474,11 +1553,16 @@
                         @endforeach
                     </div>
                 </div>
-                <div class="rv" style="margin-top: 10px;">
+                <div class="rail-foot rv">
                     <a href="{{ route('products.index') }}" class="sec-link">
                         See everything on the Products page
                         <svg fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
                     </a>
+                    <div class="rail-filter" id="railFilter" role="group" aria-label="Filter stock by type">
+                        <button type="button" class="active" data-filter="all" aria-pressed="true">All</button>
+                        <button type="button" data-filter="uniforms" aria-pressed="false">Uniforms</button>
+                        <button type="button" data-filter="books" aria-pressed="false">Books</button>
+                    </div>
                 </div>
             @else
                 <div class="rail-empty rv">
@@ -1500,13 +1584,6 @@
             ->take(12)
             ->get(['id', 'name', 'business_name', 'carousel_image', 'cover_photo', 'profile_photo', 'location']);
 
-        $ccGradients = [
-            'linear-gradient(150deg, #0A5C2F, #07341C)',
-            'linear-gradient(150deg, #C99A2E, #8a6510)',
-            'linear-gradient(150deg, #14532d, #052e16)',
-            'linear-gradient(150deg, #365314, #1a2e05)',
-            'linear-gradient(150deg, #713f12, #422006)',
-        ];
     @endphp
     <section class="cc-sec sec">
         <div class="wrap">
@@ -1528,15 +1605,17 @@
                 <div class="mq-track" style="animation-duration: {{ max(28, $showcaseConcessionaires->count() * 6) }}s;">
                     @foreach ([false, true] as $isClone)
                         @foreach ($showcaseConcessionaires as $i => $c)
-                            @php
-                                $ccImg = $c->carousel_image ?: ($c->cover_photo ?: $c->profile_photo);
-                                $ccBg = $ccImg
-                                    ? "url('" . asset('storage/' . $ccImg) . "')"
-                                    : $ccGradients[$i % count($ccGradients)];
-                            @endphp
-                            <a class="cc-card" href="{{ route('concessionaires.show', $c) }}"
-                               style="background-image: {{ $ccBg }};"
+                            @php $ccImg = $c->carousel_image ?: ($c->cover_photo ?: $c->profile_photo); @endphp
+                            <a class="cc-card {{ $ccImg ? '' : 'cc-card--plain' }}" href="{{ route('concessionaires.show', $c) }}"
+                               @if ($ccImg) style="background-image: url('{{ asset('storage/' . $ccImg) }}');" @endif
                                @if ($isClone) aria-hidden="true" tabindex="-1" @endif>
+                                @unless ($ccImg)
+                                    <div class="cc-media">
+                                        <svg class="cc-media-placeholder" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72"/>
+                                        </svg>
+                                    </div>
+                                @endunless
                                 <div class="cc-card-info">
                                     <span class="cc-tag">Concessionaire</span>
                                     <div class="cc-name">{{ $c->business_name ?: $c->name }}</div>
@@ -1556,13 +1635,16 @@
             <div class="wrap">
                 <div class="cc-static rv">
                     @foreach ($showcaseConcessionaires as $i => $c)
-                        @php
-                            $ccImg = $c->carousel_image ?: ($c->cover_photo ?: $c->profile_photo);
-                            $ccBg = $ccImg
-                                ? "url('" . asset('storage/' . $ccImg) . "')"
-                                : $ccGradients[$i % count($ccGradients)];
-                        @endphp
-                        <a class="cc-card" href="{{ route('concessionaires.show', $c) }}" style="background-image: {{ $ccBg }};">
+                        @php $ccImg = $c->carousel_image ?: ($c->cover_photo ?: $c->profile_photo); @endphp
+                        <a class="cc-card {{ $ccImg ? '' : 'cc-card--plain' }}" href="{{ route('concessionaires.show', $c) }}"
+                           @if ($ccImg) style="background-image: url('{{ asset('storage/' . $ccImg) }}');" @endif>
+                            @unless ($ccImg)
+                                <div class="cc-media">
+                                    <svg class="cc-media-placeholder" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016c.896 0 1.7-.393 2.25-1.015a3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72"/>
+                                    </svg>
+                                </div>
+                            @endunless
                             <div class="cc-card-info">
                                 <span class="cc-tag">Concessionaire</span>
                                 <div class="cc-name">{{ $c->business_name ?: $c->name }}</div>
@@ -1891,13 +1973,17 @@
             const next = document.getElementById('railNext');
             const counter = document.getElementById('railCounter');
             const cards = rail.querySelectorAll('.stock-card');
-            const total = cards.length;
+
+            function visibleCards() {
+                return [...cards].filter(c => !c.hasAttribute('hidden'));
+            }
 
             function step() {
-                return (cards[0]?.offsetWidth || 272) + 18;
+                return (visibleCards()[0]?.offsetWidth || 272) + 18;
             }
 
             function update() {
+                const total = visibleCards().length;
                 const maxScroll = rail.scrollWidth - rail.clientWidth;
                 prev.disabled = rail.scrollLeft <= 4;
                 next.disabled = rail.scrollLeft >= maxScroll - 4;
@@ -1911,6 +1997,24 @@
             next.addEventListener('click', () => rail.scrollBy({ left: step() * 2, behavior: 'smooth' }));
             rail.addEventListener('scroll', update, { passive: true });
             window.addEventListener('resize', update);
+
+            const filter = document.getElementById('railFilter');
+            if (filter) {
+                filter.addEventListener('click', (e) => {
+                    const btn = e.target.closest('button[data-filter]');
+                    if (!btn || btn.classList.contains('active')) return;
+                    filter.querySelectorAll('button').forEach(b => {
+                        const on = b === btn;
+                        b.classList.toggle('active', on);
+                        b.setAttribute('aria-pressed', on);
+                    });
+                    const type = btn.dataset.filter;
+                    cards.forEach(c => c.toggleAttribute('hidden', type !== 'all' && c.dataset.type !== type));
+                    rail.scrollTo({ left: 0 });
+                    update();
+                });
+            }
+
             update();
         })();
     </script>

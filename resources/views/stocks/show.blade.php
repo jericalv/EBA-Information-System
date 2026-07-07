@@ -9,396 +9,596 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800,900|manrope:400,500,600,700,800|ibm-plex-mono:400,500,600&display=swap" rel="stylesheet" />
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --green: #0A5C2F;
-            --green-light: #0D7A3E;
-            --green-dark: #064420;
-            --cvsu-green: #0A5C2F;
-            --cvsu-green-light: #0D7A3E;
-            --white: #FFFFFF;
-            --gray-50: #FAFAF8;
-            --gray-100: #F5F5F4;
-            --gray-200: #E5E7EB;
-            --gray-600: #4B5563;
-            --gray-700: #374151;
-            --gray-900: #111827;
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-            --spacing-sm: 8px;
-            --spacing-md: 16px;
-            --spacing-lg: 24px;
-            --spacing-xl: 32px;
+        :root {
+            --ink: #16231C;
+            --ink-soft: #43534A;
+            --ink-faint: #68786D;
+            --paper: #EDF2E8;
+            --paper-deep: #E0E8D9;
+            --card: #FFFFFF;
+            --card-soft: #F7FAF4;
+            --green: #0A5C2F;
+            --green-bright: #0D7A3E;
+            --green-deep: #07341C;
+            --gold: #C99A2E;
+            --gold-soft: #E4C36B;
+            --line: #D7E0CF;
+            --line-strong: #BECBB3;
+            --red: #B4232A;
+            --red-deep: #7C1D22;
+            --amber: #B45309;
+            --font-display: 'Inter', 'Manrope', system-ui, sans-serif;
+            --font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+            --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--gray-100);
+            font-family: var(--font-body);
+            background: var(--paper);
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            color: var(--gray-900);
+            color: var(--ink);
+            line-height: 1.6;
+            overflow-x: hidden;
         }
 
+        img { max-width: 100%; }
+
+        a:focus-visible, button:focus-visible {
+            outline: 2px solid var(--green);
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--green);
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .eyebrow::before {
+            content: '';
+            width: 22px;
+            height: 1px;
+            background: var(--gold);
+            flex-shrink: 0;
+        }
+
+        /* ===== NAVBAR ===== */
         .navbar {
             position: fixed;
             top: 0; left: 0; right: 0;
             z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-            transition: all 0.3s ease;
+            background: rgba(237, 242, 232, 0.92);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--line);
+            transition: box-shadow .3s ease, background-color .3s ease;
+        }
+        .navbar.scrolled {
+            background: rgba(255, 255, 255, 0.94);
+            box-shadow: 0 2px 24px rgba(24, 36, 32, 0.07);
         }
 
-        .navbar.scrolled { box-shadow: 0 4px 30px rgba(0, 0, 0, 0.08); }
-
         .nav-container {
-            max-width: 1280px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            height: 72px;
+            height: 70px;
         }
 
         .nav-brand {
-            display: flex; align-items: center; gap: 14px;
-            text-decoration: none; color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: var(--ink);
         }
-
-        .nav-brand img { width: 44px; height: 44px; border-radius: 10px; object-fit: contain; }
+        .nav-brand img { width: 42px; height: 42px; object-fit: contain; }
         .nav-brand-text { display: flex; flex-direction: column; }
-
         .nav-brand-title {
-            font-size: 16px; font-weight: 800; letter-spacing: -0.2px;
-            color: var(--cvsu-green); line-height: 1.2;
+            font-family: var(--font-display);
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+            color: var(--green);
+            line-height: 1.2;
         }
-
         .nav-brand-subtitle {
-            font-size: 11px; font-weight: 500;
-            color: var(--gray-600); letter-spacing: 0.3px;
+            font-family: var(--font-mono);
+            font-size: 9.5px;
+            font-weight: 500;
+            color: var(--ink-faint);
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
         }
 
-        .nav-links { display: flex; align-items: center; gap: 8px; }
-
+        .nav-links { display: flex; align-items: center; gap: 4px; }
         .nav-links a {
-            text-decoration: none; font-size: 14px; font-weight: 500;
-            color: var(--gray-600); padding: 8px 16px;
-            border-radius: 8px; transition: all 0.2s ease;
+            text-decoration: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--ink-soft);
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: color .2s ease, background-color .2s ease;
         }
-
-        .nav-links a:hover { color: var(--cvsu-green); background: rgba(10, 92, 47, 0.06); }
-
-        .nav-links a.active {
-            color: var(--cvsu-green); background: rgba(10, 92, 47, 0.1); font-weight: 700;
+        .nav-links a:hover { color: var(--green); background: rgba(10, 92, 47, 0.06); }
+        .nav-links a.active { color: var(--green); background: rgba(10, 92, 47, 0.09); }
+        .nav-links .btn-login {
+            color: #fff;
+            background: var(--green);
+            padding: 9px 20px;
+            margin-left: 8px;
         }
+        .nav-links .btn-login:hover { background: var(--green-bright); color: #fff; }
 
-        .nav-links .btn-login { color: var(--cvsu-green); font-weight: 600; }
-
-        .nav-links .btn-register {
-            background: var(--cvsu-green); color: var(--white);
-            font-weight: 600; padding: 8px 20px; border-radius: 8px;
-        }
-
-        .nav-links .btn-register:hover { background: var(--cvsu-green-light); color: var(--white); }
-
-        .nav-links .btn-logout {
-            background: transparent; color: #dc2626; font-weight: 600;
-            padding: 8px 20px; border: 2px solid #dc2626; border-radius: 8px;
-        }
-
-        .nav-links .btn-logout:hover { background: #dc2626; color: var(--white); }
-
-        .mobile-toggle {
-            display: none; background: none; border: none;
-            cursor: pointer; padding: 8px;
-        }
-
+        .mobile-toggle { display: none; background: none; border: none; cursor: pointer; padding: 8px; }
         .mobile-toggle span {
-            display: block; width: 24px; height: 2px;
-            background: var(--gray-700); margin: 5px 0;
-            border-radius: 2px; transition: all 0.3s ease;
+            display: block;
+            width: 22px; height: 2px;
+            background: var(--ink);
+            margin: 5px 0;
+            border-radius: 2px;
         }
-
-        .nav-mobile-actions { display: flex; align-items: center; gap: 10px; }
+        .nav-mobile-actions { display: none; align-items: center; gap: 10px; }
         .nav-profile-mobile { display: none; }
 
-        .page-wrapper { flex: 1; padding-top: 72px; }
+        /* ===== MAIN ===== */
+        .page-wrapper { flex: 1; padding-top: 70px; }
 
         .main-content {
             width: 100%;
-            max-width: 1200px;
+            max-width: 1160px;
             margin: 0 auto;
-            padding: var(--spacing-xl) var(--spacing-md);
+            padding: 34px 24px 56px;
         }
 
         .breadcrumb {
-            display: flex; align-items: center; gap: 8px;
-            margin-bottom: var(--spacing-lg); font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 26px;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            letter-spacing: 0.3px;
         }
+        .breadcrumb a {
+            color: var(--ink-faint);
+            text-decoration: none;
+            transition: color .2s ease;
+        }
+        .breadcrumb a:hover { color: var(--green); }
+        .breadcrumb span { color: var(--line-strong); }
+        .breadcrumb .current { color: var(--green); font-weight: 600; }
 
-        .breadcrumb a { color: var(--gray-600); text-decoration: none; }
-        .breadcrumb a:hover { color: var(--cvsu-green); }
-        .breadcrumb span { color: var(--gray-200); }
-        .breadcrumb .current { color: var(--gray-900); font-weight: 500; }
-
+        /* ===== STOCK DETAIL ===== */
         .stock-detail {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: var(--spacing-lg);
-            align-items: stretch;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 44px;
+            align-items: start;
         }
 
-        .stock-image-lg {
-            background: #fff;
-            border-radius: 16px;
+        .sd-media {
+            position: relative;
+            background-color: var(--paper-deep);
+            background-image: radial-gradient(rgba(24, 36, 32, 0.1) 1px, transparent 1px);
+            background-size: 16px 16px;
+            border: 1px solid var(--line);
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            min-height: 340px;
+            aspect-ratio: 1;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-
-        .stock-image-lg img {
+        .sd-media img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            display: block;
+        }
+        .sd-media svg {
+            width: 88px;
+            height: 88px;
+            color: var(--line-strong);
+        }
+        .sd-cat {
+            position: absolute;
+            top: 14px; left: 14px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            background: rgba(255, 255, 255, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 5px;
+            padding: 6px 10px;
+            color: var(--ink-soft);
+            z-index: 2;
         }
 
-        .stock-image-lg svg {
-            width: 96px; height: 96px; color: var(--gray-200);
+        .sd-title {
+            font-family: var(--font-display);
+            font-weight: 800;
+            font-size: clamp(26px, 3vw, 34px);
+            line-height: 1.14;
+            letter-spacing: -0.5px;
+            color: var(--ink);
+            margin: 12px 0 14px;
         }
 
-        .stock-content {
+        .sd-meta {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 14px;
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            color: var(--ink-faint);
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--line);
+        }
+        .sd-meta strong { color: var(--ink-soft); font-weight: 600; }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            border: 1px solid var(--line-strong);
+            border-radius: 999px;
+            padding: 5px 13px;
+            background: var(--card);
+            color: var(--ink-soft);
+        }
+        .status-pill::before {
+            content: '';
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--green-bright);
+            flex-shrink: 0;
+        }
+        .status-pill.available { color: var(--green); }
+        .status-pill.low-stock { color: var(--amber); }
+        .status-pill.low-stock::before { background: var(--amber); }
+        .status-pill.out-of-stock { color: var(--red); }
+        .status-pill.out-of-stock::before { background: var(--red); }
+
+        /* Summary cards */
+        .summary-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+        .summary-row.single { grid-template-columns: 1fr; }
+        .summary-card {
+            background: var(--card-soft);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 16px 18px;
+        }
+        .summary-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            margin-bottom: 6px;
+        }
+        .summary-value {
+            font-family: var(--font-mono);
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--green);
+            line-height: 1.1;
+            font-variant-numeric: tabular-nums;
+        }
+        .summary-value.low-stock { color: var(--amber); }
+        .summary-value.out-of-stock { color: var(--red); }
+        .summary-value small {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--ink-faint);
+            margin-left: 4px;
+        }
+
+        /* ===== SIZE RUN BOARD (signature) ===== */
+        .size-board {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 22px;
+        }
+        .size-board-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+        .size-board-title {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 1.6px;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+        }
+        .size-board-title strong { color: var(--green); font-weight: 600; }
+
+        /* Segmented Price / Sizes switch */
+        .view-switch {
+            position: relative;
+            display: inline-flex;
+            background: var(--paper-deep);
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            padding: 3px;
+        }
+        .view-switch::before {
+            content: '';
+            position: absolute;
+            top: 3px; bottom: 3px;
+            left: 3px;
+            width: calc(50% - 3px);
+            background: var(--green-deep);
+            border-radius: 6px;
+            transition: transform .25s cubic-bezier(0.34, 1.1, 0.64, 1);
+        }
+        .view-switch[data-view="sizes"]::before { transform: translateX(100%); }
+        .view-switch button {
+            position: relative;
+            z-index: 1;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            font-weight: 600;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+            padding: 7px 18px;
+            min-width: 96px;
+            border-radius: 6px;
+            transition: color .2s ease;
+        }
+        .view-switch button[aria-pressed="true"] { color: var(--gold-soft); }
+        .view-switch button:hover:not([aria-pressed="true"]) { color: var(--green); }
+
+        .size-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .size-tile {
+            position: relative;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--card-soft);
+            padding: 14px 12px 12px;
+            text-align: center;
+            overflow: hidden;
+            transition: border-color .2s ease, background-color .2s ease;
+        }
+        .size-tile:hover { border-color: var(--line-strong); background: #fff; }
+        .size-tile.is-out { background: repeating-linear-gradient(-45deg, var(--card-soft), var(--card-soft) 6px, rgba(24, 36, 32, 0.025) 6px, rgba(24, 36, 32, 0.025) 12px); }
+
+        .size-tag {
+            display: inline-block;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            color: var(--ink-soft);
+            border: 1px solid var(--line-strong);
+            border-radius: 5px;
             background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            padding: var(--spacing-lg);
+            padding: 2px 9px;
+            margin-bottom: 10px;
+        }
+
+        .size-values {
+            position: relative;
+            height: 42px;
+        }
+        .size-val {
+            position: absolute;
+            inset: 0;
             display: flex;
             flex-direction: column;
-            justify-content: flex-start;
-            gap: var(--spacing-sm);
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity .22s ease, transform .22s ease;
+            pointer-events: none;
+        }
+        .size-board[data-view="price"] .size-val.val-price,
+        .size-board[data-view="sizes"] .size-val.val-sizes {
+            opacity: 1;
+            transform: translateY(0);
         }
 
-        .stock-type {
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--gray-600);
-            letter-spacing: 0.05em;
+        .size-price {
+            font-family: var(--font-mono);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--green);
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+        }
+        .size-qty {
+            font-family: var(--font-mono);
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .size-qty .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: var(--green-bright);
+            flex-shrink: 0;
+        }
+        .size-qty .dot.amber { background: var(--amber); }
+        .size-qty .dot.red { background: var(--red); }
+        .size-sub {
+            font-family: var(--font-mono);
+            font-size: 9.5px;
+            letter-spacing: 1px;
             text-transform: uppercase;
+            color: var(--ink-faint);
         }
-
-        .stock-content h1 {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--gray-900);
-            margin-bottom: 0;
-            line-height: 1.1;
+        .size-none {
+            font-family: var(--font-mono);
+            font-size: 15px;
+            color: var(--line-strong);
         }
+        .size-none-sub { color: var(--ink-faint); }
+        .size-out-label { color: var(--red); }
 
-        .stock-status-badge {
+        .size-board-foot {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+            padding-top: 14px;
+            border-top: 1px solid var(--line);
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            letter-spacing: 0.6px;
+            color: var(--ink-faint);
+        }
+        .size-board-foot .legend { display: inline-flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+        .size-board-foot .legend span { display: inline-flex; align-items: center; gap: 6px; }
+        .size-board-foot .legend i {
+            width: 7px; height: 7px;
+            border-radius: 50%;
             display: inline-block;
-            border-radius: 999px;
-            padding: 6px 14px;
-            font-size: 12px;
-            font-weight: 700;
-            width: fit-content;
-            margin-top: 0;
-            margin-bottom: var(--spacing-md);
-            text-transform: uppercase;
-            color: var(--white);
         }
+        .size-board-foot .legend i.g { background: var(--green-bright); }
+        .size-board-foot .legend i.a { background: var(--amber); }
+        .size-board-foot .legend i.r { background: var(--red); }
 
-        .stock-status-badge.available { background-color: var(--cvsu-green); }
-        .stock-status-badge.low-stock { background-color: #ea580c; }
-        .stock-status-badge.out-of-stock { background-color: #dc2626; }
-
-        .stock-login-notice {
-            margin-top: var(--spacing-sm);
-            border: 1px solid rgba(59,130,246,0.18);
-            background: rgba(59,130,246,0.07);
-            color: #1d4ed8;
-            border-radius: 12px;
-            padding: 14px 16px;
+        /* Login notice */
+        .login-notice {
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--gold);
+            background: var(--card);
+            border-radius: 10px;
+            padding: 18px 20px;
             font-size: 14px;
-            line-height: 1.5;
+            color: var(--ink-soft);
+            margin-top: 8px;
         }
-
-        .stock-login-notice a {
-            color: #1e40af;
+        .login-notice a {
+            color: var(--green);
             font-weight: 700;
             text-decoration: underline;
         }
+        .login-notice a:hover { color: var(--green-bright); }
 
-        .stock-login-notice a:hover {
-            color: #1d4ed8;
-        }
-
-        .quantity-box {
-            border: 1px solid var(--gray-200);
-            border-radius: 12px;
-            padding: var(--spacing-md);
-            background: var(--gray-50);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .quantity-label {
-            font-size: 13px;
-            color: var(--gray-600);
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .quantity-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--cvsu-green);
-            line-height: 1;
-        }
-
-        .quantity-value.low-stock { color: #ea580c; }
-        .quantity-value.out-of-stock { color: #dc2626; }
-
-        .unit-price-box {
-            border: 1px solid var(--gray-200);
-            border-radius: 12px;
-            padding: var(--spacing-md);
-            background: var(--gray-50);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .unit-price-label {
-            font-size: 13px;
-            color: var(--gray-600);
-            font-weight: 500;
-            margin-bottom: 4px;
-        }
-
-        .unit-price-value {
-            font-size: 36px;
-            font-weight: 700;
-            color: var(--cvsu-green);
-            line-height: 1;
-        }
-
-        .pricing-label {
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--gray-700);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-top: var(--spacing-sm);
-            margin-bottom: var(--spacing-md);
-        }
-
-        .price-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: var(--spacing-md);
-            margin-bottom: var(--spacing-lg);
-        }
-
-        .price-card {
-            border: 1px solid var(--gray-200);
-            border-radius: 12px;
-            padding: var(--spacing-md);
-            background: #fff;
+        /* ===== FOOTER ===== */
+        .footer { background: var(--green-deep); margin-top: auto; }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 22px 24px;
             display: flex;
-            flex-direction: column;
-            gap: 4px;
-            text-align: center;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
         }
-
-        .price-card:hover {
-            border-color: var(--cvsu-green-light);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .footer-text {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            letter-spacing: 0.8px;
+            color: rgba(255, 255, 255, 0.65);
         }
+        .footer-text a { color: var(--gold-soft); text-decoration: none; font-weight: 600; }
+        .footer-text a:hover { text-decoration: underline; }
 
-        .price-size {
-            font-size: 13px;
-            color: var(--gray-600);
-            font-weight: 500;
-            text-transform: uppercase;
-        }
-
-        .price-amount {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--cvsu-green);
-        }
-        .stock-amount {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--gray-900);
-        }
-
-        .as-of-date {
-            font-size: 13px;
-            color: var(--gray-600);
-            margin-top: auto;
-            padding-top: var(--spacing-md);
-            text-align: center;
-            width: 100%;
-        }
-
-        .pricing-size-label,
-        .pricing-size-table-wrap,
-        .pricing-size-table { display: none; }
-
-        .footer {
-            background: #f8fafc;
-            border-top: 1px solid #e2e8f0;
-            padding: var(--spacing-lg);
-            text-align: center;
-            margin-top: auto;
-        }
-
-        .footer-text { font-size: 13px; color: var(--gray-600); }
-        .footer-text a { color: var(--cvsu-green); text-decoration: none; font-weight: 600; }
-
+        /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
-            .stock-detail { grid-template-columns: 1fr; gap: 20px; }
-            .stock-image-lg { max-height: 360px; }
-            .price-grid { grid-template-columns: repeat(2, 1fr); }
+            .stock-detail { grid-template-columns: 1fr; gap: 26px; }
+            .sd-media { max-height: 380px; }
         }
-
         @media (max-width: 768px) {
             .nav-links { display: none; }
             .mobile-toggle { display: block; }
-            .nav-mobile-actions { margin-left: auto; }
+            .nav-mobile-actions { display: flex; margin-left: auto; }
             .nav-profile-mobile { display: inline-flex; }
             .nav-links.active {
-                display: flex; flex-direction: column;
-                position: absolute; top: 72px; left: 0; right: 0;
-                background: var(--white); padding: 16px 24px;
-                border-bottom: 1px solid var(--gray-200);
-                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+                display: flex;
+                flex-direction: column;
+                align-items: stretch;
+                position: absolute;
+                top: 70px; left: 0; right: 0;
+                background: var(--card);
+                padding: 16px 24px;
+                border-bottom: 1px solid var(--line);
+                box-shadow: 0 10px 40px rgba(24, 36, 32, 0.08);
             }
+            .nav-links.active .btn-login { margin-left: 0; text-align: center; justify-content: center; display: flex; }
         }
-
         @media (max-width: 600px) {
-            .stock-content { padding: 20px; }
-            .price-grid { grid-template-columns: 1fr; }
+            .sd-title { font-size: 24px; }
+            .summary-row { grid-template-columns: 1fr; }
+            .size-grid { grid-template-columns: repeat(2, 1fr); }
+            .size-board { padding: 16px; }
+            .size-board-head { justify-content: center; }
+            .view-switch { width: 100%; }
+            .view-switch button { flex: 1; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition-duration: 0.01ms !important; }
         }
     </style>
 </head>
 <body>
     @include('partials.pending-application-banner')
 
+    <!-- ===== NAVBAR ===== -->
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <a href="/" class="nav-brand">
                 <img src="{{ asset('images/eba-logo.png') }}" alt="EBA Logo">
                 <div class="nav-brand-text">
                     <span class="nav-brand-title">EBA Information System</span>
-                    <span class="nav-brand-subtitle">CvSU &mdash; Trece Martires City Campus</span>
+                    <span class="nav-brand-subtitle">CvSU &mdash; Trece Martires</span>
                 </div>
             </a>
 
@@ -410,7 +610,9 @@
                 @endauth
 
                 <button class="mobile-toggle" onclick="toggleMenu()" aria-label="Toggle navigation">
-                    <span></span><span></span><span></span>
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </button>
             </div>
 
@@ -439,27 +641,26 @@
         $sizeOrder = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
         $stockPrices = is_array($stock->prices ?? null) ? $stock->prices : [];
         $stockSizes = is_array($stock->sizes ?? null) ? $stock->sizes : [];
-        $visiblePrices = [];
-        $visibleStockBySize = [];
+        $sizeRun = [];
 
         if (($stock->item_type ?? null) === 'uniforms') {
             foreach ($sizeOrder as $sizeKey) {
                 $price = (float) ($stockPrices[$sizeKey] ?? 0);
                 $sizeQty = (int) ($stockSizes[$sizeKey] ?? 0);
 
-                if ($price > 0) {
-                    $visiblePrices[$sizeKey] = $price;
-                }
-
-                if ($sizeQty > 0) {
-                    $visibleStockBySize[$sizeKey] = $sizeQty;
+                if ($price > 0 || $sizeQty > 0) {
+                    $sizeRun[$sizeKey] = ['price' => $price, 'qty' => $sizeQty];
                 }
             }
         }
+
+        $sizesTracked = !empty($stockSizes);
+        $sizesInStock = count(array_filter($sizeRun, fn ($entry) => $entry['qty'] > 0));
     @endphp
 
     <div class="page-wrapper">
         <div class="main-content">
+            <!-- Breadcrumb -->
             <div class="breadcrumb">
                 <a href="/">Home</a>
                 <span>/</span>
@@ -469,7 +670,7 @@
             </div>
 
             <div class="stock-detail">
-                <div class="stock-image-lg">
+                <div class="sd-media">
                     @if($stock->image)
                         <img src="{{ asset('storage/' . $stock->image) }}" alt="{{ $stock->item_name }}">
                     @else
@@ -479,57 +680,99 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 16.5 12 21l8.25-4.5"/>
                         </svg>
                     @endif
+                    <span class="sd-cat">{{ $stock->item_type ?? 'Stock' }}</span>
                 </div>
 
                 <section class="stock-content" aria-label="Stock details">
-                    <span class="stock-type">{{ strtoupper($stock->item_type ?? '') }}</span>
-                    <h1>{{ $stock->item_name }}</h1>
+                    <span class="eyebrow">Campus Registry &mdash; Official Stock</span>
+                    <h1 class="sd-title">{{ $stock->item_name }}</h1>
 
-                    @auth
-                    <span class="stock-status-badge {{ $stockStatusClass }}">
-                        {{ $stockStatusLabel }}
-                    </span>
-
-                    <div class="quantity-box">
-                        <p class="quantity-label">Quantity available</p>
-                        <div class="quantity-value {{ $stockStatusClass }}">{{ number_format($stockQty) }}</div>
+                    <div class="sd-meta">
+                        <span class="status-pill {{ $stockStatusClass }}">{{ $stockStatusLabel }}</span>
+                        <span><strong>REF</strong> #{{ str_pad($stock->id, 4, '0', STR_PAD_LEFT) }}</span>
+                        <span>&middot;</span>
+                        <span><strong>As of</strong> {{ date('F Y') }}</span>
                     </div>
 
-                    @if(($stock->item_type ?? null) === 'books' && $stock->unit_price > 0)
-                        <div class="unit-price-box">
-                            <p class="unit-price-label">Price</p>
-                            <div class="unit-price-value">&#8369;{{ number_format($stock->unit_price, 2) }}</div>
+                    @auth
+                    <div class="summary-row {{ ($stock->item_type ?? null) === 'books' && $stock->unit_price > 0 ? '' : 'single' }}">
+                        <div class="summary-card">
+                            <p class="summary-label">Quantity on hand</p>
+                            <div class="summary-value {{ $stockStatusClass }}">{{ number_format($stockQty) }}<small>pcs</small></div>
                         </div>
-                    @endif
 
-                    @if(($stock->item_type ?? null) === 'uniforms' && !empty($visiblePrices))
-                        <p class="pricing-label">PRICING BY SIZE</p>
-                        <div class="price-grid">
-                            @foreach($visiblePrices as $sizeKey => $price)
-                                <div class="price-card">
-                                    <span class="price-size">{{ $sizeKey }}</span>
-                                    <span class="price-amount">&#8369;{{ number_format($price, 2) }}</span>
+                        @if(($stock->item_type ?? null) === 'books' && $stock->unit_price > 0)
+                            <div class="summary-card">
+                                <p class="summary-label">Price</p>
+                                <div class="summary-value">&#8369;{{ number_format($stock->unit_price, 2) }}</div>
+                            </div>
+                        @endif
+                    </div>
+
+                    @if(($stock->item_type ?? null) === 'uniforms' && !empty($sizeRun))
+                        <div class="size-board" id="sizeBoard" data-view="price">
+                            <div class="size-board-head">
+                                @if($sizesTracked)
+                                    <span class="size-board-title">Size Run &mdash; <strong>{{ $sizesInStock }}</strong> of {{ count($sizeRun) }} sizes in stock</span>
+                                @else
+                                    <span class="size-board-title">Size Run &mdash; <strong>{{ count($sizeRun) }}</strong> sizes listed</span>
+                                @endif
+                                <div class="view-switch" id="viewSwitch" data-view="price" role="group" aria-label="Switch between price and size availability">
+                                    <button type="button" data-view="price" aria-pressed="true">Price</button>
+                                    <button type="button" data-view="sizes" aria-pressed="false">Sizes</button>
                                 </div>
-                            @endforeach
+                            </div>
+
+                            <div class="size-grid">
+                                @foreach($sizeRun as $sizeKey => $entry)
+                                    <div class="size-tile {{ $sizesTracked && $entry['qty'] === 0 ? 'is-out' : '' }}">
+                                        <span class="size-tag">{{ $sizeKey }}</span>
+                                        <div class="size-values">
+                                            <div class="size-val val-price">
+                                                @if($entry['price'] > 0)
+                                                    <span class="size-price">&#8369;{{ number_format($entry['price'], 2) }}</span>
+                                                    <span class="size-sub">per piece</span>
+                                                @else
+                                                    <span class="size-none">&mdash;</span>
+                                                    <span class="size-sub size-none-sub">No price set</span>
+                                                @endif
+                                            </div>
+                                            <div class="size-val val-sizes">
+                                                @if($entry['qty'] > 0)
+                                                    <span class="size-qty">
+                                                        <i class="dot {{ $entry['qty'] <= 5 ? 'amber' : '' }}"></i>{{ number_format($entry['qty']) }}
+                                                    </span>
+                                                    <span class="size-sub">pcs available</span>
+                                                @elseif($sizesTracked)
+                                                    <span class="size-qty size-out-label"><i class="dot red"></i>0</span>
+                                                    <span class="size-sub size-out-label">Out of stock</span>
+                                                @else
+                                                    <span class="size-none">&mdash;</span>
+                                                    <span class="size-sub size-none-sub">Not tracked per size</span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+
+                            <div class="size-board-foot">
+                                @if($sizesTracked)
+                                    <span class="legend">
+                                        <span><i class="g"></i> In stock</span>
+                                        <span><i class="a"></i> Running low</span>
+                                        <span><i class="r"></i> Out of stock</span>
+                                    </span>
+                                @else
+                                    <span>Per-size availability not yet recorded</span>
+                                @endif
+                                <span>CvSU Trece Martires</span>
+                            </div>
                         </div>
                     @endif
-
-                    @if(($stock->item_type ?? null) === 'uniforms' && !empty($visibleStockBySize))
-                        <p class="pricing-label">STOCK BY SIZE</p>
-                        <div class="price-grid">
-                            @foreach($visibleStockBySize as $sizeKey => $sizeQty)
-                                <div class="price-card">
-                                    <span class="price-size">{{ $sizeKey }}</span>
-                                    <span class="stock-amount">{{ number_format($sizeQty) }}</span>
-                                </div>
-                            @endforeach
-                        </div>
-                    @endif
-
-                    <p class="as-of-date">As of {{ date('F Y') }} &mdash; CvSU Trece Martires</p>
                     @else
-                    <div class="stock-login-notice" role="status" aria-live="polite">
-                        Log in to view stock details.
+                    <div class="login-notice" role="status" aria-live="polite">
+                        Log in to view prices and size availability for this item.
                         <a href="{{ route('login') }}">Log in here</a>.
                     </div>
                     @endauth
@@ -538,8 +781,12 @@
         </div>
     </div>
 
+    <!-- Footer -->
     <footer class="footer">
-        <p class="footer-text">&copy; {{ date('Y') }} <a href="/">CvSU</a> - Trece Martires City Campus. All rights reserved.</p>
+        <div class="footer-inner">
+            <p class="footer-text">&copy; {{ date('Y') }} <a href="/">CvSU</a> &mdash; Trece Martires City Campus. All rights reserved.</p>
+            <p class="footer-text">EBA Information System</p>
+        </div>
     </footer>
 
     <script>
@@ -550,6 +797,23 @@
 
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
+        }
+
+        // Price / Sizes view switch
+        const sizeBoard = document.getElementById('sizeBoard');
+        const viewSwitch = document.getElementById('viewSwitch');
+
+        if (sizeBoard && viewSwitch) {
+            viewSwitch.querySelectorAll('button').forEach((btn) => {
+                btn.addEventListener('click', () => {
+                    const view = btn.dataset.view;
+                    sizeBoard.dataset.view = view;
+                    viewSwitch.dataset.view = view;
+                    viewSwitch.querySelectorAll('button').forEach((b) => {
+                        b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+                    });
+                });
+            });
         }
     </script>
 </body>

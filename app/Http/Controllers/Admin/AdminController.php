@@ -16,6 +16,7 @@ use App\Models\ActivityLog;
 use App\Models\PartnershipApplication;
 use App\Models\ProductReview;
 use App\Models\SalesOrder;
+use App\Models\SalesOrderItem;
 use App\Models\UniformStock;
 use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -28,6 +29,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Collection;
@@ -201,6 +203,51 @@ class AdminController extends Controller
             ];
         })->values()->toArray();
 
+        $salesByMonthData = collect(range(5, 0))->map(function ($i) {
+            $month = now()->subMonths($i);
+
+            $byType = SalesOrderItem::query()
+                ->join('sales_orders', 'sales_orders.id', '=', 'sales_order_items.sales_order_id')
+                ->leftJoin('uniform_stocks', 'uniform_stocks.id', '=', 'sales_order_items.uniform_stock_id')
+                ->whereYear('sales_orders.created_at', $month->year)
+                ->whereMonth('sales_orders.created_at', $month->month)
+                ->selectRaw("COALESCE(uniform_stocks.item_type, 'uniforms') as item_type")
+                ->selectRaw('SUM(sales_order_items.quantity) as units')
+                ->selectRaw('SUM(sales_order_items.quantity * sales_order_items.price_at_sale) as revenue')
+                ->groupBy('item_type')
+                ->get()
+                ->keyBy('item_type');
+
+            return [
+                'month' => $month->format('M Y'),
+                'uniform_revenue' => (float) ($byType['uniforms']->revenue ?? 0),
+                'book_revenue' => (float) ($byType['books']->revenue ?? 0),
+                'uniform_units' => (int) ($byType['uniforms']->units ?? 0),
+                'book_units' => (int) ($byType['books']->units ?? 0),
+            ];
+        })->values()->toArray();
+
+        $topItemsData = SalesOrderItem::query()
+            ->join('uniform_stocks', 'uniform_stocks.id', '=', 'sales_order_items.uniform_stock_id')
+            ->selectRaw('uniform_stocks.item_name as name')
+            ->selectRaw("COALESCE(uniform_stocks.item_type, 'uniforms') as item_type")
+            ->selectRaw('SUM(sales_order_items.quantity) as units')
+            ->selectRaw('SUM(sales_order_items.quantity * sales_order_items.price_at_sale) as revenue')
+            ->groupBy('uniform_stocks.id', 'uniform_stocks.item_name', 'uniform_stocks.item_type')
+            ->orderByDesc('units')
+            ->take(10)
+            ->get()
+            ->map(function ($row) {
+                return [
+                    'name' => $row->name,
+                    'type' => $row->item_type === 'books' ? 'Book' : 'Uniform',
+                    'units' => (int) $row->units,
+                    'revenue' => (float) $row->revenue,
+                ];
+            })
+            ->values()
+            ->toArray();
+
         $topConcessionairesData = User::where('role', 'concessionaire')
             ->where('is_approved', true)
             ->get()
@@ -225,7 +272,9 @@ class AdminController extends Controller
             'applicationStatusData',
             'monthlyPaymentsData',
             'applicationsTrendData',
-            'topConcessionairesData'
+            'topConcessionairesData',
+            'salesByMonthData',
+            'topItemsData'
         ));
     }
 
@@ -375,6 +424,68 @@ class AdminController extends Controller
         $user->delete();
 
         return back()->with('success', "{$name} has been deleted.");
+    }
+
+    /**
+     * Return account details for the admin user-detail modal.
+     */
+    public function userDetails(User $user)
+    {
+        $recentActivity = ActivityLog::query()
+            ->where(function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->orWhere(function ($q2) use ($user) {
+                      $q2->where('subject_type', 'user')
+                         ->where('subject_id', (string) $user->id);
+                  });
+            })
+            ->latest()
+            ->limit(6)
+            ->get();
+
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'phone_number' => $user->phone_number,
+            'business_name' => $user->business_name,
+            'monthly_fee' => $user->monthly_fee !== null ? number_format((float) $user->monthly_fee, 2) : null,
+            'location' => $user->location,
+            'is_approved' => (bool) $user->is_approved,
+            'is_active_concessionaire' => (bool) $user->is_active_concessionaire,
+            'email_verified_at' => $user->email_verified_at?->format('M d, Y'),
+            'two_factor_enabled' => ! is_null($user->two_factor_confirmed_at),
+            'joined' => $user->created_at->format('M d, Y'),
+            'joined_relative' => $user->created_at->diffForHumans(),
+            'recent_activity' => $recentActivity->map(fn ($log) => [
+                'action' => $log->action,
+                'description' => $log->description,
+                'when' => $log->created_at->diffForHumans(),
+            ])->values(),
+        ]);
+    }
+
+    /**
+     * Send a password reset link to a user on their behalf.
+     */
+    public function sendPasswordReset(User $user)
+    {
+        $status = Password::sendResetLink(['email' => $user->email]);
+
+        if ($status !== Password::RESET_LINK_SENT) {
+            return back()->with('error', __($status));
+        }
+
+        ActivityLog::log(
+            'password_reset_sent',
+            'user',
+            (string) $user->id,
+            "Sent a password reset link to {$user->name}",
+            ['email' => $user->email]
+        );
+
+        return back()->with('success', "Password reset link sent to {$user->email}.");
     }
 
     /**
@@ -927,12 +1038,21 @@ class AdminController extends Controller
             ->where('is_approved', true)
             ->where('is_active_concessionaire', true)
             ->withCount([
+                // "Paid" means the current month is covered, so advance payments
+                // recorded in an earlier month still count.
                 'concessionairePayments as current_month_payment_count' => function ($paymentQuery) use ($currentMonthStart, $currentMonthEnd) {
-                    $paymentQuery->whereBetween('payment_date', [$currentMonthStart, $currentMonthEnd]);
+                    $paymentQuery->where(function ($q) use ($currentMonthStart, $currentMonthEnd) {
+                        $q->whereBetween('period_month', [$currentMonthStart, $currentMonthEnd])
+                            ->orWhere(function ($fallback) use ($currentMonthStart, $currentMonthEnd) {
+                                $fallback->whereNull('period_month')
+                                    ->whereBetween('payment_date', [$currentMonthStart, $currentMonthEnd]);
+                            });
+                    });
                 },
             ])
             ->withSum('concessionairePayments as total_paid', 'amount')
             ->withMax('concessionairePayments as last_payment_date', 'payment_date')
+            ->withMax('concessionairePayments as paid_through_month', 'period_month')
             ->orderBy('business_name')
             ->orderBy('name')
             ->get();
