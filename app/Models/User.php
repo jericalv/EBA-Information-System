@@ -128,6 +128,16 @@ class User extends Authenticatable
     }
 
     /**
+     * Carousel banner images uploaded by this concessionaire.
+     */
+    public function carouselMedia(): HasMany
+    {
+        return $this->hasMany(ConcessionaireMedia::class)
+            ->orderBy('sort_order')
+            ->orderBy('id');
+    }
+
+    /**
      * Store-level reviews received by this concessionaire.
      */
     public function concessionaireReviews(): HasMany

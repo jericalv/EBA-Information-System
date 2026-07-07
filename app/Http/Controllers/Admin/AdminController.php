@@ -170,27 +170,6 @@ class AdminController extends Controller
             'recent_users' => User::latest()->take(5)->get(),
         ];
 
-        // Trend data for stat cards (last 7 days)
-        $usersTrend = collect(range(6, 0))->map(function ($i) {
-            $date = now()->subDays($i);
-            return User::whereDate('created_at', '<=', $date)->count();
-        })->values()->toArray();
-
-        $adminsTrend = collect(range(6, 0))->map(function ($i) {
-            $date = now()->subDays($i);
-            return User::where('role', 'admin')->whereDate('created_at', '<=', $date)->count();
-        })->values()->toArray();
-
-        $cashiersTrend = collect(range(6, 0))->map(function ($i) {
-            $date = now()->subDays($i);
-            return User::where('role', 'cashier')->whereDate('created_at', '<=', $date)->count();
-        })->values()->toArray();
-
-        $partnershipsTrend = collect(range(6, 0))->map(function ($i) {
-            $date = now()->subDays($i);
-            return PartnershipApplication::where('status', 'pending')->whereDate('created_at', '<=', $date)->count();
-        })->values()->toArray();
-
         $applicationStatusData = [
             'pending' => PartnershipApplication::where('status', 'pending')->count(),
             'approved' => PartnershipApplication::where('status', 'approved')->count(),
@@ -240,10 +219,6 @@ class AdminController extends Controller
 
         return $this->adminView('admin.dashboard', compact(
             'stats',
-            'usersTrend',
-            'adminsTrend',
-            'cashiersTrend',
-            'partnershipsTrend',
             'applicationStatusData',
             'monthlyPaymentsData',
             'applicationsTrendData',
@@ -1892,7 +1867,9 @@ class AdminController extends Controller
 
         $textKeys = [
             'hero_title', 'hero_subtitle',
-            'features_title',
+            'uniforms_title', 'uniforms_subtitle',
+            'features_title', 'features_subtitle',
+            'about_title', 'about_subtitle',
             'feature_1_title', 'feature_1_desc',
             'feature_2_title', 'feature_2_desc',
             'feature_3_title', 'feature_3_desc',
