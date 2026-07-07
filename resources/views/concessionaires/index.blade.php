@@ -161,33 +161,57 @@
         /* ===== PAGE HEADER (registry style) ===== */
         .page-wrapper { flex: 1; padding-top: 70px; }
 
-        .reg-head { border-bottom: 1px solid var(--line); }
+        /* dark dotted header band */
+        .reg-head {
+            position: relative;
+            background: var(--green-deep);
+            overflow: hidden;
+        }
+        .reg-head::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            pointer-events: none;
+        }
+        .reg-head > .wrap { position: relative; z-index: 1; }
+        .reg-head .flow-img {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+            filter: brightness(0) invert(1);
+        }
+        .flow-reg-tr { top: -70px; right: -140px; width: 720px; opacity: 0.10; transform: rotate(-13deg); }
         .reg-head-inner {
-            padding: 46px 0 38px;
+            padding: 44px 0 40px;
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
             gap: 32px;
         }
+        .reg-head .eyebrow { color: var(--gold-soft); }
+        .reg-head .eyebrow::before { background: var(--gold-soft); }
         .reg-title {
             font-family: var(--font-display);
             font-weight: 800;
             font-size: clamp(28px, 3.6vw, 40px);
             line-height: 1.08;
             letter-spacing: -0.7px;
-            color: var(--ink);
+            color: #fff;
             margin: 12px 0 10px;
         }
         .reg-sub {
             font-size: 15px;
-            color: var(--ink-soft);
+            color: rgba(255, 255, 255, 0.72);
             line-height: 1.7;
             max-width: 520px;
         }
         .reg-meta {
             flex-shrink: 0;
             font-family: var(--font-mono);
-            border-left: 1px solid var(--line-strong);
+            border-left: 1px solid rgba(255, 255, 255, 0.16);
             padding-left: 24px;
             display: flex;
             flex-direction: column;
@@ -205,12 +229,12 @@
             font-weight: 500;
             letter-spacing: 1.4px;
             text-transform: uppercase;
-            color: var(--ink-faint);
+            color: rgba(255, 255, 255, 0.55);
         }
         .reg-meta-row strong {
             font-size: 13px;
             font-weight: 600;
-            color: var(--green);
+            color: #fff;
             font-variant-numeric: tabular-nums;
         }
 
@@ -304,8 +328,8 @@
         /* ===== GRID ===== */
         .cc-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(244px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 22px;
         }
         .cc-noresult {
             text-align: center;
@@ -351,12 +375,23 @@
             background: linear-gradient(180deg, rgba(0,0,0,0) 46%, rgba(7, 52, 28, 0.34) 100%);
             pointer-events: none;
         }
+        /* dotted placeholder when no cover photo is set */
+        .cc-poster--empty {
+            background-color: var(--paper-deep);
+            background-image: radial-gradient(rgba(24, 36, 32, 0.1) 1px, transparent 1px);
+            background-size: 15px 15px;
+        }
+        .cc-poster--empty::after { display: none; }
         .cc-monogram {
             font-family: var(--font-display);
             font-size: 52px;
             font-weight: 800;
             color: rgba(255, 255, 255, 0.42);
             letter-spacing: 1px;
+        }
+        .cc-poster--empty .cc-monogram {
+            color: var(--line-strong);
+            text-shadow: 0 1px 0 rgba(255, 255, 255, 0.5);
         }
         .cc-rating-chip {
             position: absolute;
@@ -481,15 +516,48 @@
         .cc-card:hover .cc-view { color: var(--green); }
         .cc-card:hover .cc-view svg { transform: translateX(2px); }
 
-        /* ===== VISION / MISSION / VALUES BANNER ===== */
-        .vmv-sec {
+        /* ===== BUTTONS (portal language: 6px radius) ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 13px 24px;
+            font-family: var(--font-body);
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.1px;
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: background-color .2s ease, border-color .2s ease, color .2s ease, box-shadow .2s ease;
+        }
+        .btn-gold {
+            background: var(--gold);
+            color: var(--green-deep);
+        }
+        .btn-gold:hover {
+            background: var(--gold-soft);
+            box-shadow: 0 6px 18px rgba(201, 154, 46, 0.3);
+        }
+        .btn-white-outline {
+            background: transparent;
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.35);
+        }
+        .btn-white-outline:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.7);
+        }
+
+        /* ===== CTA BANNER ===== */
+        .cta-sec {
             position: relative;
             background: var(--green-deep);
-            color: #fff;
             overflow: hidden;
-            border-top: 1px solid var(--green-deep);
+            padding: 82px 0 86px;
         }
-        .vmv-sec::before {
+        .cta-sec::before {
             content: '';
             position: absolute;
             inset: 0;
@@ -506,57 +574,37 @@
             /* recolor the green line-art asset to pure white */
             filter: brightness(0) invert(1);
         }
-        .flow-vmv-tr {
-            top: -70px; right: -150px;
+        .flow-cta {
+            top: -60px; right: -100px;
             width: 720px;
             opacity: 0.10;
-            transform: rotate(12deg);
+            transform: rotate(-11deg);
         }
-        .flow-vmv-bl {
-            bottom: -120px; left: -170px;
-            width: 620px;
-            opacity: 0.08;
-            transform: rotate(-8deg);
+        .cta-inner {
+            position: relative;
+            z-index: 1;
+            max-width: 680px;
+            margin: 0 auto;
+            text-align: center;
+            color: #fff;
         }
-        .vmv-inner { position: relative; z-index: 1; padding: 62px 0 66px; }
-        .vmv-head { margin-bottom: 44px; max-width: 640px; }
-        .vmv-head .eyebrow { color: var(--gold-soft); }
-        .vmv-head .eyebrow::before { background: var(--gold-soft); }
-        .vmv-title {
+        .cta-inner .eyebrow { color: var(--gold-soft); justify-content: center; }
+        .cta-inner .eyebrow::before { background: var(--gold-soft); }
+        .cta-inner h2 {
             font-family: var(--font-display);
             font-weight: 800;
-            font-size: clamp(26px, 3.4vw, 38px);
+            font-size: clamp(28px, 3.8vw, 42px);
+            letter-spacing: -0.7px;
             line-height: 1.08;
-            letter-spacing: -0.6px;
-            color: #fff;
-            margin: 14px 0 12px;
+            margin: 16px 0 14px;
         }
-        .vmv-head p { color: rgba(255, 255, 255, 0.72); font-size: 15px; }
-
-        .vmv-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
-        .vmv-col {
-            padding: 4px 32px 4px 32px;
-            border-left: 1px solid var(--line-dark);
+        .cta-inner p {
+            font-size: 15.5px;
+            color: rgba(255, 255, 255, 0.75);
+            line-height: 1.75;
+            margin-bottom: 30px;
         }
-        .vmv-col:first-child { border-left: none; padding-left: 0; }
-        .vmv-col h3 {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            color: var(--gold-soft);
-            margin-bottom: 18px;
-        }
-        .vmv-col > p {
-            font-size: 14.5px;
-            line-height: 1.85;
-            color: rgba(255, 255, 255, 0.85);
-        }
-        .core-values-list { display: flex; flex-direction: column; gap: 14px; }
-        .core-value-item { display: flex; align-items: center; gap: 12px; }
-        .core-value-item svg { width: 15px; height: 15px; color: var(--gold); flex-shrink: 0; }
-        .core-value-item strong { font-size: 15px; font-weight: 700; color: #fff; }
+        .cta-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
 
         /* ===== EMPTY STATE ===== */
         .empty-state {
@@ -608,7 +656,7 @@
             }
             .reg-meta {
                 border-left: 0;
-                border-top: 1px solid var(--line-strong);
+                border-top: 1px solid rgba(255, 255, 255, 0.16);
                 padding-left: 0;
                 padding-top: 16px;
                 flex-direction: row;
@@ -618,9 +666,6 @@
                 width: 100%;
             }
             .reg-meta-row { flex-direction: column; gap: 3px; }
-            .vmv-grid { grid-template-columns: 1fr; gap: 30px; }
-            .vmv-col { border-left: none; padding: 0; padding-bottom: 26px; border-bottom: 1px solid var(--line-dark); }
-            .vmv-col:last-child { border-bottom: none; padding-bottom: 0; }
         }
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -707,6 +752,7 @@
 
         <!-- ===== PAGE HEADER ===== -->
         <header class="reg-head">
+            <img class="flow-img flow-reg-tr" src="{{ asset('images/flowlines1-green.png') }}" alt="" aria-hidden="true" loading="lazy">
             <div class="wrap">
                 <div class="reg-head-inner">
                     <div>
@@ -774,41 +820,22 @@
             @endif
         </div>
 
-        <!-- ===== VISION / MISSION / VALUES BANNER ===== -->
-        <section class="vmv-sec" aria-label="CvSU vision, mission and core values">
-            <img class="flow-img flow-vmv-tr" src="{{ asset('images/flowlines3-green.png') }}" alt="" aria-hidden="true" loading="lazy">
-            <img class="flow-img flow-vmv-bl" src="{{ asset('images/flowlines1-green.png') }}" alt="" aria-hidden="true" loading="lazy">
-            <div class="wrap vmv-inner">
-                <div class="vmv-head">
-                    <span class="eyebrow">Cavite State University</span>
-                    <h2 class="vmv-title">Our vision, mission &amp; core values</h2>
-                    <p>Guiding principles that drive excellence at CvSU Trece Martires City Campus.</p>
-                </div>
-
-                <div class="vmv-grid">
-                    <div class="vmv-col">
-                        <h3>University Vision</h3>
-                        <p>{{ \App\Models\SiteSetting::get('vision', 'The premier university in historic Cavite globally recognized for excellence in character development, academics, research, innovation and sustainable community engagement.') }}</p>
-                    </div>
-                    <div class="vmv-col">
-                        <h3>University Mission</h3>
-                        <p>{{ \App\Models\SiteSetting::get('mission', 'Cavite State University shall provide excellent, equitable and relevant educational opportunities in the arts, sciences and technology through quality instruction and responsive research and development activities. It shall produce professional, skilled and morally upright individuals for global competitiveness.') }}</p>
-                    </div>
-                    <div class="vmv-col">
-                        <h3>Core Values</h3>
-                        <div class="core-values-list">
-                            @for ($i = 1; $i <= 5; $i++)
-                                @php $cv = \App\Models\SiteSetting::get('core_value_'.$i, ''); @endphp
-                                @if ($cv)
-                                <div class="core-value-item">
-                                    <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                        <path d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"/>
-                                    </svg>
-                                    <strong>{{ $cv }}</strong>
-                                </div>
-                                @endif
-                            @endfor
-                        </div>
+        <!-- ===== CTA BANNER ===== -->
+        <section class="cta-sec" aria-label="Join the campus registry">
+            <img class="flow-img flow-cta" src="{{ asset('images/flowlines3-green.png') }}" alt="" aria-hidden="true" loading="lazy">
+            <div class="wrap">
+                <div class="cta-inner">
+                    <span class="eyebrow">Get Started</span>
+                    <h2>Ready to join the campus registry?</h2>
+                    <p>Create an account to review products, track your application, or partner with the External and Business Affairs Office at CvSU &mdash; Trece Martires City Campus.</p>
+                    <div class="cta-actions">
+                        @guest
+                            <a href="{{ route('register') }}" class="btn btn-gold">Create an Account</a>
+                            <a href="{{ route('login') }}" class="btn btn-white-outline">Log In</a>
+                        @else
+                            <a href="{{ route('products.index') }}" class="btn btn-gold">Browse Products</a>
+                            <a href="{{ route('concessionaires.index') }}" class="btn btn-white-outline">View Concessionaires</a>
+                        @endguest
                     </div>
                 </div>
             </div>

@@ -900,26 +900,6 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{{ route('admin.stocks') }}" class="sb-item {{ request()->routeIs('admin.stocks*') ? 'is-active' : '' }}">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L12 3l9 4.5-9 4.5L3 7.5Z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9 4.5 9-4.5"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5L12 21l9-4.5"/>
-                            </svg>
-                            <span>Stocks</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('admin.uniform-checkout') }}" class="sb-item {{ request()->routeIs('admin.uniform-checkout') ? 'is-active' : '' }}">
-                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                <circle cx="9" cy="21" r="1"/>
-                                <circle cx="20" cy="21" r="1"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
-                            </svg>
-                            <span>Uniform Checkout</span>
-                        </a>
-                    </li>
-                    <li>
                         <a href="{{ route('admin.partnerships') }}" class="sb-item {{ request()->routeIs('admin.partnerships') ? 'is-active' : '' }}">
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -930,6 +910,12 @@
                             <span>Partnerships</span>
                         </a>
                     </li>
+                </ul>
+            </div>
+
+            <div class="sb-group">
+                <h3 class="sb-group-label">Concessionaires</h3>
+                <ul>
                     <li>
                         <a href="{{ route('admin.concessionaires') }}" class="sb-item {{ request()->routeIs('admin.concessionaires*') || request()->routeIs('admin.payments*') ? 'is-active' : '' }}">
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -938,7 +924,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 9h18"/>
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 21v-6h6v6"/>
                             </svg>
-                            <span>Concessionaires</span>
+                            <span>Fee Tracking</span>
                         </a>
                     </li>
                     <li>
@@ -960,6 +946,32 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m9 9 2 2 4-4"/>
                             </svg>
                             <span>Reviews</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sb-group">
+                <h3 class="sb-group-label">POS</h3>
+                <ul>
+                    <li>
+                        <a href="{{ route('admin.stocks') }}" class="sb-item {{ request()->routeIs('admin.stocks*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L12 3l9 4.5-9 4.5L3 7.5Z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9 4.5 9-4.5"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5L12 21l9-4.5"/>
+                            </svg>
+                            <span>Stocks</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.uniform-checkout') }}" class="sb-item {{ request()->routeIs('admin.uniform-checkout') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <circle cx="9" cy="21" r="1"/>
+                                <circle cx="20" cy="21" r="1"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                            <span>Checkout</span>
                         </a>
                     </li>
                     <li>

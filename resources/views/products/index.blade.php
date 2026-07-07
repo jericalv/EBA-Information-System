@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Canteen Products | EBA Information System</title>
+    <title>Campus Store &amp; Canteen | EBA Information System</title>
     <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
@@ -167,28 +167,55 @@
             padding-top: 70px;
         }
 
-        .reg-head {
-            border-bottom: 1px solid var(--line);
+        /* dark dotted header band — shared by top header + mid section band */
+        .reg-head, .reg-band {
+            position: relative;
+            background: var(--green-deep);
+            overflow: hidden;
         }
+        .reg-head::before, .reg-band::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 22px 22px;
+            pointer-events: none;
+        }
+        .reg-band { border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .reg-head > .wrap, .reg-band > .wrap { position: relative; z-index: 1; }
+        /* recolor green flow-line art to white on the dark bands */
+        .flow-img {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            z-index: 0;
+            filter: brightness(0) invert(1);
+        }
+        .flow-reg-tr { top: -70px; right: -140px; width: 720px; opacity: 0.10; transform: rotate(-13deg); }
+        .flow-band-bl { bottom: -120px; left: -160px; width: 640px; opacity: 0.08; transform: rotate(10deg); }
+
         .reg-head-inner {
-            padding: 46px 0 38px;
+            padding: 44px 0 40px;
             display: flex;
             align-items: flex-end;
             justify-content: space-between;
             gap: 32px;
         }
+        .reg-band .reg-head-inner { padding: 40px 0 36px; }
+        .reg-head .eyebrow, .reg-band .eyebrow { color: var(--gold-soft); }
+        .reg-head .eyebrow::before, .reg-band .eyebrow::before { background: var(--gold-soft); }
         .reg-title {
             font-family: var(--font-display);
             font-weight: 800;
             font-size: clamp(28px, 3.6vw, 40px);
             line-height: 1.08;
             letter-spacing: -0.7px;
-            color: var(--ink);
+            color: #fff;
             margin: 12px 0 10px;
         }
         .reg-sub {
             font-size: 15px;
-            color: var(--ink-soft);
+            color: rgba(255, 255, 255, 0.72);
             line-height: 1.7;
             max-width: 520px;
         }
@@ -196,7 +223,7 @@
         .reg-meta {
             flex-shrink: 0;
             font-family: var(--font-mono);
-            border-left: 1px solid var(--line-strong);
+            border-left: 1px solid rgba(255, 255, 255, 0.16);
             padding-left: 24px;
             display: flex;
             flex-direction: column;
@@ -214,12 +241,12 @@
             font-weight: 500;
             letter-spacing: 1.4px;
             text-transform: uppercase;
-            color: var(--ink-faint);
+            color: rgba(255, 255, 255, 0.55);
         }
         .reg-meta-row strong {
             font-size: 13px;
             font-weight: 600;
-            color: var(--green);
+            color: #fff;
             font-variant-numeric: tabular-nums;
         }
 
@@ -760,7 +787,7 @@
             }
             .reg-meta {
                 border-left: 0;
-                border-top: 1px solid var(--line-strong);
+                border-top: 1px solid rgba(255, 255, 255, 0.16);
                 padding-left: 0;
                 padding-top: 16px;
                 flex-direction: row;
@@ -842,32 +869,174 @@
     </nav>
 
     <div class="page-wrapper">
-        <!-- Page Header -->
+        @php
+            $hasStocks = isset($visibleStocks) && $visibleStocks->count() > 0;
+            $uniformLines = $hasStocks ? $visibleStocks->filter(fn ($s) => ($s->item_type ?? null) !== 'books')->count() : 0;
+            $bookLines = $hasStocks ? $visibleStocks->filter(fn ($s) => ($s->item_type ?? null) === 'books')->count() : 0;
+        @endphp
+
+        <!-- Page Header (dark) -->
         <header class="reg-head">
+            <img class="flow-img flow-reg-tr" src="{{ asset('images/flowlines1-green.png') }}" alt="" aria-hidden="true" loading="lazy">
             <div class="wrap">
                 <div class="reg-head-inner">
-                    <div>
-                        <span class="eyebrow">Campus Registry &mdash; Canteen</span>
-                        <h1 class="reg-title">Canteen Products</h1>
-                        <p class="reg-sub">Browse and review food items from the campus concessionaires. Ratings come from registered students and faculty.</p>
-                    </div>
-                    <div class="reg-meta" aria-label="Registry summary">
-                        <div class="reg-meta-row">
-                            <span>Items listed</span>
-                            <strong>{{ number_format($products->total()) }}</strong>
+                    @if($hasStocks)
+                        <div>
+                            <span class="eyebrow">Campus Registry &mdash; Stockroom</span>
+                            <h1 class="reg-title">Campus Available Items</h1>
+                            <p class="reg-sub">Uniforms, books, and supplies on hand at CvSU Trece Martires City Campus.</p>
                         </div>
-                        <div class="reg-meta-row">
-                            <span>Concessionaires</span>
-                            <strong>{{ number_format($concessionaires->count()) }}</strong>
+                        <div class="reg-meta" aria-label="Registry summary">
+                            <div class="reg-meta-row">
+                                <span>Uniform lines</span>
+                                <strong>{{ number_format($uniformLines) }}</strong>
+                            </div>
+                            <div class="reg-meta-row">
+                                <span>Book lines</span>
+                                <strong>{{ number_format($bookLines) }}</strong>
+                            </div>
+                            <div class="reg-meta-row">
+                                <span>As of</span>
+                                <strong>{{ now()->format('M d, Y') }}</strong>
+                            </div>
                         </div>
-                        <div class="reg-meta-row">
-                            <span>As of</span>
-                            <strong>{{ now()->format('M d, Y') }}</strong>
+                    @else
+                        <div>
+                            <span class="eyebrow">Campus Registry &mdash; Canteen</span>
+                            <h1 class="reg-title">Canteen Products</h1>
+                            <p class="reg-sub">Browse and review food items from the campus concessionaires. Ratings come from registered students and faculty.</p>
                         </div>
-                    </div>
+                        <div class="reg-meta" aria-label="Registry summary">
+                            <div class="reg-meta-row">
+                                <span>Items listed</span>
+                                <strong>{{ number_format($products->total()) }}</strong>
+                            </div>
+                            <div class="reg-meta-row">
+                                <span>Concessionaires</span>
+                                <strong>{{ number_format($concessionaires->count()) }}</strong>
+                            </div>
+                            <div class="reg-meta-row">
+                                <span>As of</span>
+                                <strong>{{ now()->format('M d, Y') }}</strong>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </header>
+
+        @if($hasStocks)
+            <!-- Campus Available Items: filters + grid -->
+            <div class="main-content">
+                <div class="filters-bar" id="stockFilterBar">
+                    <div class="search-box">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <input type="text" id="stockSearch" placeholder="Search available items...">
+                    </div>
+                    <select id="stockTypeFilter" class="filter-select">
+                        <option value="">All Types</option>
+                        <option value="uniforms">Uniforms</option>
+                        <option value="books">Books</option>
+                    </select>
+                    <select id="stockAvailabilityFilter" class="filter-select">
+                        <option value="">All Availability</option>
+                        <option value="available">Available</option>
+                        <option value="out">Out of Stock</option>
+                    </select>
+                </div>
+
+                <div class="stocks-grid" id="stocksGrid">
+                    @foreach($visibleStocks as $stock)
+                        @php
+                            $stockQty = (int) $stock->quantity;
+                            $isOutOfStock = $stockQty === 0;
+                            $isLowStock = $stockQty > 0 && $stockQty <= 10;
+                            $stockType = ($stock->item_type ?? null) === 'books' ? 'books' : 'uniforms';
+                        @endphp
+                        <a href="{{ route('stocks.show', $stock) }}" class="stock-card {{ $isOutOfStock ? 'is-out' : '' }}" data-stock-type="{{ $stockType }}" data-stock-name="{{ strtolower($stock->item_name) }}" data-availability="{{ $isOutOfStock ? 'out' : 'available' }}">
+                            <div class="stock-media">
+                                @if($stock->image)
+                                    <img src="{{ asset('storage/' . $stock->image) }}" alt="{{ $stock->item_name }}">
+                                @else
+                                    <span class="stock-media-placeholder" aria-hidden="true">
+                                        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5 12 3l8.25 4.5L12 12 3.75 7.5Z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12 12 16.5 20.25 12"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 16.5 12 21l8.25-4.5"/>
+                                        </svg>
+                                    </span>
+                                @endif
+                                @if($isOutOfStock)
+                                    <span class="stock-status out"><span class="dot" aria-hidden="true"></span>Out of Stock</span>
+                                @elseif($isLowStock)
+                                    <span class="stock-status low"><span class="dot" aria-hidden="true"></span>Low Stock</span>
+                                @else
+                                    <span class="stock-status"><span class="dot" aria-hidden="true"></span>Available</span>
+                                @endif
+                            </div>
+                            <div class="stock-body">
+                                @if($stock->item_type)
+                                    <div class="stock-kicker">{{ $stock->item_type }}</div>
+                                @endif
+                                <h3 class="stock-name">{{ $stock->item_name }}</h3>
+                            </div>
+                            <div class="stock-foot">
+                                @if(($stock->item_type ?? null) === 'books' && $stock->unit_price > 0)
+                                    <span class="stock-price">&#8369;{{ number_format($stock->unit_price, 2) }}</span>
+                                @endif
+                                @auth
+                                    <span class="stock-qty {{ $isOutOfStock ? 'out-of-stock' : ($isLowStock ? 'low-stock' : '') }}">{{ number_format($stockQty) }}<em>on hand</em></span>
+                                @endauth
+                                <span class="stock-view">
+                                    View
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12l-7.5 7.5M21 12H3"/>
+                                    </svg>
+                                </span>
+                            </div>
+                        </a>
+                    @endforeach
+                </div>
+
+                <div class="empty-state" id="stocksNoResults" hidden>
+                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                    </svg>
+                    <h3>No matching items</h3>
+                    <p>We couldn't find anything for &ldquo;<span id="stocksNoResultsQuery"></span>&rdquo;. Check the spelling or try a different keyword.</p>
+                </div>
+            </div>
+
+            <!-- Canteen Products: dark section band -->
+            <section class="reg-band" aria-label="Canteen products">
+                <img class="flow-img flow-band-bl" src="{{ asset('images/flowlines3-green.png') }}" alt="" aria-hidden="true" loading="lazy">
+                <div class="wrap">
+                    <div class="reg-head-inner">
+                        <div>
+                            <span class="eyebrow">Campus Registry &mdash; Canteen</span>
+                            <h2 class="reg-title">Canteen Products</h2>
+                            <p class="reg-sub">Browse and review food items from the campus concessionaires. Ratings come from registered students and faculty.</p>
+                        </div>
+                        <div class="reg-meta" aria-label="Canteen summary">
+                            <div class="reg-meta-row">
+                                <span>Items listed</span>
+                                <strong>{{ number_format($products->total()) }}</strong>
+                            </div>
+                            <div class="reg-meta-row">
+                                <span>Concessionaires</span>
+                                <strong>{{ number_format($concessionaires->count()) }}</strong>
+                            </div>
+                            <div class="reg-meta-row">
+                                <span>As of</span>
+                                <strong>{{ now()->format('M d, Y') }}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endif
 
         <div class="main-content">
             <!-- Filters -->
@@ -973,8 +1142,16 @@
                         @endforeach
                     </div>
 
+                    <div class="empty-state" id="productsNoResults" hidden>
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+                        </svg>
+                        <h3>No matching products</h3>
+                        <p>We couldn't find anything for &ldquo;<span id="productsNoResultsQuery"></span>&rdquo;. Check the spelling or try a different keyword.</p>
+                    </div>
+
                     @if ($products->hasPages())
-                        <div class="pagination-wrap">
+                        <div class="pagination-wrap" id="productsPagination">
                             {{ $products->links() }}
                         </div>
                     @endif
@@ -990,72 +1167,6 @@
             </div>
         </div>
 
-        @if(isset($visibleStocks) && $visibleStocks->count() > 0)
-            <section class="stocks-band" aria-label="Campus available items">
-                <div class="main-content">
-                    <div class="stocks-head">
-                        <div>
-                            <span class="eyebrow">Campus Registry &mdash; Stockroom</span>
-                            <h2 class="stocks-title">Campus Available Items</h2>
-                            <p class="stocks-sub">Uniforms, books, and supplies on hand at CvSU Trece Martires City Campus.</p>
-                        </div>
-                        <p class="stocks-count"><strong>{{ number_format($visibleStocks->count()) }}</strong> {{ \Illuminate\Support\Str::plural('line', $visibleStocks->count()) }} on record</p>
-                    </div>
-
-                    <div class="stocks-grid">
-                        @foreach($visibleStocks as $stock)
-                            @php
-                                $stockQty = (int) $stock->quantity;
-                                $isOutOfStock = $stockQty === 0;
-                                $isLowStock = $stockQty > 0 && $stockQty <= 10;
-                            @endphp
-                            <a href="{{ route('stocks.show', $stock) }}" class="stock-card {{ $isOutOfStock ? 'is-out' : '' }}">
-                                <div class="stock-media">
-                                    @if($stock->image)
-                                        <img src="{{ asset('storage/' . $stock->image) }}" alt="{{ $stock->item_name }}">
-                                    @else
-                                        <span class="stock-media-placeholder" aria-hidden="true">
-                                            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5 12 3l8.25 4.5L12 12 3.75 7.5Z"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12 12 16.5 20.25 12"/>
-                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 16.5 12 21l8.25-4.5"/>
-                                            </svg>
-                                        </span>
-                                    @endif
-                                    @if($isOutOfStock)
-                                        <span class="stock-status out"><span class="dot" aria-hidden="true"></span>Out of Stock</span>
-                                    @elseif($isLowStock)
-                                        <span class="stock-status low"><span class="dot" aria-hidden="true"></span>Low Stock</span>
-                                    @else
-                                        <span class="stock-status"><span class="dot" aria-hidden="true"></span>Available</span>
-                                    @endif
-                                </div>
-                                <div class="stock-body">
-                                    @if($stock->item_type)
-                                        <div class="stock-kicker">{{ $stock->item_type }}</div>
-                                    @endif
-                                    <h3 class="stock-name">{{ $stock->item_name }}</h3>
-                                </div>
-                                <div class="stock-foot">
-                                    @if(($stock->item_type ?? null) === 'books' && $stock->unit_price > 0)
-                                        <span class="stock-price">&#8369;{{ number_format($stock->unit_price, 2) }}</span>
-                                    @endif
-                                    @auth
-                                        <span class="stock-qty {{ $isOutOfStock ? 'out-of-stock' : ($isLowStock ? 'low-stock' : '') }}">{{ number_format($stockQty) }}<em>on hand</em></span>
-                                    @endauth
-                                    <span class="stock-view">
-                                        View
-                                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12l-7.5 7.5M21 12H3"/>
-                                        </svg>
-                                    </span>
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            </section>
-        @endif
     </div>
 
     <!-- Footer -->
@@ -1111,12 +1222,18 @@
                 sortedCards.forEach((card) => productsGrid.appendChild(card));
             };
 
+            const noResults = document.getElementById('productsNoResults');
+            const noResultsQuery = document.getElementById('productsNoResultsQuery');
+            const pagination = document.getElementById('productsPagination');
+
             const filterCards = () => {
-                const query = (searchInput?.value || '').trim().toLowerCase();
+                const rawQuery = (searchInput?.value || '').trim();
+                const query = rawQuery.toLowerCase();
                 const selectedCategory = (categorySelect?.value || '').toLowerCase();
                 const selectedConcessionaire = concessionaireSelect?.value || '';
                 const selectedSort = sortSelect?.value || 'newest';
                 const cards = Array.from(productsGrid.querySelectorAll('.product-card'));
+                let visibleCount = 0;
 
                 cards.forEach((card) => {
                     const matchesQuery = !query
@@ -1124,11 +1241,23 @@
                         || card.dataset.concessionaire.includes(query);
                     const matchesCategory = !selectedCategory || card.dataset.category === selectedCategory;
                     const matchesConcessionaire = !selectedConcessionaire || card.dataset.concessionaireId === selectedConcessionaire;
+                    const matches = matchesQuery && matchesCategory && matchesConcessionaire;
 
-                    card.classList.toggle('hidden', !(matchesQuery && matchesCategory && matchesConcessionaire));
+                    card.classList.toggle('hidden', !matches);
+                    if (matches) visibleCount++;
                 });
 
                 sortCards(cards, selectedSort);
+
+                const hasFilter = !!(query || selectedCategory || selectedConcessionaire);
+                const showEmpty = visibleCount === 0 && hasFilter;
+
+                if (noResults) {
+                    noResults.hidden = !showEmpty;
+                    if (noResultsQuery) noResultsQuery.textContent = rawQuery || 'these filters';
+                }
+                productsGrid.classList.toggle('hidden', showEmpty);
+                if (pagination) pagination.classList.toggle('hidden', hasFilter);
             };
 
             if (searchInput) {
@@ -1153,6 +1282,53 @@
             });
 
             filterCards();
+        }
+
+        const stockTypeFilter = document.getElementById('stockTypeFilter');
+        const stocksGrid = document.getElementById('stocksGrid');
+
+        if (stockTypeFilter && stocksGrid) {
+            const stockCards = Array.from(stocksGrid.querySelectorAll('.stock-card'));
+            const stocksCount = document.getElementById('stocksCount');
+            const stocksCountLabel = document.getElementById('stocksCountLabel');
+            const stockSearch = document.getElementById('stockSearch');
+            const stockAvailabilityFilter = document.getElementById('stockAvailabilityFilter');
+            const stocksNoResults = document.getElementById('stocksNoResults');
+            const stocksNoResultsQuery = document.getElementById('stocksNoResultsQuery');
+
+            const filterStocks = () => {
+                const rawQuery = (stockSearch?.value || '').trim();
+                const query = rawQuery.toLowerCase();
+                const type = stockTypeFilter.value;
+                const availability = stockAvailabilityFilter?.value || '';
+                let visibleCount = 0;
+
+                stockCards.forEach((card) => {
+                    const matchesQuery = !query || (card.dataset.stockName || '').includes(query);
+                    const matchesType = !type || card.dataset.stockType === type;
+                    const matchesAvailability = !availability || card.dataset.availability === availability;
+                    const matches = matchesQuery && matchesType && matchesAvailability;
+
+                    card.classList.toggle('hidden', !matches);
+                    if (matches) visibleCount++;
+                });
+
+                if (stocksCount) stocksCount.textContent = visibleCount.toLocaleString();
+                if (stocksCountLabel) stocksCountLabel.textContent = visibleCount === 1 ? 'line' : 'lines';
+
+                const hasFilter = !!(query || type || availability);
+                const showEmpty = visibleCount === 0 && hasFilter;
+
+                if (stocksNoResults) {
+                    stocksNoResults.hidden = !showEmpty;
+                    if (stocksNoResultsQuery) stocksNoResultsQuery.textContent = rawQuery || 'these filters';
+                }
+                stocksGrid.classList.toggle('hidden', showEmpty);
+            };
+
+            stockTypeFilter.addEventListener('change', filterStocks);
+            if (stockAvailabilityFilter) stockAvailabilityFilter.addEventListener('change', filterStocks);
+            if (stockSearch) stockSearch.addEventListener('input', filterStocks);
         }
     </script>
 </body>

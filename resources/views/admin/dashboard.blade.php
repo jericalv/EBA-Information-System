@@ -72,6 +72,9 @@
     .dashboard-charts-row.alt {
         grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     }
+    .dashboard-charts-row.single {
+        grid-template-columns: 1fr;
+    }
     .chart-panel {
         padding: 20px 22px;
         border-radius: 14px;
@@ -152,6 +155,9 @@
     #chart_admin_status { min-height: 300px; }
     #chart_admin_trend { min-height: 300px; }
     #chart_admin_top { min-height: 320px; }
+    #chart_admin_sales { min-height: 320px; }
+    #chart_admin_units { min-height: 300px; }
+    #chart_admin_items { min-height: 320px; }
     /* Belt-and-suspenders: no collapse transitions until charts have mounted. */
     .dashboard-page.charts-loading .chart-panel-head,
     .dashboard-page.charts-loading .chart-body,
@@ -171,7 +177,7 @@
     // hard refresh never flashes the expanded state before the main script runs.
     (function () {
         try {
-            var panelIds = ['panel_monthly', 'panel_status', 'panel_trend', 'panel_top'];
+            var panelIds = ['panel_monthly', 'panel_status', 'panel_trend', 'panel_top', 'panel_sales', 'panel_units', 'panel_items'];
             var css = '';
             panelIds.forEach(function (id) {
                 if (localStorage.getItem('adminDash:collapsed:' + id) === '1') {
@@ -316,6 +322,64 @@
                 <div class="chart-body">
                     <div class="chart-body-inner">
                         <div id="chart_admin_top"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-charts-row">
+            <div class="panel chart-panel" id="panel_sales">
+                <div class="chart-panel-head">
+                    <div>
+                        <h2 class="panel-title">Uniform &amp; book revenue</h2>
+                        <p class="panel-sub">Sales revenue per month, split by item type.</p>
+                    </div>
+                    <div class="chart-menu-wrap">
+                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Uniform and book revenue options">&#8943;</button>
+                        <div class="chart-menu pop" data-menu hidden></div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-body-inner">
+                        <div id="chart_admin_sales"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel chart-panel" id="panel_units">
+                <div class="chart-panel-head">
+                    <div>
+                        <h2 class="panel-title">Units sold</h2>
+                        <p class="panel-sub">Uniform and book units sold per month.</p>
+                    </div>
+                    <div class="chart-menu-wrap">
+                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Units sold options">&#8943;</button>
+                        <div class="chart-menu pop" data-menu hidden></div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-body-inner">
+                        <div id="chart_admin_units"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-charts-row single">
+            <div class="panel chart-panel" id="panel_items">
+                <div class="chart-panel-head">
+                    <div>
+                        <h2 class="panel-title">Most bought items</h2>
+                        <p class="panel-sub">Top uniform and book items ranked by units sold.</p>
+                    </div>
+                    <div class="chart-menu-wrap">
+                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Most bought items options">&#8943;</button>
+                        <div class="chart-menu pop" data-menu hidden></div>
+                    </div>
+                </div>
+                <div class="chart-body">
+                    <div class="chart-body-inner">
+                        <div id="chart_admin_items"></div>
                     </div>
                 </div>
             </div>
@@ -504,6 +568,8 @@
     const monthlyPayments = @json($monthlyPaymentsData);
     const appTrend = @json($applicationsTrendData);
     const topConc = @json($topConcessionairesData);
+    const salesByMonth = @json($salesByMonthData);
+    const topItems = @json($topItemsData);
     const statusTotal = (appStatus.pending || 0) + (appStatus.approved || 0) + (appStatus.rejected || 0);
 
     var pesoFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -540,6 +606,9 @@
     var statusChart = null;
     var trendChart = null;
     var topChart = null;
+    var salesChart = null;
+    var unitsChart = null;
+    var itemsChart = null;
 
     if (document.querySelector('#chart_admin_monthly') && typeof ApexCharts !== 'undefined') {
         monthlyChart = new ApexCharts(document.querySelector('#chart_admin_monthly'), {
@@ -666,6 +735,108 @@
         }
     }
 
+    // Uniforms/books use a validated categorical pair (lighter pine + amber).
+    var salesColors = ['#12784A', '#D97706'];
+    var salesMonthLabels = salesByMonth.map(function (m) { return m.month; });
+
+    if (document.querySelector('#chart_admin_sales') && typeof ApexCharts !== 'undefined') {
+        salesChart = new ApexCharts(document.querySelector('#chart_admin_sales'), {
+            chart: Object.assign({}, chartBase, { height: 320, type: 'bar', width: '100%' }),
+            series: [
+                { name: 'Uniforms', data: salesByMonth.map(function (m) { return m.uniform_revenue; }) },
+                { name: 'Books', data: salesByMonth.map(function (m) { return m.book_revenue; }) }
+            ],
+            colors: salesColors,
+            plotOptions: { bar: { columnWidth: '55%', borderRadius: 4, borderRadiusApplication: 'end' } },
+            dataLabels: { enabled: false },
+            stroke: { show: true, width: 2, colors: ['transparent'] },
+            xaxis: {
+                categories: salesMonthLabels,
+                labels: { style: { fontSize: '11px', fontWeight: 600 } },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                min: 0,
+                forceNiceScale: true,
+                labels: { style: { fontSize: '11px' }, formatter: function (v) { return formatPeso(v); } }
+            },
+            legend: { show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '12px', fontWeight: 600, markers: { size: 5, shape: 'circle' }, itemMargin: { horizontal: 10 } },
+            tooltip: {
+                theme: 'dark', style: { fontSize: '12px' },
+                y: { formatter: function (v) { return '₱' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2 }); } }
+            },
+            grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+        });
+        chartsExpected++;
+        setTimeout(function () { salesChart.render(); }, 50);
+    }
+
+    if (document.querySelector('#chart_admin_units') && typeof ApexCharts !== 'undefined') {
+        unitsChart = new ApexCharts(document.querySelector('#chart_admin_units'), {
+            chart: Object.assign({}, chartBase, { height: 300, type: 'line', width: '100%' }),
+            series: [
+                { name: 'Uniforms', data: salesByMonth.map(function (m) { return m.uniform_units; }) },
+                { name: 'Books', data: salesByMonth.map(function (m) { return m.book_units; }) }
+            ],
+            colors: salesColors,
+            stroke: { curve: 'smooth', width: 2.5 },
+            dataLabels: { enabled: false },
+            markers: { size: 3, strokeColors: '#fff', strokeWidth: 2, hover: { size: 5 } },
+            xaxis: {
+                categories: salesMonthLabels,
+                labels: { style: { fontSize: '11px', fontWeight: 600 } },
+                axisBorder: { show: false },
+                axisTicks: { show: false }
+            },
+            yaxis: {
+                min: 0,
+                forceNiceScale: true,
+                labels: { style: { fontSize: '11px' }, formatter: function (v) { return Math.round(v); } }
+            },
+            legend: { show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '12px', fontWeight: 600, markers: { size: 5, shape: 'circle' }, itemMargin: { horizontal: 10 } },
+            tooltip: { theme: 'dark', style: { fontSize: '12px' }, y: { formatter: function (v) { return v + ' ' + (v === 1 ? 'unit' : 'units'); } } },
+            grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+        });
+        chartsExpected++;
+        setTimeout(function () { unitsChart.render(); }, 50);
+    }
+
+    var itemsTarget = document.querySelector('#chart_admin_items');
+    if (itemsTarget && typeof ApexCharts !== 'undefined') {
+        if (!topItems.length) {
+            itemsTarget.innerHTML = '<p class="chart-empty">No uniform or book sales recorded yet.</p>';
+        } else {
+            itemsChart = new ApexCharts(itemsTarget, {
+                chart: Object.assign({}, chartBase, { height: Math.max(220, 60 + topItems.length * 34), type: 'bar', width: '100%' }),
+                series: [{ name: 'Units sold', data: topItems.map(function (item) { return item.units; }) }],
+                colors: ['#0A5C2F'],
+                plotOptions: { bar: { horizontal: true, barHeight: '55%', borderRadius: 4, borderRadiusApplication: 'end' } },
+                dataLabels: { enabled: false },
+                xaxis: {
+                    categories: topItems.map(function (item) { return item.name; }),
+                    labels: { style: { fontSize: '11px' }, formatter: function (v) { return Math.round(v); } },
+                    axisBorder: { show: false },
+                    axisTicks: { show: false }
+                },
+                yaxis: { labels: { style: { fontSize: '11.5px', fontWeight: 600 }, maxWidth: 220 } },
+                legend: { show: false },
+                tooltip: {
+                    theme: 'dark', style: { fontSize: '12px' },
+                    y: {
+                        formatter: function (v, opts) {
+                            var item = topItems[opts.dataPointIndex] || {};
+                            return v + ' ' + (v === 1 ? 'unit' : 'units') + ' · ' + (item.type || '') + ' · ' + formatPeso(item.revenue || 0) + ' revenue';
+                        }
+                    }
+                },
+                grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+            });
+            chartsExpected++;
+            setTimeout(function () { itemsChart.render(); }, 50);
+        }
+    }
+
     // ---------- Report registry (shared by per-panel menus and "Download reports") ----------
     var reportRegistry = [
         {
@@ -711,6 +882,36 @@
             csvRows: function () {
                 return topConc.map(function (c) { return [c.name, c.reviews]; });
             }
+        },
+        {
+            panel: 'panel_sales',
+            chart: function () { return salesChart; },
+            pngName: 'uniform-book-revenue.png',
+            csvName: 'uniform-book-revenue.csv',
+            csvHeaders: ['Month', 'Uniform revenue', 'Book revenue'],
+            csvRows: function () {
+                return salesByMonth.map(function (m) { return [m.month, m.uniform_revenue, m.book_revenue]; });
+            }
+        },
+        {
+            panel: 'panel_units',
+            chart: function () { return unitsChart; },
+            pngName: 'units-sold.png',
+            csvName: 'units-sold.csv',
+            csvHeaders: ['Month', 'Uniform units', 'Book units'],
+            csvRows: function () {
+                return salesByMonth.map(function (m) { return [m.month, m.uniform_units, m.book_units]; });
+            }
+        },
+        {
+            panel: 'panel_items',
+            chart: function () { return itemsChart; },
+            pngName: 'most-bought-items.png',
+            csvName: 'most-bought-items.csv',
+            csvHeaders: ['Item', 'Type', 'Units sold', 'Revenue'],
+            csvRows: function () {
+                return topItems.map(function (item) { return [item.name, item.type, item.units, item.revenue]; });
+            }
         }
     ];
 
@@ -738,13 +939,32 @@
         return el ? el.textContent.trim() : '';
     }
 
-    // One CSV with each report as a titled section, separated by a blank line.
+    // One CSV with the reports laid out side by side: each report is a titled
+    // block of columns, separated by an empty spacer column.
     function downloadAllCSV() {
         var blocks = reportRegistry.map(function (report) {
-            var section = [[reportTitle(report)], report.csvHeaders].concat(report.csvRows());
-            return rowsToCSV(section);
+            return [[reportTitle(report)], report.csvHeaders].concat(report.csvRows());
         });
-        downloadCSVString('admin-dashboard-reports.csv', blocks.join('\r\n\r\n'));
+
+        var widths = blocks.map(function (block) {
+            return block.reduce(function (max, row) { return Math.max(max, row.length); }, 1);
+        });
+        var height = blocks.reduce(function (max, block) { return Math.max(max, block.length); }, 0);
+
+        var rows = [];
+        for (var r = 0; r < height; r++) {
+            var row = [];
+            blocks.forEach(function (block, i) {
+                var cells = block[r] || [];
+                for (var c = 0; c < widths[i]; c++) {
+                    row.push(cells[c] === undefined ? '' : cells[c]);
+                }
+                if (i < blocks.length - 1) row.push('');
+            });
+            rows.push(row);
+        }
+
+        downloadCSVString('admin-dashboard-reports.csv', rowsToCSV(rows));
     }
 
     // One PNG that stacks every chart vertically with a header and per-chart titles.

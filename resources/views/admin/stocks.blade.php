@@ -110,32 +110,27 @@
         display: inline-block;
         text-align: left;
     }
-    .btn-actions-trigger {
-        background: #fff;
-        color: var(--ink);
-        border: 1px solid var(--line-strong);
-        padding: 0 12px;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
+    .row-menu-btn {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        justify-content: center;
+        width: 32px;
         height: 32px;
-        line-height: 1;
-        box-sizing: border-box;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
     }
-    .btn-actions-trigger:hover {
-        background: #F2F4F6;
-        border-color: #AEB6C0;
-        color: var(--ink);
+    .row-menu-btn svg { width: 17px; height: 17px; }
+    .row-menu-btn:hover,
+    .row-menu-btn.is-open {
+        background: var(--pine-soft);
+        color: var(--pine);
+        border-color: var(--line-strong);
     }
-    .btn-actions-trigger svg {
-        width: 12px;
-        height: 12px;
-    }
+    .row-menu-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
     .actions-dropdown-menu {
         position: absolute;
         right: 0;
@@ -674,10 +669,9 @@
                             </td>
                             <td style="text-align:right;">
                                 <div class="actions-dropdown-container">
-                                    <button type="button" class="btn-actions-trigger" onclick="toggleActionsMenu(this)">
-                                        Actions
-                                        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    <button type="button" class="row-menu-btn" aria-label="More actions" aria-haspopup="menu" onclick="toggleActionsMenu(this)">
+                                        <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
                                         </svg>
                                     </button>
 
@@ -1090,15 +1084,18 @@
         document.querySelectorAll('.actions-dropdown-menu.active').forEach((openMenu) => {
             if (openMenu !== menu) {
                 openMenu.classList.remove('active');
+                openMenu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
             }
         });
 
-        menu.classList.toggle('active');
+        const isActive = menu.classList.toggle('active');
+        button.classList.toggle('is-open', isActive);
     }
 
     function closeAllMenus() {
         document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
             menu.classList.remove('active');
+            menu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
         });
     }
 
