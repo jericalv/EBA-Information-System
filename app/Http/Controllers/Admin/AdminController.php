@@ -1663,12 +1663,15 @@ class AdminController extends Controller
     public function updateStock(Request $request, UniformStock $stock)
     {
         $validated = $request->validate([
+            'item_name' => 'required|string|max:100|unique:uniform_stocks,item_name,' . $stock->id,
             'quantity' => 'required|integer|min:0|max:3000',
             'item_type' => ['nullable', Rule::in(['books', 'uniforms'])],
             'book_price' => 'nullable|numeric|min:0|max:999999.99',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_image' => 'nullable|boolean',
         ]);
 
+        $oldItemName = (string) $stock->item_name;
         $oldQuantity = (int) $stock->quantity;
         $newQuantity = (int) $validated['quantity'];
         $oldImage = $stock->image;
@@ -1679,6 +1682,12 @@ class AdminController extends Controller
             }
 
             $stock->image = $request->file('image')->store('stocks', 'public');
+        } elseif ($request->boolean('remove_image')) {
+            if ($stock->image) {
+                Storage::disk('public')->delete($stock->image);
+            }
+
+            $stock->image = null;
         }
 
         $itemType = strtolower((string) ($validated['item_type'] ?? $stock->item_type ?? ''));
@@ -1704,6 +1713,7 @@ class AdminController extends Controller
             $unitPrice = max(0, (float) ($validated['book_price'] ?? 0));
         }
 
+        $stock->item_name = $validated['item_name'];
         $stock->quantity = $newQuantity;
         $stock->item_type = $itemType ?: $stock->item_type;
         $stock->sizes = $sizes;
@@ -1715,10 +1725,11 @@ class AdminController extends Controller
             'stock_quantity_updated',
             'uniform_stock',
             (string) $stock->id,
-            "Updated stock quantity for {$stock->item_name}",
+            "Updated stock item {$stock->item_name}",
             [
                 'stock_id' => $stock->id,
-                'item_name' => $stock->item_name,
+                'old_item_name' => $oldItemName,
+                'new_item_name' => $stock->item_name,
                 'old_quantity' => $oldQuantity,
                 'new_quantity' => $newQuantity,
                 'old_image' => $oldImage,
@@ -1727,7 +1738,7 @@ class AdminController extends Controller
             ]
         );
 
-        return back()->with('success', "Quantity updated for {$stock->item_name}.");
+        return back()->with('success', "Stock item updated for {$stock->item_name}.");
     }
 
     /**
@@ -1774,6 +1785,40 @@ class AdminController extends Controller
             return back()->with('error', "Unable to update {$stockName} status. Please try again.");
         }
     }
+
+    /**
+     * Permanently delete a stock item and its attached image.
+     */
+    public function destroyStock(UniformStock $stock)
+    {
+        $stockId = (int) $stock->id;
+        $itemName = (string) $stock->item_name;
+        $imagePath = $stock->image;
+
+        $stock->salesOrderItems()->delete();
+
+        if ($imagePath) {
+            Storage::disk('public')->delete($imagePath);
+        }
+
+        $stock->delete();
+
+        ActivityLog::log(
+            'stock_item_deleted',
+            'uniform_stock',
+            (string) $stockId,
+            "Deleted stock item {$itemName}",
+            [
+                'stock_id' => $stockId,
+                'item_name' => $itemName,
+                'deleted_image' => $imagePath,
+                'admin_id' => Auth::id(),
+            ]
+        );
+
+        return back()->with('success', "Deleted {$itemName}. The item has been permanently removed.");
+    }
+
     public function transactionLogs(Request $request)
     {
         $today = now()->toDateString();

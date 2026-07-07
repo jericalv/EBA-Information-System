@@ -549,8 +549,7 @@
         .stock-media img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            padding: 16px;
+            object-fit: cover;
             transition: transform .4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .stock-card:hover .stock-media img { transform: scale(1.045); }
