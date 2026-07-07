@@ -74,6 +74,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::post('/stocks', [AdminController::class, 'storeStock'])->name('stocks.store');
     Route::patch('/stocks/{stock}', [AdminController::class, 'updateStock'])->name('stocks.update');
     Route::delete('/stocks/{id}', [AdminController::class, 'confirmDelete'])->name('stocks.delete');
+    Route::delete('/stocks/{stock}/destroy', [AdminController::class, 'destroyStock'])->name('stocks.destroy');
     
     // System Logs
     Route::get('/logs', [AdminController::class, 'logs'])->name('logs');

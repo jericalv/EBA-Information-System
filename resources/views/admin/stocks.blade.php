@@ -4,123 +4,17 @@
 
 @section('extra-css')
 <style>
-    .stocks-overview {
+    .stocks-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 16px;
-        margin-bottom: 20px;
-    }
-    .stocks-card {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        padding: 20px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        border-top-width: 3px;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-    }
-    .stocks-card-blue {
-        border-top-color: #3b82f6;
-    }
-    .stocks-card-indigo {
-        border-top-color: #6366f1;
-    }
-    .stocks-card-green {
-        border-top-color: #10b981;
-    }
-    .stocks-card-gray {
-        border-top-color: #64748b;
-    }
-    .stocks-card-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-    }
-    .stocks-card-icon {
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    .stocks-card-icon svg {
-        width: 20px;
-        height: 20px;
-        color: #fff;
-    }
-    .stocks-card-icon-blue {
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    }
-    .stocks-card-icon-indigo {
-        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
-    }
-    .stocks-card-icon-green {
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    }
-    .stocks-card-icon-gray {
-        background: linear-gradient(135deg, #64748b 0%, #475569 100%);
-    }
-    .stocks-card-label {
-        font-size: 13px;
-        color: #64748b;
-        font-weight: 600;
-    }
-    .stocks-card-value {
-        font-size: 30px;
-        font-weight: 800;
-        color: #0f172a;
-        line-height: 1.2;
-    }
-    .stocks-card-status {
-        display: inline-flex;
-        align-items: center;
-        gap: 4px;
-        padding: 4px 10px;
-        border-radius: 6px;
-        font-size: 11px;
-        font-weight: 700;
-        margin-top: auto;
-        width: fit-content;
-    }
-    .stocks-card-status-green {
-        background: #dcfce7;
-        color: #166534;
-    }
-    .stocks-card-status-amber {
-        background: #fef3c7;
-        color: #92400e;
-    }
-    .stocks-card-status-neutral {
-        background: #f1f5f9;
-        color: #475569;
+        grid-template-columns: 1fr;
+        gap: 20px;
+        align-items: start;
     }
 
-    .stocks-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    align-items: start;
+    [x-cloak] {
+        display: none !important;
     }
-    
-    .stocks-form-card {
-        background: #fff;
-        border: 1px solid #e2e8f0;
-        border-radius: 14px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        padding: 24px;
-    }
-    .stocks-form-card h3 {
-        font-size: 16px;
-        font-weight: 700;
-        color: #111827;
-        margin-bottom: 16px;
-    }
+
     .stocks-field {
         margin-bottom: 14px;
     }
@@ -130,31 +24,6 @@
         font-weight: 700;
         color: #334155;
         margin-bottom: 6px;
-    }
-    .stocks-field input[type="text"],
-    .stocks-field input[type="number"],
-    .stocks-field input[type="file"] {
-        width: 100%;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-family: inherit;
-        font-size: 14px;
-        color: #0f172a;
-        background: #f8fafc;
-    }
-    .stocks-field input[type="text"],
-    .stocks-field input[type="number"] {
-        height: 42px;
-        padding: 0 14px;
-    }
-    .stocks-field input[type="file"] {
-        padding: 10px;
-    }
-    .stocks-field input:focus {
-        outline: none;
-        border-color: #0a5c2f;
-        box-shadow: 0 0 0 3px rgba(10,92,47,0.08);
-        background: #fff;
     }
     .stocks-help {
         margin-top: 5px;
@@ -167,7 +36,7 @@
         align-items: center;
         gap: 8px;
         font-size: 13px;
-        margin: 16px 0 20px;
+        margin: 16px 0 4px;
         color: #334155;
         font-weight: 500;
     }
@@ -199,171 +68,28 @@
         color: #94a3b8;
     }
 
-    /* Edit Modal */
-    #editStockModal {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 9999;
-        background: rgba(15, 23, 42, 0.7);
-        backdrop-filter: blur(2px);
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        animation: fadeIn 0.15s ease-out;
-    }
-    #editStockModal.active {
-        display: flex;
-    }
-    @keyframes fadeIn {
-        from { opacity: 0; }
-        to { opacity: 1; }
-    }
-    @keyframes modalSlideIn {
-        from {
-            opacity: 0;
-            transform: scale(0.96) translateY(-8px);
-        }
-        to {
-            opacity: 1;
-            transform: scale(1) translateY(0);
-        }
-    }
-    .edit-modal-content {
-        background: #fff;
-        border-radius: 16px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    .stocks-table-card table {
         width: 100%;
-        max-width: 768px;
-        max-height: 80vh;
-        overflow: hidden;
-        animation: modalSlideIn 0.2s ease-out;
+        border-collapse: collapse;
+        min-width: 700px;
+        table-layout: fixed;
     }
-    .edit-modal-header {
-        padding: 24px 28px 20px;
-        border-bottom: 1px solid #f1f5f9;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        position: sticky;
-        top: 0;
-        background: #fff;
-        z-index: 10;
-        border-radius: 16px 16px 0 0;
+    .stocks-table-card th,
+    .stocks-table-card td {
+        padding: 14px 16px;
+        border-bottom: 1px solid #eef2f7;
+        text-align: left;
+        vertical-align: middle;
     }
-    .edit-modal-header h3 {
-        font-size: 18px;
-        font-weight: 700;
-        color: #0f172a;
-        margin: 0;
-    }
-    .edit-modal-close {
-        width: 32px;
-        height: 32px;
-        border: 0;
-        background: #f1f5f9;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        transition: all 0.15s;
+    .stocks-table-card th {
+        background: #f8fafc;
         color: #64748b;
-    }
-    .edit-modal-close:hover {
-        background: #e2e8f0;
-        color: #334155;
-    }
-    .edit-modal-close svg {
-        width: 18px;
-        height: 18px;
-    }
-    .edit-modal-body {
-        padding: 24px 28px;
-        max-height: calc(80vh - 150px);
-        overflow-y: auto;
-    }
-    .edit-modal-field {
-        margin-bottom: 18px;
-    }
-    .edit-modal-field label {
-        display: block;
-        font-size: 13px;
-        font-weight: 700;
-        color: #334155;
-        margin-bottom: 8px;
-    }
-    .edit-modal-field input[type="number"],
-    .edit-modal-field input[type="file"] {
-        width: 100%;
-        border: 1px solid #e2e8f0;
-        border-radius: 8px;
-        font-family: inherit;
-        font-size: 14px;
-        color: #0f172a;
-        background: #f8fafc;
-    }
-    .edit-modal-field input[type="number"] {
-        height: 44px;
-        padding: 0 14px;
-    }
-    .edit-modal-field input[type="file"] {
-        padding: 11px;
-    }
-    .edit-modal-field input:focus {
-        outline: none;
-        border-color: #0a5c2f;
-        box-shadow: 0 0 0 3px rgba(10,92,47,0.08);
-        background: #fff;
-    }
-    .edit-modal-preview {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-    }
-    .edit-modal-preview-thumb {
-        width: 56px;
-        height: 56px;
-        border-radius: 10px;
-        overflow: hidden;
-        border: 1px solid #e2e8f0;
-        background: #f8fafc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    .edit-modal-preview-thumb img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .edit-modal-preview-thumb svg {
-        width: 24px;
-        height: 24px;
-        color: #94a3b8;
-    }
-    .edit-modal-preview-label {
         font-size: 12px;
-        color: #64748b;
-        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
     }
-    .edit-modal-footer {
-        padding: 20px 28px 24px;
-        border-top: 1px solid #f1f5f9;
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-        position: sticky;
-        bottom: 0;
-        background: #fff;
-        border-radius: 0 0 16px 16px;
-    }
-
-    .table-search-inline {
-        width: auto;
-        max-width: 360px;
+    .stocks-table-card tbody tr:last-child td {
+        border-bottom: none;
     }
 
     /* Allow dropdown menus to float beyond table/card edges without clipping */
@@ -372,87 +98,89 @@
         overflow: visible !important;
     }
     .stocks-table-card .card-body,
-        .stocks-table-card table{
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 700px;
-        table-layout: fixed;
-    }
+    .stocks-table-card table,
     .stocks-table-card tbody,
     .stocks-table-card tbody tr,
     .stocks-table-card tbody td {
         overflow: visible !important;
     }
-    .actions-cell {
-        position: relative;
-        overflow: visible !important;
-    }
-    
-    tbody tr.hidden {
-        display: none;
-    }
 
-    @media (max-width: 1200px) {
-        .stocks-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* Standardized Actions Dropdown Styling */
     .actions-dropdown-container {
         position: relative;
         display: inline-block;
         text-align: left;
     }
     .btn-actions-trigger {
-        background: #f8fafc;
-        color: #334155;
-        border: 1px solid #cbd5e1;
-        padding: 5px 8px;
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid var(--line-strong);
+        padding: 0 12px;
         border-radius: 6px;
         font-size: 13px;
-        font-weight: 600;
+        font-weight: 700;
         cursor: pointer;
         display: inline-flex;
         align-items: center;
-        gap: 4px;
-        transition: all 0.2s;
-        height: 28px;
+        gap: 6px;
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        height: 32px;
         line-height: 1;
         box-sizing: border-box;
     }
     .btn-actions-trigger:hover {
-        background: #f1f5f9;
-        border-color: #94a3b8;
-        color: #0f172a;
+        background: #F2F4F6;
+        border-color: #AEB6C0;
+        color: var(--ink);
     }
     .btn-actions-trigger svg {
         width: 12px;
         height: 12px;
-        transition: transform 0.2s;
-        color: #64748b;
-    }
-    .btn-actions-trigger.active svg {
-        transform: rotate(180deg);
-        color: #0f172a;
     }
     .actions-dropdown-menu {
         position: absolute;
         right: 0;
-        /* top / bottom set dynamically by Alpine :style */
+        top: calc(100% + 4px);
         background: #fff;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
-        box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
-        z-index: 50;
-        width: 130px;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        box-shadow: var(--shadow-pop);
+        z-index: 60;
+        width: 180px;
         overflow: hidden;
+        display: none;
     }
-    .status-pill {
-        display: inline-flex;
+    .actions-dropdown-menu.active {
+        display: block;
+    }
+    .actions-dropdown-item {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 13px;
+        color: #334155;
+        text-align: left;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        display: flex;
         align-items: center;
-        white-space: nowrap;
+        gap: 8px;
+        transition: background 0.15s;
+        box-sizing: border-box;
     }
+    .actions-dropdown-item:hover {
+        background: var(--pine-soft);
+        color: var(--ink);
+    }
+    .actions-dropdown-item.btn-delete-item {
+        color: #dc2626;
+        font-weight: 500;
+    }
+    .actions-dropdown-item.btn-delete-item:hover {
+        background: #fef2f2;
+        color: #b91c1c;
+    }
+
     .stock-status-badge {
         display: inline-flex;
         align-items: center;
@@ -473,12 +201,12 @@
         flex-shrink: 0;
     }
     .stock-status-badge-active {
-        background: #d1fae5;
-        color: #065f46;
-        border-color: #a7f3d0;
+        background: #dcfce7;
+        color: #15803d;
+        border-color: #bbf7d0;
     }
     .stock-status-badge-active .stock-status-badge-dot {
-        background: #10b981;
+        background: #16a34a;
     }
     .stock-status-badge-archived {
         background: #ffe4e6;
@@ -488,110 +216,294 @@
     .stock-status-badge-archived .stock-status-badge-dot {
         background: #f43f5e;
     }
-    /* Alpine transition helpers for the dropdown */
-    .add-transition { transition: opacity 0.15s ease, transform 0.15s ease; }
-    .dd-hidden  { opacity: 0; transform: scale(0.95); }
-    .dd-visible { opacity: 1; transform: scale(1); }
-    .actions-dropdown-item {
-        width: 100%;
-        padding: 8px 12px;
-        font-size: 13px;
-        color: #334155;
-        text-align: left;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-family: inherit;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: background 0.15s;
-        box-sizing: border-box;
-    }
-    .actions-dropdown-item:hover {
-        background: #f1f5f9;
-        color: #0f172a;
-    }
-    .actions-dropdown-item.btn-delete-item {
-        color: #dc2626;
-        font-weight: 500;
-    }
-    .actions-dropdown-item.btn-delete-item:hover {
-        background: #fef2f2;
-        color: #b91c1c;
-    }
 
-    /* Custom Delete Confirmation Modal */
-    #deleteStockModal {
+    #editStockModal,
+    #addStockModal,
+    #deleteStockModal,
+    #archiveStockModal {
         display: none;
         position: fixed;
         inset: 0;
-        z-index: 10000;
+        z-index: 9999;
         background: rgba(15, 23, 42, 0.7);
         backdrop-filter: blur(2px);
         align-items: center;
         justify-content: center;
         padding: 20px;
-        animation: fadeIn 0.15s ease-out;
     }
-    #deleteStockModal.active {
+    #editStockModal.active,
+    #addStockModal.active,
+    #deleteStockModal.active,
+    #archiveStockModal.active {
         display: flex;
     }
-    .delete-modal-content {
+    .add-modal-content,
+    .edit-modal-content,
+    .delete-modal-content,
+    .archive-modal-content {
         background: #fff;
         border-radius: 16px;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         width: 100%;
-        max-width: 440px;
         animation: modalSlideIn 0.2s ease-out;
         overflow: hidden;
     }
-    .delete-modal-header {
+    .add-modal-content { max-width: 768px; max-height: 80vh; overflow-y: auto; }
+    .edit-modal-content { max-width: 768px; max-height: 80vh; overflow-y: auto; }
+    .delete-modal-content { max-width: 440px; }
+    .archive-modal-content { max-width: 440px; }
+    @keyframes modalSlideIn {
+        from { opacity: 0; transform: scale(0.96) translateY(-8px); }
+        to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+    .add-modal-header,
+    .edit-modal-header,
+    .delete-modal-header,
+    .archive-modal-header {
         padding: 20px 24px;
         border-bottom: 1px solid #f1f5f9;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
-    .delete-modal-header h3 {
+    .add-modal-header h3,
+    .edit-modal-header h3,
+    .delete-modal-header h3,
+    .archive-modal-header h3 {
+        margin: 0;
         font-size: 16px;
         font-weight: 700;
+    }
+    .add-modal-form-body {
+        padding: 24px;
+    }
+    .add-modal-field {
+        margin-bottom: 16px;
+    }
+    .add-modal-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 6px;
+    }
+    .add-modal-field input[type="text"],
+    .add-modal-field input[type="number"],
+    .add-modal-field input[type="file"],
+    .add-modal-field select {
+        width: 100%;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--ink);
+        background: #fff;
+    }
+    .add-modal-field input[type="text"],
+    .add-modal-field input[type="number"],
+    .add-modal-field select {
+        height: 42px;
+        padding: 0 14px;
+    }
+    .add-modal-field select {
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23687180' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        padding-right: 34px;
+    }
+    .add-modal-field input[type="file"] {
+        padding: 10px;
+    }
+    .add-modal-field input:focus,
+    .add-modal-field select:focus {
+        outline: none;
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.10);
+        background: #fff;
+    }
+    .add-modal-help {
+        margin-top: 5px;
+        font-size: 12px;
+        color: #64748b;
+        line-height: 1.4;
+    }
+
+    .image-dropzone {
+        border: 2px dashed #cbd5e1;
+        border-radius: 12px;
+        background: #fcfcfd;
+        padding: 26px 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+    .image-dropzone:hover {
+        border-color: var(--pine);
+        background: #f8fafc;
+    }
+    .image-dropzone-preview {
+        width: 88px;
+        height: 88px;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 0 auto 14px;
+        border: 1px solid #e2e8f0;
+        background: #fff;
+    }
+    .image-dropzone-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .image-dropzone-title {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--pine);
+        text-decoration: underline;
+        text-underline-offset: 2px;
+    }
+    .image-dropzone-hint {
+        margin-top: 6px;
+        font-size: 12px;
+        color: #94a3b8;
+    }
+    .image-dropzone-status {
+        margin-top: 10px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #475569;
+    }
+    .image-dropzone-remove {
+        margin-top: 8px;
+        display: inline-block;
+        font-size: 12px;
+        font-weight: 700;
         color: #dc2626;
-        margin: 0;
+        cursor: pointer;
+    }
+    .image-dropzone-remove:hover {
+        text-decoration: underline;
+    }
+
+    .add-visible-row {
         display: flex;
         align-items: center;
         gap: 8px;
+        font-size: 13px;
+        margin: 16px 0 4px;
+        color: #334155;
+        font-weight: 500;
     }
-    .delete-modal-close {
-        background: none;
-        border: none;
-        color: #94a3b8;
+    .add-visible-row input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
         cursor: pointer;
-        padding: 4px;
-        border-radius: 6px;
+    }
+    .add-modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #f1f5f9;
         display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: #f8fafc;
+    }
+    .btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+    .delete-modal-header h3 {
+        color: #dc2626;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .archive-modal-header h3 {
+        color: var(--ink);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .edit-modal-close,
+    .delete-modal-close,
+    .archive-modal-close {
+        border: 0;
+        background: #f1f5f9;
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-        transition: all 0.15s;
+        cursor: pointer;
+        color: #64748b;
     }
-    .delete-modal-close:hover {
-        background: #f1f5f9;
-        color: #475569;
+    .edit-modal-close:hover,
+    .delete-modal-close:hover,
+    .archive-modal-close:hover {
+        background: #e2e8f0;
+        color: #334155;
     }
-    .delete-modal-close svg {
-        width: 20px;
-        height: 20px;
+    .edit-modal-close svg,
+    .delete-modal-close svg,
+    .archive-modal-close svg {
+        width: 18px;
+        height: 18px;
     }
-    .delete-modal-body {
+    .edit-modal-body,
+    .delete-modal-body,
+    .archive-modal-body {
         padding: 24px;
+    }
+    .edit-modal-field {
+        margin-bottom: 18px;
+    }
+    .edit-modal-field label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+    }
+    .edit-modal-field input[type="text"],
+    .edit-modal-field input[type="number"] {
+        width: 100%;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
+        font-family: inherit;
         font-size: 14px;
-        color: #475569;
+        color: var(--ink);
+        background: #fff;
+        height: 44px;
+        padding: 0 14px;
+    }
+    .edit-modal-field input:focus {
+        outline: none;
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.10);
+        background: #fff;
+    }
+    .edit-modal-footer,
+    .delete-modal-footer,
+    .archive-modal-footer {
+        padding: 16px 24px;
+        border-top: 1px solid #f1f5f9;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: #f8fafc;
+    }
+    .delete-modal-body p,
+    .archive-modal-body p {
+        margin: 0 0 16px 0;
+        color: #334155;
+        font-size: 14px;
         line-height: 1.5;
     }
-    .delete-modal-body p {
-        margin: 0 0 16px 0;
-    }
-    .delete-modal-body strong {
+    .delete-modal-body strong,
+    .archive-modal-body strong {
         color: #0f172a;
     }
     .delete-modal-warning {
@@ -601,40 +513,67 @@
         color: #9f1239;
         border-radius: 8px;
         font-weight: 500;
-        display: flex;
-        align-items: flex-start;
-        gap: 8px;
         font-size: 13px;
         box-sizing: border-box;
     }
-    .delete-modal-warning svg {
+    .archive-modal-warning {
+        padding: 12px 14px;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        color: #92400e;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 13px;
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        box-sizing: border-box;
+    }
+    .archive-modal-warning svg {
         flex-shrink: 0;
         width: 16px;
         height: 16px;
         margin-top: 1px;
     }
-    .delete-modal-footer {
-        padding: 16px 24px;
-        background: #f8fafc;
-        border-top: 1px solid #f1f5f9;
-        border-radius: 0 0 16px 16px;
-        display: flex;
-        justify-content: flex-end;
-        gap: 10px;
+
+    tbody tr.hidden {
+        display: none;
+    }
+
+    @media (max-width: 1200px) {
+        .stocks-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 @endsection
 
 @section('content')
-@php
-    $totalItems = $stocks->count();
-    $visibleItems = $stocks->where('is_visible', true)->count();
-    $hiddenItems = $totalItems - $visibleItems;
-    $totalQuantity = $stocks->sum('quantity');
-    $lowStockCount = $stocks->where('quantity', '<', 10)->count();
-@endphp
-<div class="stocks-grid">
-    
+<div class="stocks-grid" x-data="{
+    isAddModalOpen: false,
+    type: '',
+    quantity: {{ (int) old('quantity', 0) }},
+    prices: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 },
+    quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 },
+    imagePreview: '',
+    imageName: '',
+    get totalQuantity() {
+        return Object.values(this.quantities).reduce((sum, val) => sum + (Number(val) || 0), 0);
+    },
+    handleImage(input) {
+        const file = input.files && input.files[0];
+        if (!file) { return; }
+        this.imageName = file.name;
+        const reader = new FileReader();
+        reader.onload = (e) => { this.imagePreview = e.target.result; };
+        reader.readAsDataURL(file);
+    },
+    clearImage(input) {
+        this.imagePreview = '';
+        this.imageName = '';
+        if (input) { input.value = ''; }
+    }
+}">
     <section class="card stocks-table-card">
         <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
             <div>
@@ -642,27 +581,27 @@
                 <div style="font-size:13px;color:#64748b;margin-top:4px;">Manage your inventory items</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
-    <button type="button" class="btn btn-green" onclick="openAddModal()">
-        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width:14px;height:14px;">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/>
-        </svg>
-        Add Item
-    </button>
-    <div style="position:relative;display:inline-flex;align-items:center;">
-        <svg style="position:absolute;left:10px;width:15px;height:15px;color:#94a3b8;pointer-events:none;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-        </svg>
-        <input
-            id="stocks-instant-search"
-            type="text"
-            placeholder="Search items..."
-            oninput="filterRows()"
-            style="height:38px;padding:0 14px 0 34px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;color:#0f172a;background:#fff;width:220px;font-family:inherit;"
-            onfocus="this.style.borderColor='#0a5c2f';this.style.boxShadow='0 0 0 3px rgba(10,92,47,0.08)'"
-            onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'"
-                >
+                <button type="button" class="btn btn-green" @click="isAddModalOpen = true; type = ''; quantity = 0; prices = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; quantities = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; imagePreview = ''; imageName = ''; if ($refs.addForm) $refs.addForm.reset(); refreshBodyScrollLock()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="width:14px;height:14px;">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14m7-7H5"/>
+                    </svg>
+                    Add Item
+                </button>
+                <div style="position:relative;display:inline-flex;align-items:center;">
+                    <svg style="position:absolute;left:10px;width:15px;height:15px;color:#94a3b8;pointer-events:none;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                    </svg>
+                    <input
+                        id="stocks-instant-search"
+                        type="text"
+                        placeholder="Search items..."
+                        oninput="filterRows()"
+                        style="height:38px;padding:0 14px 0 34px;border:1px solid var(--line-strong);border-radius:6px;font-size:13px;color:var(--ink);background:#fff;width:220px;font-family:inherit;"
+                        onfocus="this.style.borderColor='#0A5C2F';this.style.boxShadow='0 0 0 3px rgba(10,92,47,0.10)'"
+                        onblur="this.style.borderColor='#CBD6CE';this.style.boxShadow='none'"
+                    >
+                </div>
             </div>
-        </div>
         </div>
         <div class="card-body">
             <table>
@@ -670,10 +609,11 @@
                     <tr>
                         <th style="width:60px;">Image</th>
                         <th style="width:200px;">Item Name</th>
+                        <th style="width:120px;">Item Type</th>
                         <th style="width:100px;">Quantity</th>
-                        <th style="width:130px;">STOCK LEVEL</th>  {{-- ADD --}}
-                        <th style="width:110px;">STATUS</th>
-                        <th style="width:100px;text-align:right;">ACTIONS</th>
+                        <th style="width:130px;">Stock Level</th>
+                        <th style="width:110px;">Status</th>
+                        <th style="width:100px;text-align:right;">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -693,6 +633,13 @@
                                 </span>
                             </td>
                             <td style="font-weight:700;color:#0f172a;">{{ $stock->item_name }}</td>
+                            <td>
+                                @if($stock->item_type)
+                                    <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;background:#f1f5f9;color:#334155;font-size:12px;font-weight:700;text-transform:capitalize;">{{ $stock->item_type }}</span>
+                                @else
+                                    <span style="color:#94a3b8;font-size:13px;">—</span>
+                                @endif
+                            </td>
                             <td style="font-weight:700;color:#0f172a;">{{ number_format($stock->quantity) }}</td>
                             <td>
                                 @if($stock->quantity === 0)
@@ -706,8 +653,8 @@
                                         Low Stock
                                     </span>
                                 @else
-                                    <span style="color:#059669;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
-                                        <span style="width:7px;height:7px;border-radius:50%;background:#059669;display:inline-block;flex-shrink:0;"></span>
+                                    <span style="color:#15803d;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
+                                        <span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;flex-shrink:0;"></span>
                                         Healthy
                                     </span>
                                 @endif
@@ -725,39 +672,28 @@
                                     </span>
                                 @endif
                             </td>
-                            <td class="actions-cell relative" style="text-align:right;">
-                                <div class="actions-dropdown-container" x-data="{ open: false, flipped: false }" :style="open ? 'z-index: 60;' : 'z-index: 2;'">
-                                    <button
-                                        @click="
-                                            flipped = ($el.getBoundingClientRect().bottom + 120 > window.innerHeight);
-                                            open = !open;
-                                        "
-                                        :class="{ 'active': open }"
-                                        class="btn-actions-trigger"
-                                        type="button">
+                            <td style="text-align:right;">
+                                <div class="actions-dropdown-container">
+                                    <button type="button" class="btn-actions-trigger" onclick="toggleActionsMenu(this)">
                                         Actions
                                         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </button>
 
-                                    <div x-show="open"
-                                         @click.outside="open = false"
-                                         x-transition:enter="add-transition"
-                                         x-transition:enter-start="dd-hidden"
-                                         x-transition:enter-end="dd-visible"
-                                         x-transition:leave="add-transition"
-                                         x-transition:leave-start="dd-visible"
-                                         x-transition:leave-end="dd-hidden"
-                                         :style="flipped
-                                             ? 'bottom: calc(100% + 4px); top: auto; transform-origin: bottom right;'
-                                             : 'top: calc(100% + 4px); bottom: auto; transform-origin: top right;'"
-                                         class="actions-dropdown-menu absolute right-0 z-50 mt-1 w-36 rounded-md bg-white shadow-xl border border-slate-100 pointer-events-auto"
-                                         style="display:none;">
+                                    <div class="actions-dropdown-menu">
                                         <button
                                             type="button"
-                                            @click="open = false; openEditModal({{ $stock->id }}, @js($stock->item_name), {{ (int) $stock->quantity }}, @js($stock->image ? asset('storage/' . $stock->image) : ''), @js(route('admin.stocks.update', $stock)), @js($stock->item_type ?? ''), @js($stock->prices ?? []), @js($stock->sizes ?? []), @js((float) ($stock->unit_price ?? 0)))"
                                             class="actions-dropdown-item"
+                                            data-update-url="{{ route('admin.stocks.update', $stock->id) }}"
+                                            data-item-name="{{ $stock->item_name }}"
+                                            data-quantity="{{ (int) $stock->quantity }}"
+                                            data-item-type="{{ $stock->item_type ?? '' }}"
+                                            data-prices='@json($stock->prices ?? [])'
+                                            data-sizes='@json($stock->sizes ?? [])'
+                                            data-unit-price="{{ $stock->unit_price ?? '' }}"
+                                            data-image="{{ $stock->image ? asset('storage/' . $stock->image) : '' }}"
+                                            onclick="openEditModalFromButton(this)"
                                         >
                                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;flex-shrink:0;">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -767,13 +703,29 @@
 
                                         <button
                                             type="button"
-                                            @click="open = false; openDeleteModal({{ $stock->id }}, @js($stock->item_name), @js(route('admin.stocks.delete', $stock->id)), {{ $stock->is_visible ? 'true' : 'false' }})"
+                                            class="actions-dropdown-item"
+                                            data-archive-url="{{ route('admin.stocks.delete', $stock->id) }}"
+                                            data-item-name="{{ $stock->item_name }}"
+                                            data-visible="{{ $stock->is_visible ? '1' : '0' }}"
+                                            onclick="openArchiveModalFromButton(this)"
+                                        >
+                                            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;flex-shrink:0;">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                                            </svg>
+                                            {{ $stock->is_visible ? 'Archive Item' : 'Restore Item' }}
+                                        </button>
+
+                                        <button
+                                            type="button"
                                             class="actions-dropdown-item btn-delete-item"
+                                            data-delete-url="{{ route('admin.stocks.destroy', $stock->id) }}"
+                                            data-item-name="{{ $stock->item_name }}"
+                                            onclick="openDeleteModalFromButton(this)"
                                         >
                                             <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:14px;height:14px;flex-shrink:0;">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.34 9m-4.78 0L9 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
                                             </svg>
-                                            {{ $stock->is_visible ? 'Archive Item' : 'Restore Item' }}
+                                            Delete Item
                                         </button>
                                     </div>
                                 </div>
@@ -781,20 +733,166 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align:center;padding:32px;color:#94a3b8;">No stock items found.</td>
+                            <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No stock items found.</td>
                         </tr>
                     @endforelse
                     <tr id="stocks-no-results-row" style="display:none;">
-                        <td colspan="6" style="text-align:center;padding:32px;color:#94a3b8;">No results found.</td>
+                        <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No results found.</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </section>
+
+    <!-- Add Stock Modal -->
+    <div id="addStockModal" :class="{ 'active': isAddModalOpen }" @click.self="isAddModalOpen = false; refreshBodyScrollLock()" @keydown.escape.window="if (isAddModalOpen) { isAddModalOpen = false; refreshBodyScrollLock(); }">
+        <div class="add-modal-content" x-cloak>
+            <div class="add-modal-header">
+                <h3>Add New Item</h3>
+                <button type="button" class="edit-modal-close" @click="isAddModalOpen = false; refreshBodyScrollLock()">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <form x-cloak x-ref="addForm" method="POST" action="{{ route('admin.stocks.store') }}" enctype="multipart/form-data">
+                @csrf
+
+                <div class="add-modal-form-body">
+                    <div class="add-modal-field">
+                        <label for="add_item_type">Item Type</label>
+                        <select id="add_item_type" name="item_type" x-model="type" required>
+                            <option value="">-- Select Type --</option>
+                            <option value="books">Books</option>
+                            <option value="uniforms">Uniforms</option>
+                        </select>
+                    </div>
+
+                    <div class="add-modal-field">
+                        <label for="add_item_name">Item Name</label>
+                        <input type="text" id="add_item_name" name="item_name" maxlength="100" value="{{ old('item_name') }}" required>
+                    </div>
+
+                    <div class="add-modal-field" x-show="type === 'uniforms'" x-cloak>
+                        <label>Prices and Sizes</label>
+                        <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
+                            <span></span>
+                            <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
+                            <span style="font-size:12px;font-weight:700;color:#334155;">Stocks by Size</span>
+                        </div>
+                        <div style="display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;">
+                            @foreach(['XS','S','M','L','XL','2XL','3XL','4XL','5XL'] as $size)
+                            <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end;">
+                                <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:0;">{{ $size }}</label>
+                                <input type="number" id="size_{{ strtolower($size) }}" name="price_{{ strtolower($size) }}" min="0" step="0.01" value="0" x-model.number="prices['{{ $size }}']">
+                                <input type="number" id="qty_{{ strtolower($size) }}" name="qty_{{ strtolower($size) }}" min="0" value="0" x-model.number="quantities['{{ $size }}']">
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+
+                    <div class="add-modal-field" x-show="type === 'books'" x-cloak>
+                        <label for="add_book_price">Price (₱)</label>
+                        <input type="number" id="add_book_price" name="book_price" min="0" step="0.01" value="0" x-bind:disabled="type !== 'books'">
+                        <p class="add-modal-help">Selling price per book. Auto-fills at checkout and can be adjusted per sale.</p>
+                    </div>
+
+                    <div class="add-modal-field">
+                        <label for="add_quantity">Quantity</label>
+                        <input
+                            type="number"
+                            id="add_quantity"
+                            name="quantity"
+                            min="0"
+                            max="3000"
+                            x-model.number="quantity"
+                            x-effect="if (type === 'uniforms') quantity = totalQuantity"
+                            :readonly="type === 'uniforms'"
+                            :style="type === 'uniforms' ? 'background:#f1f5f9;color:#64748b;cursor:not-allowed;' : ''"
+                            required
+                        >
+                        <p class="add-modal-help" x-show="type === 'uniforms'" x-cloak>Automatically totals the stocks entered per size above.</p>
+                    </div>
+
+                    <div class="add-modal-field">
+                        <label>Item Image</label>
+                        <div class="image-dropzone" @click="$refs.addImageInput.click()">
+                            <template x-if="imagePreview">
+                                <div class="image-dropzone-preview"><img :src="imagePreview" alt="Selected image preview"></div>
+                            </template>
+                            <div class="image-dropzone-title" x-text="imagePreview ? 'Click to change item image' : 'Click to upload item image'"></div>
+                            <div class="image-dropzone-hint">JPG, PNG, or WebP — max 2 MB</div>
+                            <div class="image-dropzone-status" x-text="imageName || 'No file selected'"></div>
+                            <span class="image-dropzone-remove" x-show="imagePreview" x-cloak @click.stop="clearImage($refs.addImageInput)">Remove image</span>
+                        </div>
+                        <input type="file" id="add_image" x-ref="addImageInput" name="image" accept=".jpg,.jpeg,.png,.webp" style="display:none;" @change="handleImage($refs.addImageInput)">
+                        <p class="add-modal-help">Optional. A placeholder is shown on the public page if none is provided.</p>
+                    </div>
+
+                    <label class="add-visible-row">
+                        <input type="checkbox" name="is_visible" value="1" checked>
+                        Show on public products page
+                    </label>
+                </div>
+
+                <div class="add-modal-footer">
+                    <button type="button" class="btn btn-outline btn-sm" @click="isAddModalOpen = false; refreshBodyScrollLock()">Cancel</button>
+                    <button type="submit" class="btn btn-green btn-sm">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- Edit Stock Modal -->
-<div id="editStockModal">
+<div id="editStockModal" x-data="{
+    itemType: '',
+    bookPrice: 0,
+    quantity: 0,
+    prices: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 },
+    quantities: { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 },
+    currentImage: '',
+    imagePreview: '',
+    imageName: '',
+    removeImage: false,
+    get totalQuantity() {
+        return Object.values(this.quantities).reduce((sum, val) => sum + (Number(val) || 0), 0);
+    },
+    get hasImage() {
+        return !!this.imagePreview || (!!this.currentImage && !this.removeImage);
+    },
+    handleImage(input) {
+        const file = input.files && input.files[0];
+        if (!file) { return; }
+        this.imageName = file.name;
+        this.removeImage = false;
+        const reader = new FileReader();
+        reader.onload = (e) => { this.imagePreview = e.target.result; };
+        reader.readAsDataURL(file);
+    },
+    clearImage(input) {
+        if (input) { input.value = ''; }
+        if (this.imagePreview) {
+            this.imagePreview = '';
+            this.imageName = '';
+        } else {
+            this.removeImage = true;
+        }
+    },
+    setEditData(type, incomingPrices, incomingQuantities, incomingUnitPrice, incomingQuantity, incomingImage) {
+        this.itemType = type || '';
+        this.bookPrice = parseFloat(incomingUnitPrice ?? 0) || 0;
+        this.quantity = parseInt(incomingQuantity ?? 0) || 0;
+        this.currentImage = incomingImage || '';
+        this.imagePreview = '';
+        this.imageName = '';
+        this.removeImage = false;
+        const defaults = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 };
+        this.prices = { ...defaults, ...(incomingPrices || {}) };
+        this.quantities = { ...defaults, ...(incomingQuantities || {}) };
+    }
+}" x-on:edit-stock-data.window="setEditData($event.detail.itemType, $event.detail.prices, $event.detail.quantities, $event.detail.unitPrice, $event.detail.quantity, $event.detail.image)">
     <div class="edit-modal-content">
         <div class="edit-modal-header">
             <h3>Edit Stock Item</h3>
@@ -808,14 +906,14 @@
             @csrf
             @method('PATCH')
             <div class="edit-modal-body">
-                <input type="hidden" id="modalItemType" name="item_type" value="">
+                <input type="hidden" id="modalItemType" name="item_type" x-model="itemType">
+                <input type="hidden" name="remove_image" :value="removeImage ? '1' : '0'">
                 <div class="edit-modal-field">
-                    <label>Item Name</label>
-                    <div style="padding: 12px 14px; background: #f1f5f9; border-radius: 8px; font-weight: 600; color: #334155; font-size: 14px;" id="modalItemName"></div>
+                    <label for="modalItemName">Item Name</label>
+                    <input type="text" id="modalItemName" name="item_name" maxlength="100" required>
                 </div>
-
-                <div class="edit-modal-field" id="edit_prices_section" style="display:none;">
-                    <label>Prices by Size</label>
+                <div class="edit-modal-field" x-show="itemType === 'uniforms'" x-cloak>
+                    <label>Prices and Sizes</label>
                     <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
                         <span></span>
                         <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
@@ -825,57 +923,51 @@
                         @foreach(['XS','S','M','L','XL','2XL','3XL','4XL','5XL'] as $size)
                         <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end;">
                             <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:0;">{{ $size }}</label>
-                            <input
-                                type="number"
-                                id="edit_price_{{ strtolower($size) }}"
-                                name="price_{{ strtolower($size) }}"
-                                min="0"
-                                step="0.01"
-                                value="0"
-                                style="width:100%;height:38px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:#f8fafc;font-family:inherit;"
-                            >
-                            <input
-                                type="number"
-                                id="edit_qty_{{ strtolower($size) }}"
-                                name="qty_{{ strtolower($size) }}"
-                                min="0"
-                                value="0"
-                                style="width:100%;height:38px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:#f8fafc;font-family:inherit;"
-                            >
+                            <input type="number" id="edit_price_{{ strtolower($size) }}" name="price_{{ strtolower($size) }}" min="0" step="0.01" x-model.number="prices['{{ $size }}']" :disabled="itemType !== 'uniforms'">
+                            <input type="number" id="edit_qty_{{ strtolower($size) }}" name="qty_{{ strtolower($size) }}" min="0" x-model.number="quantities['{{ $size }}']" :disabled="itemType !== 'uniforms'">
                         </div>
                         @endforeach
                     </div>
                 </div>
-                
-                <div class="edit-modal-field" id="edit_book_price_section" style="display:none;">
+                <div class="edit-modal-field" x-show="itemType === 'books'" x-cloak>
                     <label for="modalBookPrice">Price (₱)</label>
-                    <input type="number" id="modalBookPrice" name="book_price" min="0" step="0.01" value="0"
-                        style="width:100%;height:44px;padding:0 14px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;color:#0f172a;background:#f8fafc;">
+                    <input type="number" id="modalBookPrice" name="book_price" min="0" step="0.01" x-model.number="bookPrice" :disabled="itemType !== 'books'">
                 </div>
-
                 <div class="edit-modal-field">
                     <label for="modalQuantity">Quantity</label>
-                    <input type="number" id="modalQuantity" name="quantity" min="0" max="3000" pattern="\d*" inputmode="numeric" oninput="this.value=this.value.replace(/[^0-9]/g,'')" required>
+                    <input
+                        type="number"
+                        id="modalQuantity"
+                        name="quantity"
+                        min="0"
+                        max="3000"
+                        pattern="\d*"
+                        inputmode="numeric"
+                        x-model.number="quantity"
+                        x-effect="if (itemType === 'uniforms') quantity = totalQuantity"
+                        :readonly="itemType === 'uniforms'"
+                        :style="itemType === 'uniforms' ? 'background:#f1f5f9;color:#64748b;cursor:not-allowed;' : ''"
+                        oninput="this.value=this.value.replace(/[^0-9]/g,'')"
+                        required
+                    >
+                    <p class="add-modal-help" x-show="itemType === 'uniforms'" x-cloak>Automatically totals the stocks entered per size above.</p>
                 </div>
-
                 <div class="edit-modal-field">
-                    <label>Current Image</label>
-                    <div class="edit-modal-preview">
-                        <div class="edit-modal-preview-thumb" id="modalCurrentImageThumb">
-                            <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5 12 3l8.25 4.5L12 12 3.75 7.5Z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12 12 16.5 20.25 12"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 16.5 12 21l8.25-4.5"/>
-                            </svg>
-                        </div>
-                        <span class="edit-modal-preview-label">This is the current image</span>
+                    <label>Item Image</label>
+                    <div class="image-dropzone" @click="$refs.editImageInput.click()">
+                        <template x-if="imagePreview">
+                            <div class="image-dropzone-preview"><img :src="imagePreview" alt="Selected image preview"></div>
+                        </template>
+                        <template x-if="!imagePreview && currentImage && !removeImage">
+                            <div class="image-dropzone-preview"><img :src="currentImage" alt="Current item image"></div>
+                        </template>
+                        <div class="image-dropzone-title" x-text="hasImage ? 'Click to change item image' : 'Click to upload item image'"></div>
+                        <div class="image-dropzone-hint">JPG, PNG, or WebP — max 2 MB</div>
+                        <div class="image-dropzone-status" x-text="imageName || (currentImage && !removeImage ? 'Current image' : 'No file selected')"></div>
+                        <span class="image-dropzone-remove" x-show="hasImage" x-cloak @click.stop="clearImage($refs.editImageInput)">Remove image</span>
                     </div>
-                </div>
-                
-                <div class="edit-modal-field">
-                    <label for="modalImage">Upload New Image (Optional)</label>
-                    <input type="file" id="modalImage" name="image" accept=".jpg,.jpeg,.png,.webp">
-                    <p class="stocks-help">Leave empty to keep the current image</p>
+                    <input type="file" x-ref="editImageInput" name="image" accept=".jpg,.jpeg,.png,.webp" style="display:none;" @change="handleImage($refs.editImageInput)">
+                    <p class="add-modal-help">Leave unchanged to keep the current image.</p>
                 </div>
             </div>
             <div class="edit-modal-footer">
@@ -886,7 +978,45 @@
     </div>
 </div>
 
-<!-- Custom Delete Stock Modal -->
+<!-- Archive / Restore Stock Modal -->
+<div id="archiveStockModal">
+    <div class="archive-modal-content">
+        <div class="archive-modal-header">
+            <h3>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0;">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" />
+                </svg>
+                <span id="archiveModalTitle">Archive Stock Item</span>
+            </h3>
+            <button type="button" class="archive-modal-close" onclick="closeArchiveModal()">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <form id="archiveStockForm" method="POST">
+            @csrf
+            @method('DELETE')
+            <div class="archive-modal-body">
+                <p><span id="archiveModalPromptText">Are you sure you want to archive the stock item</span> <strong id="archiveModalItemName"></strong>?</p>
+                <div class="archive-modal-warning">
+                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" />
+                    </svg>
+                    <div>
+                        <strong>Note:</strong> This action only updates item availability while preserving historical sales records.
+                    </div>
+                </div>
+            </div>
+            <div class="archive-modal-footer">
+                <button type="button" class="btn btn-outline btn-sm" onclick="closeArchiveModal()">Cancel</button>
+                <button id="archiveModalSubmit" type="submit" class="btn btn-green btn-sm">Archive Item</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Delete Stock Modal (permanent) -->
 <div id="deleteStockModal">
     <div class="delete-modal-content">
         <div class="delete-modal-header">
@@ -894,7 +1024,7 @@
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:20px;height:20px;flex-shrink:0;">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
                 </svg>
-                <span id="deleteModalTitle">Archive Stock Item</span>
+                Delete Stock Item
             </h3>
             <button type="button" class="delete-modal-close" onclick="closeDeleteModal()">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -906,195 +1036,23 @@
             @csrf
             @method('DELETE')
             <div class="delete-modal-body">
-                <p><span id="deleteModalPromptText">Are you sure you want to archive the stock item</span> <strong id="deleteModalItemName"></strong>?</p>
-                
+                <p>Are you sure you want to permanently delete <strong id="deleteModalItemName"></strong>?</p>
                 <div class="delete-modal-warning">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z" />
-                    </svg>
-                    <div>
-                        <strong>Note:</strong> This action updates item availability while preserving historical sales records.
-                    </div>
+                    This action cannot be undone. The stock record and attached image will be permanently deleted.
                 </div>
             </div>
             <div class="delete-modal-footer">
                 <button type="button" class="btn btn-outline btn-sm" onclick="closeDeleteModal()">Cancel</button>
-                <button id="deleteModalSubmit" type="submit" class="btn btn-sm" style="background:#dc2626;color:#fff;border:1px solid #dc2626;cursor:pointer;font-weight:600;min-height:36px;border-radius:6px;padding:0 16px;">Archive Item</button>
+                <button type="submit" class="btn btn-danger btn-sm">Confirm Delete</button>
             </div>
         </form>
     </div>
 </div>
 @endsection
-<!-- Add Stock Modal -->
-<div id="addStockModal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(15,23,42,0.7);backdrop-filter:blur(2px);align-items:center;justify-content:center;padding:20px;">
-    <div style="background:#fff;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1);width:100%;max-width:768px;max-height:80vh;overflow-y:auto;animation:modalSlideIn 0.2s ease-out;">
-        <div style="padding:20px 24px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:10;border-radius:16px 16px 0 0;">
-            <h3 style="margin:0;font-size:16px;font-weight:700;">Add New Item</h3>
-            <button type="button" class="edit-modal-close" onclick="closeAddModal()">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
-            </button>
-        </div>
-        <form id="addStockForm" method="POST" action="{{ route('admin.stocks.store') }}" enctype="multipart/form-data">
-            @csrf
-            <div style="padding:24px;">
 
-                {{-- Item Type --}}
-                <div class="edit-modal-field">
-                    <label for="add_item_type">Item Type</label>
-                    <select id="add_item_type" name="item_type" onchange="toggleAddPrices(this.value)" style="width:100%;height:42px;padding:0 14px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;color:#0f172a;background:#f8fafc;" required>
-                        <option value="">-- Select Type --</option>
-                        <option value="books">Books</option>
-                        <option value="uniforms">Uniforms</option>
-                    </select>
-                </div>
-
-                {{-- Item Name --}}
-                <div class="edit-modal-field">
-                    <label for="add_item_name">Item Name</label>
-                    <input type="text" id="add_item_name" name="item_name" maxlength="100" style="width:100%;height:42px;padding:0 14px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;color:#0f172a;background:#f8fafc;" required>
-                </div>
-
-                {{-- Prices by Size (only for uniforms) --}}
-                <div id="add_prices_section" style="display:none;margin-bottom:18px;">
-                    <label style="display:block;font-size:13px;font-weight:700;color:#334155;margin-bottom:10px;">Prices by Size</label>
-                    <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
-                        <span></span>
-                        <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
-                        <span style="font-size:12px;font-weight:700;color:#334155;">Stocks by Size</span>
-                    </div>
-                    <div style="display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;">
-                        @foreach(['XS','S','M','L','XL','2XL','3XL','4XL','5XL'] as $size)
-                        <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end;">
-                            <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:0;">{{ $size }}</label>
-                            <input type="number" name="price_{{ strtolower($size) }}" min="0" step="0.01" value="0"
-                                style="width:100%;height:38px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:#f8fafc;font-family:inherit;">
-                            <input type="number" name="qty_{{ strtolower($size) }}" min="0" value="0"
-                                style="width:100%;height:38px;padding:0 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;background:#f8fafc;font-family:inherit;">
-                        </div>
-                        @endforeach
-                    </div>
-                </div>
-
-                {{-- Price (only for books) --}}
-                <div id="add_book_price_section" class="edit-modal-field" style="display:none;">
-                    <label for="add_book_price">Price (₱)</label>
-                    <input type="number" id="add_book_price" name="book_price" min="0" step="0.01" value="0"
-                        style="width:100%;height:42px;padding:0 14px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;color:#0f172a;background:#f8fafc;">
-                    <p class="stocks-help">Selling price per book. Auto-fills at checkout and can be adjusted per sale.</p>
-                </div>
-
-                {{-- Quantity --}}
-                <div class="edit-modal-field">
-                    <label for="add_quantity">Quantity</label>
-                    <input type="number" id="add_quantity" name="quantity" min="0" max="3000" value="0"
-                        style="width:100%;height:42px;padding:0 14px;border:1px solid #e2e8f0;border-radius:8px;font-family:inherit;font-size:14px;color:#0f172a;background:#f8fafc;" required>
-                </div>
-
-                {{-- Image --}}
-                <div class="edit-modal-field">
-                    <label for="add_image">Choose Image</label>
-                    <input type="file" id="add_image" name="image" accept=".jpg,.jpeg,.png,.webp"
-                        style="width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:10px;font-size:14px;background:#f8fafc;">
-                    <p class="stocks-help">Optional. If not provided, a placeholder is shown on the public page.</p>
-                </div>
-
-                {{-- Visibility --}}
-                <label class="stocks-visible-row">
-                    <input type="checkbox" name="is_visible" value="1" checked>
-                    Show on public products page
-                </label>
-
-            </div>
-            <div style="padding:16px 24px;border-top:1px solid #f1f5f9;display:flex;justify-content:flex-end;gap:10px;background:#f8fafc;border-radius:0 0 16px 16px;position:sticky;bottom:0;">
-                <button type="button" class="btn btn-outline btn-sm" onclick="closeAddModal()">Cancel</button>
-                <button type="submit" class="btn btn-green btn-sm">Add Item</button>
-            </div>
-        </form>
-    </div>
-</div>
 @section('scripts')
 <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 <script>
-    function openAddModal() {
-    const modal = document.getElementById('addStockModal');
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    }
-
-    function closeAddModal() {
-        const modal = document.getElementById('addStockModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-        document.getElementById('addStockForm').reset();
-        document.getElementById('add_prices_section').style.display = 'none';
-    }
-
-    function toggleAddPrices(type) {
-        const section = document.getElementById('add_prices_section');
-        const bookPriceSection = document.getElementById('add_book_price_section');
-        const quantityInput = document.getElementById('add_quantity');
-        section.style.display = type === 'uniforms' ? 'block' : 'none';
-        if (bookPriceSection) {
-            bookPriceSection.style.display = type === 'books' ? 'block' : 'none';
-        }
-
-        if (quantityInput) {
-            const isUniform = type === 'uniforms';
-            quantityInput.readOnly = isUniform;
-            quantityInput.style.background = isUniform ? '#f1f5f9' : '#f8fafc';
-
-            if (isUniform) {
-                recalculateAddQuantityFromSizes();
-            }
-        }
-    }
-
-    function recalculateAddQuantityFromSizes() {
-        const quantityInput = document.getElementById('add_quantity');
-        if (!quantityInput) return;
-
-        let total = 0;
-        document.querySelectorAll('#add_prices_section input[name^="qty_"]').forEach((input) => {
-            const value = Number.parseInt(input.value || '0', 10);
-            total += Number.isFinite(value) && value > 0 ? value : 0;
-        });
-
-        quantityInput.value = total;
-    }
-
-    document.getElementById('addStockModal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'addStockModal') closeAddModal();
-    });
-    function openAddModal() {
-    const modal = document.getElementById('addStockModal');
-    modal.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    }
-
-    function closeAddModal() {
-        const modal = document.getElementById('addStockModal');
-        modal.style.display = 'none';
-        document.body.style.overflow = '';
-        document.getElementById('addStockForm')?.reset();
-        document.getElementById('add_prices_section').style.display = 'none';
-        const addBookPriceSection = document.getElementById('add_book_price_section');
-        if (addBookPriceSection) {
-            addBookPriceSection.style.display = 'none';
-        }
-        const quantityInput = document.getElementById('add_quantity');
-        if (quantityInput) {
-            quantityInput.readOnly = false;
-            quantityInput.style.background = '#f8fafc';
-        }
-    }
-
-    document.getElementById('addStockModal')?.addEventListener('click', (e) => {
-        if (e.target.id === 'addStockModal') closeAddModal();
-    });
-
-    document.querySelectorAll('#add_prices_section input[name^="qty_"]').forEach((input) => {
-        input.addEventListener('input', recalculateAddQuantityFromSizes);
-    });
     function filterRows() {
         const input = document.getElementById('stocks-instant-search');
         const rows = document.querySelectorAll('tr[data-row="stock"]');
@@ -1125,128 +1083,194 @@
         }
     }
 
-    function openEditModal(stockId, stockName, stockQuantity, stockImage, updateUrl, stockItemType = '', stockPrices = {}, stockSizes = {}, stockUnitPrice = 0) {
-        const modal = document.getElementById('editStockModal');
-        const form = document.getElementById('editStockForm');
-        const nameEl = document.getElementById('modalItemName');
-        const quantityEl = document.getElementById('modalQuantity');
-        const thumbEl = document.getElementById('modalCurrentImageThumb');
-        const itemTypeEl = document.getElementById('modalItemType');
-        const pricesSectionEl = document.getElementById('edit_prices_section');
-        const bookPriceSectionEl = document.getElementById('edit_book_price_section');
-        const bookPriceEl = document.getElementById('modalBookPrice');
+    function toggleActionsMenu(button) {
+        const menu = button.closest('.actions-dropdown-container')?.querySelector('.actions-dropdown-menu');
+        if (!menu) return;
 
-        if (!modal || !form) return;
-
-        const sizeKeys = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
-        const normalizedType = (stockItemType || '').toLowerCase();
-
-        // Set form action
-        form.action = updateUrl;
-
-        // Set item name (display only)
-        if (nameEl) {
-            nameEl.textContent = stockName;
-        }
-
-        // Set quantity
-        if (quantityEl) {
-            quantityEl.value = stockQuantity;
-        }
-
-        if (itemTypeEl) {
-            itemTypeEl.value = normalizedType;
-        }
-
-        if (pricesSectionEl) {
-            pricesSectionEl.style.display = normalizedType === 'uniforms' ? 'block' : 'none';
-        }
-
-        if (bookPriceSectionEl) {
-            bookPriceSectionEl.style.display = normalizedType === 'books' ? 'block' : 'none';
-        }
-
-        if (bookPriceEl) {
-            bookPriceEl.value = Number(stockUnitPrice) >= 0 ? Number(stockUnitPrice) : 0;
-        }
-
-        sizeKeys.forEach((sizeKey) => {
-            const key = sizeKey.toLowerCase();
-            const priceInput = document.getElementById(`edit_price_${key}`);
-            const qtyInput = document.getElementById(`edit_qty_${key}`);
-
-            if (priceInput) {
-                const priceValue = stockPrices?.[sizeKey] ?? 0;
-                priceInput.value = Number(priceValue) >= 0 ? Number(priceValue) : 0;
-            }
-
-            if (qtyInput) {
-                const qtyValue = stockSizes?.[sizeKey] ?? 0;
-                qtyInput.value = Number(qtyValue) >= 0 ? Number(qtyValue) : 0;
+        document.querySelectorAll('.actions-dropdown-menu.active').forEach((openMenu) => {
+            if (openMenu !== menu) {
+                openMenu.classList.remove('active');
             }
         });
 
-        // Set current image preview
-        if (thumbEl) {
-            if (stockImage && stockImage !== '') {
-                thumbEl.innerHTML = `<img src="${stockImage}" alt="${stockName}">`;
-            } else {
-                thumbEl.innerHTML = `
-                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5 12 3l8.25 4.5L12 12 3.75 7.5Z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12 12 16.5 20.25 12"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 16.5 12 21l8.25-4.5"/>
-                    </svg>
-                `;
-            }
+        menu.classList.toggle('active');
+    }
+
+    function closeAllMenus() {
+        document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
+            menu.classList.remove('active');
+        });
+    }
+
+    function openEditModalFromButton(button) {
+        closeAllMenus();
+        openEditModal(
+            button.dataset.updateUrl || '',
+            button.dataset.itemName || '',
+            button.dataset.quantity || '0',
+            button.dataset.itemType || '',
+            button.dataset.prices || '{}',
+            button.dataset.sizes || '{}',
+            button.dataset.unitPrice || '',
+            button.dataset.image || ''
+        );
+    }
+
+    function openArchiveModalFromButton(button) {
+        closeAllMenus();
+        openArchiveModal(
+            button.dataset.archiveUrl || '',
+            button.dataset.itemName || '',
+            button.dataset.visible === '1'
+        );
+    }
+
+    function openDeleteModalFromButton(button) {
+        closeAllMenus();
+        openDeleteModal(
+            button.dataset.deleteUrl || '',
+            button.dataset.itemName || ''
+        );
+    }
+
+    function openEditModal(updateUrl, stockName, stockQuantity, stockItemType, stockPricesJson, stockSizesJson, stockUnitPrice, stockImage) {
+        const modal = document.getElementById('editStockModal');
+        const form = document.getElementById('editStockForm');
+        const nameEl = document.getElementById('modalItemName');
+        const itemTypeEl = document.getElementById('modalItemType');
+
+        if (!modal || !form) return;
+
+        let parsedPrices = {};
+        let parsedSizes = {};
+        try {
+            parsedPrices = stockPricesJson ? JSON.parse(stockPricesJson) : {};
+        } catch (error) {
+            parsedPrices = {};
         }
 
-        // Show modal
+        try {
+            parsedSizes = stockSizesJson ? JSON.parse(stockSizesJson) : {};
+        } catch (error) {
+            parsedSizes = {};
+        }
+
+        form.action = updateUrl;
+        if (nameEl) nameEl.value = stockName;
+        if (itemTypeEl) itemTypeEl.value = stockItemType || '';
+
+        window.dispatchEvent(new CustomEvent('edit-stock-data', {
+            detail: {
+                itemType: stockItemType || '',
+                prices: parsedPrices,
+                quantities: parsedSizes,
+                unitPrice: stockUnitPrice || '',
+                quantity: stockQuantity || 0,
+                image: stockImage || '',
+            },
+        }));
+
         modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
+        refreshBodyScrollLock();
     }
 
     function closeEditModal() {
         const modal = document.getElementById('editStockModal');
         if (!modal) return;
 
+        window.dispatchEvent(new CustomEvent('edit-stock-data', {
+            detail: {
+                itemType: '',
+                prices: {},
+                quantities: {},
+            },
+        }));
+
         modal.classList.remove('active');
-        document.body.style.overflow = '';
-
-        // Reset form
-        const form = document.getElementById('editStockForm');
-        const imageInput = document.getElementById('modalImage');
-        const pricesSectionEl = document.getElementById('edit_prices_section');
-        if (pricesSectionEl) {
-            pricesSectionEl.style.display = 'none';
-        }
-        const bookPriceSectionEl = document.getElementById('edit_book_price_section');
-        if (bookPriceSectionEl) {
-            bookPriceSectionEl.style.display = 'none';
-        }
-
-        ['xs', 's', 'm', 'l', 'xl', '2xl', '3xl', '4xl', '5xl'].forEach((sizeKey) => {
-            const priceInput = document.getElementById(`edit_price_${sizeKey}`);
-            const qtyInput = document.getElementById(`edit_qty_${sizeKey}`);
-
-            if (priceInput) {
-                priceInput.value = 0;
-            }
-
-            if (qtyInput) {
-                qtyInput.value = 0;
-            }
-        });
-
-        if (imageInput) {
-            imageInput.value = '';
-        }
+        refreshBodyScrollLock();
     }
 
-    // Close modal on backdrop click
+    function openArchiveModal(archiveUrl, stockName, isCurrentlyVisible) {
+        const modal = document.getElementById('archiveStockModal');
+        const form = document.getElementById('archiveStockForm');
+        const nameEl = document.getElementById('archiveModalItemName');
+        const titleEl = document.getElementById('archiveModalTitle');
+        const promptTextEl = document.getElementById('archiveModalPromptText');
+        const submitEl = document.getElementById('archiveModalSubmit');
+
+        if (!modal || !form) return;
+
+        const isArchiveAction = Boolean(isCurrentlyVisible);
+
+        form.action = archiveUrl;
+        if (nameEl) nameEl.textContent = stockName;
+        if (titleEl) titleEl.textContent = isArchiveAction ? 'Archive Stock Item' : 'Restore Stock Item';
+        if (promptTextEl) {
+            promptTextEl.textContent = isArchiveAction
+                ? 'Are you sure you want to archive the stock item'
+                : 'Are you sure you want to restore the stock item';
+        }
+        if (submitEl) submitEl.textContent = isArchiveAction ? 'Archive Item' : 'Restore Item';
+
+        modal.classList.add('active');
+        refreshBodyScrollLock();
+    }
+
+    function closeArchiveModal() {
+        const modal = document.getElementById('archiveStockModal');
+        if (!modal) return;
+
+        modal.classList.remove('active');
+        refreshBodyScrollLock();
+    }
+
+    function openDeleteModal(deleteUrl, stockName) {
+        const modal = document.getElementById('deleteStockModal');
+        const form = document.getElementById('deleteStockForm');
+        const nameEl = document.getElementById('deleteModalItemName');
+
+        if (!modal || !form) return;
+
+        form.action = deleteUrl;
+        if (nameEl) nameEl.textContent = stockName;
+
+        modal.classList.add('active');
+        refreshBodyScrollLock();
+    }
+
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteStockModal');
+        if (!modal) return;
+
+        modal.classList.remove('active');
+        refreshBodyScrollLock();
+    }
+
+    function refreshBodyScrollLock() {
+        const isAnyModalOpen =
+            document.getElementById('addStockModal')?.classList.contains('active') ||
+            document.getElementById('editStockModal')?.classList.contains('active') ||
+            document.getElementById('archiveStockModal')?.classList.contains('active') ||
+            document.getElementById('deleteStockModal')?.classList.contains('active');
+
+        document.body.style.overflow = isAnyModalOpen ? 'hidden' : '';
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.actions-dropdown-container')) {
+            closeAllMenus();
+        }
+    });
+
     document.getElementById('editStockModal')?.addEventListener('click', (e) => {
         if (e.target.id === 'editStockModal') {
             closeEditModal();
+        }
+    });
+
+    document.getElementById('archiveStockModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'archiveStockModal') {
+            closeArchiveModal();
         }
     });
 
@@ -1256,61 +1280,16 @@
         }
     });
 
-    // Close modal on Escape key
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeEditModal();
+            closeArchiveModal();
             closeDeleteModal();
+            closeAllMenus();
         }
     });
 
-    function openDeleteModal(stockId, stockName, deleteUrl, isCurrentlyVisible = true) {
-        const modal = document.getElementById('deleteStockModal');
-        const form = document.getElementById('deleteStockForm');
-        const nameEl = document.getElementById('deleteModalItemName');
-        const titleEl = document.getElementById('deleteModalTitle');
-        const promptTextEl = document.getElementById('deleteModalPromptText');
-        const submitEl = document.getElementById('deleteModalSubmit');
-
-        if (!modal || !form) return;
-
-        const isArchiveAction = Boolean(isCurrentlyVisible);
-
-        // Set action URL
-        form.action = deleteUrl;
-
-        // Set display name
-        if (nameEl) {
-            nameEl.textContent = stockName;
-        }
-
-        if (titleEl) {
-            titleEl.textContent = isArchiveAction ? 'Archive Stock Item' : 'Restore Stock Item';
-        }
-
-        if (promptTextEl) {
-            promptTextEl.textContent = isArchiveAction
-                ? 'Are you sure you want to archive the stock item'
-                : 'Are you sure you want to restore the stock item';
-        }
-
-        if (submitEl) {
-            submitEl.textContent = isArchiveAction ? 'Archive Item' : 'Restore Item';
-        }
-
-        // Show modal
-        modal.classList.add('active');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function closeDeleteModal() {
-        const modal = document.getElementById('deleteStockModal');
-        if (!modal) return;
-
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
-    }
-
     filterRows();
+    refreshBodyScrollLock();
 </script>
 @endsection
