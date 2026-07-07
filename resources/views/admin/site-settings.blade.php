@@ -159,6 +159,10 @@
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                 Hero
             </button>
+            <button type="button" class="ss-tab" data-tab="uniforms">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                Uniform Stocks
+            </button>
             <button type="button" class="ss-tab" data-tab="features">
                 <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 Features
@@ -221,14 +225,44 @@
                 </div>
             </section>
 
+            {{-- UNIFORM STOCKS --}}
+            <section class="ss-panel" id="panel-uniforms">
+                <div class="ss-card">
+                    <div class="ss-grid ss-grid-2" style="margin-bottom:18px;">
+                        <div class="ss-field">
+                            <label>Section Title</label>
+                            <input type="text" name="uniforms_title" class="ss-input"
+                                value="{{ old('uniforms_title', $settings['uniforms_title'] ?? 'Campus uniforms, straight from the stockroom.') }}">
+                        </div>
+                        <div class="ss-field">
+                            <label>Section Description</label>
+                            <textarea name="uniforms_subtitle" class="ss-textarea" rows="3">{{ old('uniforms_subtitle', $settings['uniforms_subtitle'] ?? 'The official uniform lines the office keeps on hand — sizes, prices, and availability, updated as the ledger moves. No account needed to browse.') }}</textarea>
+                        </div>
+                    </div>
+                    <div class="ss-note">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        <div>
+                            The uniform cards themselves come straight from <strong>Uniform Stocks</strong> — names, photos, sizes, prices,
+                            and availability update automatically as the inventory moves. Only the heading and description above are edited here.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {{-- FEATURES --}}
             <section class="ss-panel" id="panel-features">
                 <div class="ss-card">
-                    <div class="ss-field" style="margin-bottom:18px;">
-                        <label>Section Title</label>
-                        <input type="text" name="features_title" class="ss-input"
-                            value="{{ old('features_title', $settings['features_title'] ?? '') }}"
-                            placeholder="Everything Your Office Needs, In One System">
+                    <div class="ss-grid ss-grid-2" style="margin-bottom:18px;">
+                        <div class="ss-field">
+                            <label>Section Title</label>
+                            <input type="text" name="features_title" class="ss-input"
+                                value="{{ old('features_title', $settings['features_title'] ?? '') }}"
+                                placeholder="Everything Your Office Needs, In One System">
+                        </div>
+                        <div class="ss-field">
+                            <label>Section Description</label>
+                            <textarea name="features_subtitle" class="ss-textarea" rows="3">{{ old('features_subtitle', $settings['features_subtitle'] ?? 'From partnership management to stock and product tracking, streamline every aspect of the External and Business Affairs Office operations.') }}</textarea>
+                        </div>
                     </div>
                     <div class="ss-grid ss-grid-3">
                         @foreach([1,2,3] as $i)
@@ -278,6 +312,18 @@
             {{-- ABOUT --}}
             <section class="ss-panel" id="panel-about">
                 <div class="ss-card">
+                    <div class="ss-grid ss-grid-2" style="margin-bottom:18px;">
+                        <div class="ss-field">
+                            <label>Section Title</label>
+                            <input type="text" name="about_title" class="ss-input"
+                                value="{{ old('about_title', $settings['about_title'] ?? 'Built to <span class="text-green-700">empower</span> our campus.') }}">
+                            <p class="ss-hint" style="margin-top:6px;">HTML is allowed here (e.g. coloured words).</p>
+                        </div>
+                        <div class="ss-field">
+                            <label>Section Description</label>
+                            <textarea name="about_subtitle" class="ss-textarea" rows="3">{{ old('about_subtitle', $settings['about_subtitle'] ?? 'A modern and streamlined platform for the External and Business Affairs Office to handle partnerships, products, and campus services with ease.') }}</textarea>
+                        </div>
+                    </div>
                     <div class="ss-img-card" style="max-width:420px;">
                         <span class="ss-img-caption">About Image</span>
                         <div class="ss-img-preview">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Concessionaire;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActivityLog;
+use App\Models\ConcessionaireMedia;
 use App\Models\ConcessionairePayment;
 use App\Models\ConcessionaireReview;
 use App\Models\PartnershipApplication;
@@ -561,6 +562,14 @@ class ConcessionaireController extends Controller
 
         $isConcessionaireActive = (bool) $user->is_active_concessionaire;
 
+        $carouselImages = $user->carouselMedia()->get()
+            ->map(fn (ConcessionaireMedia $media) => asset('storage/' . $media->path))
+            ->values();
+
+        if ($carouselImages->isEmpty() && $user->carousel_image) {
+            $carouselImages = collect([asset('storage/' . $user->carousel_image)]);
+        }
+
         $products = Product::where('concessionaire_id', $user->id)
             ->notDeleted()
             ->available()
@@ -614,6 +623,7 @@ class ConcessionaireController extends Controller
         return view('concessionaires.show', compact(
             'user',
             'publicDescription',
+            'carouselImages',
             'products',
             'isConcessionaireActive',
             'concessionaireReviews',
@@ -796,7 +806,12 @@ class ConcessionaireController extends Controller
     }
 
     /**
-     * Upload or replace the concessionaire's carousel banner image.
+     * Maximum number of carousel banner images a concessionaire may keep.
+     */
+    private const CAROUSEL_IMAGE_LIMIT = 8;
+
+    /**
+     * Upload one or more carousel banner images for the concessionaire's public page.
      */
     public function updateCarouselImage(Request $request)
     {
@@ -806,37 +821,79 @@ class ConcessionaireController extends Controller
         }
 
         $request->validate([
-            'carousel_image' => 'required|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'carousel_images' => 'required|array|min:1',
+            'carousel_images.*' => 'image|mimes:jpg,jpeg,png,webp|max:4096',
+        ], [
+            'carousel_images.required' => 'Please choose at least one image to upload.',
+            'carousel_images.*.image' => 'Each file must be an image.',
+            'carousel_images.*.max' => 'Each image must be 4 MB or smaller.',
         ]);
 
-        if ($user->carousel_image) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->carousel_image);
+        $existingCount = $user->carouselMedia()->count();
+        $remaining = self::CAROUSEL_IMAGE_LIMIT - $existingCount;
+
+        if ($remaining <= 0) {
+            return back()->with('error', 'You already have the maximum of ' . self::CAROUSEL_IMAGE_LIMIT . ' banner images. Remove one before adding more.');
         }
 
-        $path = $request->file('carousel_image')->store('carousel/' . $user->id, 'public');
-        $user->carousel_image = $this->normalizeStoredImagePath($path);
-        $user->save();
+        $files = array_slice($request->file('carousel_images'), 0, $remaining);
+        $added = 0;
 
-        return back()->with('success', 'Carousel image updated successfully.');
+        foreach ($files as $file) {
+            $path = $file->store('carousel/' . $user->id, 'public');
+            $user->carouselMedia()->create([
+                'path' => $this->normalizeStoredImagePath($path),
+                'sort_order' => $existingCount + $added,
+            ]);
+            $added++;
+        }
+
+        $this->syncPrimaryCarouselImage($user);
+
+        $skipped = count($request->file('carousel_images')) - $added;
+        $message = $added . ' image' . ($added === 1 ? '' : 's') . ' added to your banner.';
+        if ($skipped > 0) {
+            $message .= ' ' . $skipped . ' skipped (limit of ' . self::CAROUSEL_IMAGE_LIMIT . ' reached).';
+        }
+
+        return back()->with('success', $message);
     }
 
     /**
-     * Delete the concessionaire's carousel banner image.
+     * Delete a single carousel banner image from the concessionaire's gallery.
      */
-    public function deleteCarouselImage()
+    public function deleteCarouselImage(Request $request)
     {
         $user = Auth::user();
         if (! $user instanceof User) {
             abort(403);
         }
 
-        if ($user->carousel_image) {
-            \Illuminate\Support\Facades\Storage::disk('public')->delete($user->carousel_image);
-            $user->carousel_image = null;
-            $user->save();
+        $request->validate([
+            'media_id' => 'required|integer',
+        ]);
+
+        $media = $user->carouselMedia()->find($request->input('media_id'));
+
+        if ($media) {
+            \Illuminate\Support\Facades\Storage::disk('public')->delete($media->path);
+            $media->delete();
         }
 
-        return back()->with('success', 'Carousel image removed.');
+        $this->syncPrimaryCarouselImage($user);
+
+        return back()->with('success', 'Banner image removed.');
+    }
+
+    /**
+     * Keep the legacy carousel_image column pointed at the first banner image so
+     * concessionaire card thumbnails (index / landing page) keep working.
+     */
+    private function syncPrimaryCarouselImage(User $user): void
+    {
+        $first = $user->carouselMedia()->first();
+        $user->carousel_image = $first?->path;
+        $user->save();
     }
 
     /**
@@ -848,6 +905,8 @@ class ConcessionaireController extends Controller
         if (! $user instanceof User) {
             abort(403);
         }
+
+        $user->load('carouselMedia');
 
         return view('concessionaire.media', compact('user'));
     }

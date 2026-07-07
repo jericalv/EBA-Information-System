@@ -562,6 +562,7 @@
         .stock-status {
             position: absolute;
             top: 12px; left: 12px;
+            z-index: 2;
             font-family: var(--font-mono);
             font-size: 9.5px;
             font-weight: 600;
@@ -1385,8 +1386,8 @@
             <div class="sec-head rv">
                 <div class="sec-head-main">
                     <span class="eyebrow">Registry / Uniform Stocks</span>
-                    <h2 class="sec-title">Campus uniforms, straight from the stockroom.</h2>
-                    <p class="sec-sub">The official uniform lines the office keeps on hand &mdash; sizes, prices, and availability, updated as the ledger moves. No account needed to browse.</p>
+                    <h2 class="sec-title">{{ \App\Models\SiteSetting::get('uniforms_title', 'Campus uniforms, straight from the stockroom.') }}</h2>
+                    <p class="sec-sub">{{ \App\Models\SiteSetting::get('uniforms_subtitle', 'The official uniform lines the office keeps on hand — sizes, prices, and availability, updated as the ledger moves. No account needed to browse.') }}</p>
                 </div>
                 <div class="rail-controls">
                     @if ($landingUniforms->count() > 0)
@@ -1595,7 +1596,7 @@
                 <div class="sec-head-main">
                     <span class="eyebrow">The Platform</span>
                     <h2 class="sec-title">{{ \App\Models\SiteSetting::get('features_title', 'Everything Your Office Needs, In One System') }}</h2>
-                    <p class="sec-sub">From partnership management to stock and product tracking, streamline every aspect of the External and Business Affairs Office operations.</p>
+                    <p class="sec-sub">{{ \App\Models\SiteSetting::get('features_subtitle', 'From partnership management to stock and product tracking, streamline every aspect of the External and Business Affairs Office operations.') }}</p>
                 </div>
             </div>
 
@@ -1650,8 +1651,8 @@
                 </div>
                 <div class="about-text rv">
                     <span class="eyebrow">About the Office</span>
-                    <h2 class="sec-title">Built to <span class="text-green-700">empower</span> our campus.</h2>
-                    <p>A modern and streamlined platform for the External and Business Affairs Office to handle partnerships, products, and campus services with ease.</p>
+                    <h2 class="sec-title">{!! \App\Models\SiteSetting::get('about_title', 'Built to <span class="text-green-700">empower</span> our campus.') !!}</h2>
+                    <p>{{ \App\Models\SiteSetting::get('about_subtitle', 'A modern and streamlined platform for the External and Business Affairs Office to handle partnerships, products, and campus services with ease.') }}</p>
 
                     <div class="ledger-items">
                         <div class="ledger-item">

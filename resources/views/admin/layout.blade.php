@@ -10,372 +10,311 @@
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700,800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|ibm-plex-mono:400,500,600&display=swap" rel="stylesheet" />
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --green: #0A5C2F;
             --green-light: #0D7A3E;
             --green-dark: #064420;
-            --gold: #D4A843;
-            --gold-light: #E8C96A;
-            --sidebar-w: 260px;
-            --header-h: 64px;
+            --pine: #0A5C2F;
+            --pine-strong: #084A26;
+            --pine-soft: #EAF3ED;
+            --ink: #1A2B21;
+            --muted: #66756C;
+            --faint: #93A198;
+            --paper: #F5F7F5;
+            --card: #FFFFFF;
+            --line: #E2E8E3;
+            --line-strong: #CBD6CE;
+            --amber: #B45309;
+            --danger: #B91C1C;
+            --font-ui: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+            --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
+            --shadow-card: 0 1px 2px rgba(23, 37, 28, 0.04);
+            --shadow-pop: 0 12px 32px rgba(23, 37, 28, 0.14);
+            --sidebar-w: 256px;
+            --header-h: 60px;
         }
         body {
-            font-family: 'Inter', sans-serif;
-            background: #f1f5f9;
-            color: #1e293b;
+            font-family: var(--font-ui);
+            background: var(--paper);
+            color: var(--ink);
             min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            position: fixed; top: 0; left: 0; bottom: 0;
-            width: var(--sidebar-w);
-            background: var(--green-dark);
-            color: #fff;
-            display: flex; flex-direction: column;
-            z-index: 100;
-            transition: transform 0.3s;
+        /* ===== Shared typography ===== */
+        .eyebrow {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--muted);
         }
-        .sidebar-brand {
-            display: flex; align-items: center; gap: 12px;
-            padding: 20px 20px 16px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            text-decoration: none; color: #fff;
+        .page-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
         }
-        .sidebar-brand img { width: 38px; height: 38px; object-fit: contain; border-radius: 6px; }
-        .sidebar-brand-text { display: flex; flex-direction: column; }
-        .sidebar-brand-title { font-size: 14px; font-weight: 800; line-height: 1.2; }
-        .sidebar-brand-sub { font-size: 10px; opacity: 0.7; font-weight: 500; }
-        .sidebar-nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
-        .sidebar-link {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 14px; border-radius: 8px;
-            text-decoration: none; color: rgba(255,255,255,0.75);
-            font-size: 14px; font-weight: 500; transition: all 0.2s;
+        .page-title {
+            font-size: 21px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: var(--ink);
+            margin-top: 4px;
+            line-height: 1.15;
         }
-        .sidebar-link:hover { background: rgba(255,255,255,0.1); color: #fff; }
-        .sidebar-link.active { background: rgba(255,255,255,0.15); color: #fff; font-weight: 600; }
-        .sidebar-link svg { width: 20px; height: 20px; flex-shrink: 0; }
-        .sidebar-section { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); padding: 16px 14px 6px; font-weight: 700; }
-        .sidebar-logout-form { margin: 0; }
-        .sidebar-logout-form .sidebar-link {
-            width: 100%; background: none; border: none;
-            cursor: pointer; font-family: inherit; font-size: 14px;
-            font-weight: 500; color: rgba(255,255,255,0.75);
-        }
-        .sidebar-footer {
-            padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .sidebar-user {
-            display: flex; align-items: center; gap: 10px; padding: 8px 14px;
-            border-radius: 8px; background: rgba(255,255,255,0.08);
-        }
-        .sidebar-avatar {
-            width: 34px; height: 34px; border-radius: 50%; background: var(--gold);
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 13px; color: var(--green-dark); flex-shrink: 0;
-        }
-        .sidebar-user-info { flex: 1; min-width: 0; }
-        .sidebar-user-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .sidebar-user-role { font-size: 11px; opacity: 0.6; }
-        .btn-sidebar-logout {
-            display: flex; align-items: center; gap: 8px;
-            width: 100%; padding: 8px 14px; margin-bottom: 8px;
-            border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.06); color: #fca5a5;
-            font-size: 13px; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: background 0.2s;
-        }
-        .btn-sidebar-logout:hover { background: rgba(239,68,68,0.18); }
-
-        /* ===== HEADER ===== */
-        .main-header {
-            position: fixed; top: 0; right: 0; left: var(--sidebar-w);
-            height: var(--header-h); z-index: 90;
-            background: #fff; border-bottom: 1px solid #e2e8f0;
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 0 28px;
-        }
-        .header-left { display: flex; align-items: center; gap: 12px; }
-        .header-title { font-size: 18px; font-weight: 700; }
-        .header-right { display: flex; align-items: center; gap: 12px; position: relative; }
-        .btn-header {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600;
-            text-decoration: none; border: none; cursor: pointer; font-family: inherit;
-            transition: all 0.2s;
-        }
-        .btn-home { background: #f1f5f9; color: #475569; }
-        .btn-home:hover { background: #e2e8f0; }
-        .btn-logout-header { background: transparent; color: #ef4444; border: 1px solid #fecaca; }
-        .btn-logout-header:hover { background: #fef2f2; }
-        .role-badge-admin {
-            display: inline-flex;
-            align-items: center;
-            padding: 6px 12px;
-            border-radius: 999px;
+        .page-date {
+            font-family: var(--font-mono);
             font-size: 12px;
-            font-weight: 700;
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #fecaca;
+            color: var(--muted);
+            white-space: nowrap;
+            padding-bottom: 3px;
         }
-        .hamburger {
-            display: none; background: none; border: none; cursor: pointer; padding: 6px; color: #475569;
+        .page-head-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .panel {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+        }
+        .panel-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--ink);
+            letter-spacing: -0.01em;
+        }
+        .panel-sub {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 2px;
         }
 
-        /* ===== ADMIN NOTIFICATIONS ===== */
-        .admin-notif-btn {
-            position: relative;
-            width: 52px;
-            height: 52px;
-            border: 0;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #e2eacc 0%, #e2eacc 100%);
-            color: #ea580c;
+        /* ===== Buttons ===== */
+        .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 7px;
+            border-radius: 6px;
+            font-family: var(--font-ui);
+            font-size: 13.5px;
+            font-weight: 600;
+            line-height: 1;
+            padding: 9px 15px;
+            border: 1px solid transparent;
             cursor: pointer;
-            box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
         }
-        .admin-notif-btn:hover {
-            transform: scale(1.04);
-            box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
-        }
-        .admin-notif-btn:focus-visible {
-            outline: 2px solid #f97316;
+        .btn:focus-visible {
+            outline: 2px solid rgba(10, 92, 47, 0.45);
             outline-offset: 2px;
         }
-        .admin-notif-btn svg {
-            width: 30px;
-            height: 30px;
-        }
-        .admin-notif-badge {
-            position: absolute;
-            top: -4px;
-            right: -4px;
-            width: 20px;
-            height: 20px;
-            border-radius: 999px;
-            background: linear-gradient(135deg, #f97316 0%, #ef4444 100%);
-            color: #fff;
-            font-size: 10px;
-            font-weight: 700;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid #fff;
-            line-height: 1;
-        }
-        .admin-notif-dropdown {
-            position: absolute;
-            right: 0;
-            top: calc(100% + 10px);
-            width: 320px;
-            border-radius: 16px;
-            border: 1px solid #d1fae5;
+        .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+        .btn-primary, .btn-green { background: var(--pine); color: #fff; }
+        .btn-primary:hover, .btn-green:hover { background: var(--pine-strong); }
+        .btn-secondary, .btn-outline { background: #fff; color: var(--ink); border-color: var(--line-strong); }
+        .btn-secondary:hover, .btn-outline:hover { background: #F6F9F7; border-color: #AEC1B4; }
+        .btn-red, .btn-danger-soft { background: #FDF3F3; color: var(--danger); border-color: #F2D8D8; }
+        .btn-red:hover, .btn-danger-soft:hover { background: #FAE5E5; }
+        .btn-danger { background: var(--danger); color: #fff; }
+        .btn-danger:hover { background: #991B1B; }
+        .btn-sm { padding: 7px 12px; font-size: 12.5px; }
+        .btn-xs { padding: 6px 10px; font-size: 12px; }
+        .btn[disabled], .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* ===== Controls ===== */
+        .control {
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
             background: #fff;
-            box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16);
-            z-index: 150;
-            overflow: hidden;
+            color: var(--ink);
+            font-family: var(--font-ui);
+            font-size: 13.5px;
+            padding: 9px 12px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
-        .admin-notif-dropdown.hidden {
-            display: none;
+        .control::placeholder { color: var(--faint); }
+        .control:focus {
+            outline: none;
+            border-color: var(--pine);
+            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
         }
-        .admin-notif-head {
-            background: linear-gradient(135deg, #ecfdf5 0%, #ffffff 100%);
-            border-bottom: 1px solid #d1fae5;
-            padding: 12px 18px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #065f46;
-        }
-        .admin-notif-list {
-            max-height: 320px;
-            overflow-y: auto;
-            padding: 8px;
-        }
-        .admin-notif-item {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            text-decoration: none;
-            border-radius: 10px;
-            padding: 10px;
-            transition: background-color 0.2s ease;
-        }
-        .admin-notif-item:hover {
-            background: #ecfdf5;
-        }
-        .admin-notif-item-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 999px;
-            background: #d1fae5;
-            color: #047857;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-        .admin-notif-item-icon svg {
-            width: 18px;
-            height: 18px;
-        }
-        .admin-notif-item-title {
-            font-size: 13px;
-            font-weight: 700;
-            color: #047857;
-            margin-bottom: 2px;
-        }
-        .admin-notif-item-meta {
-            font-size: 12px;
-            color: #6b7280;
-            line-height: 1.25;
-        }
-        .admin-notif-foot {
-            border-top: 1px solid #e5e7eb;
-            background: #f9fafb;
-            padding: 8px;
-        }
-        .admin-notif-foot-link {
-            display: block;
-            text-align: center;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 700;
-            color: #047857;
-            border-radius: 10px;
-            padding: 10px 12px;
-            transition: background-color 0.2s ease;
-        }
-        .admin-notif-foot-link:hover {
-            background: #ecfdf5;
-        }
-
-        /* ===== MAIN ===== */
-        .main-content {
-            margin-left: var(--sidebar-w);
-            padding-top: var(--header-h);
-            min-height: 100vh;
-        }
-        .page-body { padding: 28px; }
-
-        /* ===== ALERTS ===== */
-        .alert {
-            padding: 12px 16px; border-radius: 10px; margin-bottom: 20px; font-size: 14px; font-weight: 500;
-        }
-        .alert-success { background: rgba(10,92,47,0.08); border: 1px solid rgba(10,92,47,0.2); color: var(--green); }
-        .alert-error { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); color: #dc2626; }
-
-        /* ===== CARDS ===== */
-        .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
-            margin-bottom: 28px;
-        }
-        .stat-card {
-            background: #fff; border-radius: 14px; padding: 24px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            border: 1px solid #e2e8f0;
-        }
-        .stat-card-label { font-size: 13px; color: #64748b; font-weight: 500; margin-bottom: 6px; }
-        .stat-card-value { font-size: 32px; font-weight: 800; color: #0f172a; }
-        .stat-card-icon {
-            width: 44px; height: 44px; border-radius: 10px; display: flex;
-            align-items: center; justify-content: center; margin-bottom: 14px;
-        }
-        .stat-card-icon svg { width: 22px; height: 22px; }
-        .stat-icon-green { background: rgba(10,92,47,0.1); color: var(--green); }
-        .stat-icon-gold { background: rgba(212,168,67,0.15); color: #b8860b; }
-        .stat-icon-blue { background: rgba(59,130,246,0.1); color: #2563eb; }
-
-        /* ===== TABLE ===== */
-        .card {
-            background: #fff; border-radius: 14px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            border: 1px solid #e2e8f0; overflow: hidden;
-        }
-        .card-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 20px 24px; border-bottom: 1px solid #f1f5f9;
-        }
-        .card-header h3 { font-size: 16px; font-weight: 700; }
-        .card-body { padding: 0; overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; }
-        thead th {
-            text-align: left; padding: 12px 24px; font-size: 12px; font-weight: 600;
-            text-transform: uppercase; letter-spacing: 0.5px; color: #64748b;
-            background: #f8fafc; border-bottom: 1px solid #e2e8f0;
-        }
-        tbody td {
-            padding: 14px 24px; font-size: 14px; border-bottom: 1px solid #f1f5f9;
-            vertical-align: middle;
-        }
-        tbody tr:hover { background: #f8fafc; }
-        tbody tr:last-child td { border-bottom: none; }
-        .user-cell { display: flex; align-items: center; gap: 10px; }
-        .user-avatar {
-            width: 34px; height: 34px; border-radius: 50%; background: var(--green);
-            color: #fff; display: flex; align-items: center; justify-content: center;
-            font-size: 12px; font-weight: 700; flex-shrink: 0;
-        }
-        .user-name { font-weight: 600; }
-        .user-email { font-size: 13px; color: #64748b; }
-        .badge {
-            display: inline-flex; padding: 3px 10px; border-radius: 20px;
-            font-size: 12px; font-weight: 600;
-        }
-        .badge-admin { background: rgba(10,92,47,0.1); color: var(--green); }
-        .badge-user { background: #f1f5f9; color: #64748b; }
-        .badge-warning { background: rgba(245,158,11,0.1); color: #d97706; }
-        .badge-success { background: rgba(10,92,47,0.1); color: var(--green); }
-        .badge-danger { background: rgba(239,68,68,0.1); color: #dc2626; }
-        .badge-secondary { background: #f1f5f9; color: #64748b; }
-
-        /* ===== BUTTONS ===== */
-        .btn {
-            display: inline-flex; align-items: center; gap: 6px;
-            padding: 7px 14px; border-radius: 7px; font-size: 13px; font-weight: 600;
-            border: none; cursor: pointer; font-family: inherit; text-decoration: none;
-            transition: all 0.2s;
-        }
-        .btn-sm { padding: 5px 10px; font-size: 12px; }
-        .btn-green { background: var(--green); color: #fff; }
-        .btn-green:hover { background: var(--green-light); }
-        .btn-red { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
-        .btn-red:hover { background: #fee2e2; }
-        .btn-outline { background: transparent; color: #475569; border: 1px solid #e2e8f0; }
-        .btn-outline:hover { background: #f8fafc; }
-
-        /* ===== SEARCH / FILTER ===== */
         .toolbar {
-            display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+            display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
         }
         .search-box {
             display: flex; align-items: center; gap: 8px;
-            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+            background: #fff; border: 1px solid var(--line-strong); border-radius: 6px;
             padding: 0 12px; flex: 1; max-width: 320px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
-        .search-box svg { width: 16px; height: 16px; color: #94a3b8; flex-shrink: 0; }
+        .search-box:focus-within {
+            border-color: var(--pine);
+            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+        }
+        .search-box svg { width: 15px; height: 15px; color: var(--faint); flex-shrink: 0; }
         .search-box input {
-            border: none; background: transparent; padding: 9px 0; font-size: 14px;
-            font-family: inherit; width: 100%; outline: none; color: #1e293b;
+            border: none; background: transparent; padding: 9px 0; font-size: 13px;
+            font-family: var(--font-ui); width: 100%; outline: none; color: var(--ink);
         }
+        .search-box input::placeholder { color: var(--faint); }
         .filter-select {
-            padding: 9px 12px; border: 1px solid #e2e8f0; border-radius: 8px;
-            font-size: 14px; font-family: inherit; background: #f8fafc; color: #1e293b;
+            padding: 9px 34px 9px 12px; border: 1px solid var(--line-strong); border-radius: 6px;
+            font-size: 13px; font-family: var(--font-ui); background: #fff; color: var(--ink);
             cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2366756C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--pine);
+            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
         }
 
-        /* ===== PAGINATION ===== */
-        .pagination-wrap { padding: 16px 24px; }
-        .pagination-wrap nav { width: 100%; }
+        /* ===== Dropdown pops ===== */
+        .pop {
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            background: #fff;
+            box-shadow: var(--shadow-pop);
+            overflow: hidden;
+        }
+        .pop-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 16px;
+            font-family: var(--font-ui);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--ink);
+            text-decoration: none;
+            text-align: left;
+            background: none;
+            border: 0;
+            cursor: pointer;
+            transition: background-color 0.15s ease;
+        }
+        .pop-item svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+        .pop-item:hover { background: var(--pine-soft); }
+        .pop-item.pop-item-danger { color: var(--danger); }
+        .pop-item.pop-item-danger svg { color: var(--danger); }
+        .pop-item.pop-item-danger:hover { background: #FDF3F3; }
 
+        /* ===== Alerts ===== */
+        .alert {
+            border-radius: 8px;
+            border: 1px solid;
+            padding: 12px 16px;
+            font-size: 13.5px;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .alert-success { background: #F0F7F2; border-color: #CDE3D4; color: #14532D; }
+        .alert-warning { background: #FDF8EC; border-color: #F0E1BC; color: #92400E; }
+        .alert-error { background: #FDF3F3; border-color: #F2D8D8; color: var(--danger); }
+
+        /* ===== Cards & tables ===== */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            box-shadow: var(--shadow-card);
+            overflow: hidden;
+        }
+        .card-header {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; flex-wrap: wrap;
+            padding: 16px 20px; border-bottom: 1px solid var(--line);
+        }
+        .card-header h3 {
+            font-size: 15px; font-weight: 700; letter-spacing: -0.01em;
+        }
+        .card-body { padding: 0; overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        thead th {
+            text-align: left; padding: 11px 20px;
+            font-family: var(--font-mono);
+            font-size: 10.5px; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
+            background: #FAFCFA; border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+        tbody td {
+            padding: 13px 20px; font-size: 13.5px; border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+        }
+        tbody tr { transition: background-color 0.12s ease; }
+        tbody tr:hover { background: #FAFCFA; }
+        tbody tr:last-child td { border-bottom: none; }
+        .table-num {
+            font-family: var(--font-mono);
+            font-variant-numeric: tabular-nums;
+            font-weight: 600;
+            color: var(--ink);
+            white-space: nowrap;
+        }
+        .table-num.is-pine { color: var(--pine); }
+        .table-strong { font-weight: 700; color: var(--ink); }
+        .table-dim { color: var(--faint); }
+        .user-cell { display: flex; align-items: center; gap: 12px; }
+        .user-avatar {
+            width: 34px; height: 34px; border-radius: 6px; background: var(--pine);
+            color: #fff; display: flex; align-items: center; justify-content: center;
+            font-size: 12px; font-weight: 700; flex-shrink: 0;
+        }
+        .user-name { font-weight: 700; color: var(--ink); }
+        .user-email { font-size: 12.5px; color: var(--muted); }
+        .badge {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 9px; border-radius: 5px;
+            font-family: var(--font-mono);
+            font-size: 11px; font-weight: 600;
+            white-space: nowrap;
+        }
+        .badge::before {
+            content: '';
+            width: 5px; height: 5px; border-radius: 999px; background: currentColor;
+        }
+        .badge-admin { background: #E5F3EA; color: #14532D; }
+        .badge-user { background: #F0F2F0; color: var(--muted); }
+        .badge-warning { background: #FDF8EC; color: #92400E; }
+        .badge-success { background: #E5F3EA; color: #14532D; }
+        .badge-danger { background: #FBEAEA; color: #B3261E; }
+        .badge-secondary { background: #F0F2F0; color: var(--muted); }
+        .empty-state {
+            background: #fff;
+            border: 1px dashed var(--line-strong);
+            border-radius: 10px;
+            padding: 28px;
+            text-align: center;
+            color: var(--muted);
+            font-size: 13.5px;
+            margin: 16px;
+        }
+
+        /* ===== Pagination (bootstrap-5 markup, custom styling) ===== */
+        .pagination-wrap { padding: 14px 20px; border-top: 1px solid var(--line); }
+        .pagination-wrap nav { width: 100%; }
         .pagination-wrap .d-none.flex-sm-fill.d-sm-flex.align-items-sm-center.justify-content-sm-between {
             display: flex;
             align-items: center;
@@ -383,26 +322,25 @@
             gap: 20px;
             flex-wrap: wrap;
         }
-
         .pagination-wrap .d-none.flex-sm-fill.d-sm-flex.align-items-sm-center.justify-content-sm-between > div:first-child p {
             margin: 0;
-            font-size: 13px;
-            color: #64748b;
+            font-size: 12.5px;
+            color: var(--muted);
             white-space: nowrap;
         }
-
+        .pagination-wrap .d-none.flex-sm-fill.d-sm-flex.align-items-sm-center.justify-content-sm-between > div:first-child p .fw-semibold {
+            font-family: var(--font-mono);
+            font-weight: 600;
+            color: var(--ink);
+        }
         .pagination-wrap .d-none.flex-sm-fill.d-sm-flex.align-items-sm-center.justify-content-sm-between > div:last-child {
             margin-left: auto;
         }
-
-        .pagination-wrap .d-flex.justify-content-between.flex-fill.d-sm-none {
-            display: none;
-        }
-
+        .pagination-wrap .d-flex.justify-content-between.flex-fill.d-sm-none { display: none; }
         .pagination-wrap .pagination {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
             list-style: none;
             margin: 0;
             padding: 0;
@@ -412,32 +350,27 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-width: 34px;
-            height: 34px;
-            padding: 6px 12px; border-radius: 6px; font-size: 13px; text-decoration: none;
-            color: #475569; border: 1px solid #e2e8f0;
+            min-width: 32px;
+            height: 32px;
+            padding: 5px 11px; border-radius: 6px; font-size: 12.5px; font-weight: 600;
+            text-decoration: none;
+            color: var(--ink); border: 1px solid var(--line-strong);
             background: #fff;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
         }
         .pagination-wrap .page-item.disabled .page-link {
-            color: #94a3b8;
-            background: #f8fafc;
-            border-color: #e2e8f0;
+            color: var(--faint);
+            background: #FAFCFA;
+            border-color: var(--line);
             cursor: not-allowed;
         }
-        .pagination-wrap .page-link:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
+        .pagination-wrap .page-link:hover { background: #F6F9F7; border-color: #AEC1B4; }
         .pagination-wrap .page-item.active .page-link {
-            background: var(--green); color: #fff; border-color: var(--green);
+            background: var(--pine); color: #fff; border-color: var(--pine);
         }
         .pagination-wrap svg { width: 14px; height: 14px; }
-
         @media (max-width: 640px) {
-            .pagination-wrap .d-none.flex-sm-fill.d-sm-flex.align-items-sm-center.justify-content-sm-between {
-                display: none;
-            }
-
+            .pagination-wrap .d-none.flex-sm-fill.d-sm-flex.align-items-sm-center.justify-content-sm-between { display: none; }
             .pagination-wrap .d-flex.justify-content-between.flex-fill.d-sm-none {
                 display: flex;
                 align-items: center;
@@ -446,44 +379,461 @@
             }
         }
 
-        /* ===== BREADCRUMB ===== */
-        .breadcrumb {
+        /* ===== Sidebar ===== */
+        .sb {
+            position: fixed; top: 0; left: 0; bottom: 0;
+            width: var(--sidebar-w);
+            background: #0B3120;
+            border-right: 1px solid #0A2A1B;
+            display: flex; flex-direction: column;
+            z-index: 100;
+            transition: transform 0.3s ease;
+        }
+        .sb-brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            padding: 18px 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            text-decoration: none;
+        }
+        .sb-brand-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: #fff;
+            padding: 3px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .sb-brand-logo-fallback {
+            width: 36px;
+            height: 36px;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            flex-shrink: 0;
+        }
+        .sb-brand-text { min-width: 0; flex: 1; }
+        .sb-brand-name {
+            font-size: 13.5px;
+            font-weight: 800;
+            color: #fff;
+            letter-spacing: -0.01em;
+            line-height: 1.2;
+        }
+        .sb-brand-campus {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.45);
+            margin-top: 3px;
+        }
+        .sb-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 12px;
+        }
+        .sb-group { margin-bottom: 24px; }
+        .sb-group:last-child { margin-bottom: 0; }
+        .sb-group-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.38);
+            padding: 0 12px;
+            margin-bottom: 6px;
+        }
+        .sb-group ul { list-style: none; display: flex; flex-direction: column; gap: 2px; }
+        .sb-item {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            border-radius: 6px;
+            padding: 9px 12px;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #B9CDBF;
+            text-decoration: none;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .sb-item svg { width: 17px; height: 17px; flex-shrink: 0; opacity: 0.85; }
+        .sb-item:hover { background: rgba(255, 255, 255, 0.06); color: #fff; }
+        .sb-item.is-active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+        .sb-item.is-active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 2px;
+            border-radius: 2px;
+            background: #7BD3A0;
+        }
+        .sb-item.sb-item-danger { color: #E7B4B4; }
+        .sb-item.sb-item-danger:hover { background: rgba(185, 28, 28, 0.22); color: #FCDCDC; }
+        .sb-foot {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px;
+        }
+        .sb-foot form { margin: 0; }
+        .sb-foot .sb-item {
+            width: 100%;
+            background: none;
+            border: 0;
+            font-family: var(--font-ui);
+            cursor: pointer;
+        }
+        .sb-foot .sb-item.sb-item-danger:hover { background: rgba(185, 28, 28, 0.22); }
+        .sb-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(23, 37, 28, 0.5);
+            z-index: 99;
+            display: none;
+        }
+        .sb-backdrop.is-open { display: block; }
+
+        /* ===== Navbar ===== */
+        .nb {
+            position: fixed; top: 0; right: 0; left: var(--sidebar-w);
+            height: var(--header-h); z-index: 90;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 16px;
+            padding: 0 28px;
+        }
+        .nb-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .nb-right { display: flex; align-items: center; gap: 10px; }
+        .nb-icon-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border-radius: 6px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+        }
+        .nb-icon-btn svg { width: 19px; height: 19px; }
+        .nb-icon-btn:hover { background: var(--pine-soft); color: var(--pine); }
+        .nb-icon-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
+        .nb-crumbs {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-top: 0;
-            font-size: 16px;
-            color: #64748b;
+            font-size: 13px;
+            color: var(--muted);
+            white-space: nowrap;
         }
-        .breadcrumb a {
-            color: #059669;
+        .nb-crumbs a {
+            color: var(--muted);
             text-decoration: none;
-            transition: color 0.2s;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+        .nb-crumbs a:hover { color: var(--pine); }
+        .nb-crumb-sep { color: var(--line-strong); }
+        .nb-crumb-current { color: var(--ink); font-weight: 700; }
+
+        .nb-search { position: relative; flex: 1; max-width: 380px; }
+        .nb-search-input {
+            width: 100%;
+            border: 1px solid var(--line-strong);
+            border-radius: 6px;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: var(--font-ui);
+            font-size: 13px;
+            padding: 8px 62px 8px 34px;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+        }
+        .nb-search-input::placeholder { color: var(--faint); }
+        .nb-search-input:focus {
+            outline: none;
+            background: #fff;
+            border-color: var(--pine);
+            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+        }
+        .nb-search-icon {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 15px;
+            height: 15px;
+            color: var(--faint);
+            pointer-events: none;
+        }
+        .nb-search-kbd {
+            position: absolute;
+            right: 9px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--faint);
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: #fff;
+            padding: 2px 5px;
+            pointer-events: none;
+        }
+        .nb-search-panel {
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            right: 0;
+            z-index: 160;
+            display: none;
+            padding: 6px;
+        }
+        .nb-search-panel.is-open { display: block; }
+        .nb-search-group {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--faint);
+            padding: 8px 10px 4px;
+        }
+        .nb-search-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            border-radius: 6px;
+            padding: 9px 10px;
+            font-size: 13px;
             font-weight: 600;
+            color: var(--ink);
+            text-decoration: none;
+            cursor: pointer;
         }
-        .breadcrumb a:hover {
-            color: #047857;
-            text-decoration: underline;
+        .nb-search-option svg { width: 15px; height: 15px; color: var(--muted); flex-shrink: 0; }
+        .nb-search-option small {
+            font-weight: 500;
+            font-size: 12px;
+            color: var(--muted);
+            margin-left: auto;
+            white-space: nowrap;
         }
-        .breadcrumb-separator {
-            color: #94a3b8;
-            font-size: 15px;
-        }
-        .breadcrumb-current {
-            color: #0f172a;
-            font-weight: 800;
+        .nb-search-option.is-selected,
+        .nb-search-option:hover { background: var(--pine-soft); color: var(--pine-strong); }
+        .nb-search-option.is-selected svg,
+        .nb-search-option:hover svg { color: var(--pine); }
+        .nb-search-empty {
+            padding: 12px 10px;
+            font-size: 13px;
+            color: var(--muted);
         }
 
-        /* ===== RESPONSIVE ===== */
+        .nb-badge {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: 999px;
+            background: var(--danger);
+            color: #fff;
+            font-family: var(--font-mono);
+            font-size: 9.5px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid #fff;
+            line-height: 1;
+        }
+        .nb-pop-wrap { position: relative; }
+        .nb-pop {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            z-index: 150;
+            display: none;
+        }
+        .nb-pop.is-open { display: block; }
+        .nb-divider { width: 1px; height: 24px; background: var(--line); }
+
+        .nb-user-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            background: transparent;
+            font-family: var(--font-ui);
+            padding: 4px 8px 4px 4px;
+            cursor: pointer;
+            transition: background-color 0.15s ease, border-color 0.15s ease;
+        }
+        .nb-user-btn:hover { background: var(--pine-soft); }
+        .nb-user-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
+        .nb-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+        .nb-avatar-fallback {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: var(--pine);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .nb-user-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1px;
+        }
+        .nb-user-name {
+            max-width: 130px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+        }
+        .nb-user-chevron { width: 14px; height: 14px; color: var(--muted); }
+
+        /* Notifications dropdown */
+        .notif-pop { width: 320px; }
+        .notif-head {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--line);
+            font-size: 13.5px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            color: var(--ink);
+        }
+        .notif-list {
+            max-height: 320px;
+            overflow-y: auto;
+            padding: 6px;
+        }
+        .notif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 11px;
+            text-decoration: none;
+            border-radius: 8px;
+            padding: 10px;
+            transition: background-color 0.15s ease;
+        }
+        a.notif-item:hover { background: var(--pine-soft); }
+        .notif-item-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            background: var(--pine-soft);
+            color: var(--pine);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .notif-item-icon svg { width: 15px; height: 15px; }
+        .notif-item-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--ink);
+            margin-bottom: 2px;
+        }
+        .notif-item-meta {
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.35;
+        }
+        .notif-item-time {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            color: var(--faint);
+            margin-top: 3px;
+        }
+        .notif-foot {
+            border-top: 1px solid var(--line);
+            background: #FAFCFA;
+            padding: 6px;
+        }
+        .notif-foot-link {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: var(--pine);
+            border-radius: 6px;
+            padding: 9px 12px;
+            transition: background-color 0.15s ease;
+        }
+        .notif-foot-link:hover { background: var(--pine-soft); }
+
+        /* ===== Main ===== */
+        .main-content {
+            margin-left: var(--sidebar-w);
+            padding-top: var(--header-h);
+            min-height: 100vh;
+        }
+        .page-body {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 24px 28px 40px;
+        }
+        .mobile-only { display: none; }
+
+        /* ===== Responsive ===== */
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
-            .sidebar.open { transform: translateX(0); }
-            .main-header { left: 0; }
+            .sb { transform: translateX(-100%); }
+            .sb.is-open { transform: translateX(0); }
+            .nb { left: 0; padding: 0 16px; }
             .main-content { margin-left: 0; }
-            .hamburger { display: block; }
-            .stats-grid { grid-template-columns: 1fr; }
+            .page-body { padding: 20px 16px 32px; }
+            .mobile-only { display: inline-flex; }
+            .nb-crumbs { display: none; }
+            .nb-search { max-width: none; }
+            .nb-user-meta, .nb-user-chevron { display: none; }
             .card-body { overflow-x: auto; }
             table { min-width: 600px; }
+        }
+        @media (max-width: 480px) {
+            .nb-search { display: none; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
     @yield('extra-css')
@@ -492,225 +842,353 @@
     @php
         $unreadApplicationSteps = $unreadApplicationSteps ?? collect();
         $unreadApplicationCount = $unreadApplicationCount ?? 0;
+        $adminUser = auth()->user();
+        $adminName = $adminUser?->name ?? 'Administrator';
+        $adminEmail = $adminUser?->email ?? '';
+        $adminInitials = $adminUser && method_exists($adminUser, 'initials')
+            ? $adminUser->initials()
+            : strtoupper(substr((string) $adminName, 0, 1));
+        $adminAvatarUrl = $adminUser?->profile_photo
+            ? asset('storage/' . $adminUser->profile_photo)
+            : null;
+        $ebaLogoUrl = file_exists(public_path('images/eba-logo.png'))
+            ? asset('images/eba-logo.png')
+            : null;
     @endphp
 
     <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-        <a href="{{ route('admin.dashboard') }}" class="sidebar-brand">
-            <div style="background: #ffffff; border-radius: 8px; padding: 4px; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <img src="{{ asset('images/eba-logo.png') }}" alt="EBA Logo" style="width:32px;height:32px;object-fit:contain;">
-            </div>
-            <div class="sidebar-brand-text">
-                <span class="sidebar-brand-title">EBA Admin Panel</span>
-                <span class="sidebar-brand-sub">CvSU — Trece Martires</span>
+    <aside class="sb" id="admin-sidebar" aria-label="Admin sidebar">
+        <a href="{{ route('admin.dashboard') }}" class="sb-brand">
+            @if($ebaLogoUrl)
+                <img src="{{ $ebaLogoUrl }}" alt="EBA Logo" class="sb-brand-logo">
+            @else
+                <div class="sb-brand-logo-fallback">EBA</div>
+            @endif
+            <div class="sb-brand-text">
+                <p class="sb-brand-name">EBA Admin Panel</p>
+                <p class="sb-brand-campus">CvSU · Trece Martires</p>
             </div>
         </a>
 
-        <nav class="sidebar-nav">
-            <div class="sidebar-section">Main</div>
-            <a href="{{ route('admin.dashboard') }}" class="sidebar-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-                Dashboard
-            </a>
+        <nav class="sb-nav">
+            <div class="sb-group">
+                <h3 class="sb-group-label">Main</h3>
+                <ul>
+                    <li>
+                        <a href="{{ route('admin.dashboard') }}" class="sb-item {{ request()->routeIs('admin.dashboard') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                            </svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-            <div class="sidebar-section">Management</div>
-            <a href="{{ route('admin.users') }}" class="sidebar-link {{ request()->routeIs('admin.users') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Users
-            </a>
-            <a href="{{ route('admin.stocks') }}" class="sidebar-link {{ request()->routeIs('admin.stocks*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 7.5L12 3l9 4.5-9 4.5L3 7.5Z"/><path d="M3 12l9 4.5 9-4.5"/><path d="M3 16.5L12 21l9-4.5"/></svg>
-                Stocks
-            </a>
-            <a href="{{ route('admin.partnerships') }}" class="sidebar-link {{ request()->routeIs('admin.partnerships') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-                Partnerships
-            </a>
-            <a href="{{ route('admin.concessionaires') }}" class="sidebar-link {{ request()->routeIs('admin.concessionaires*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l1-5h16l1 5"/><path d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/><path d="M3 9h18"/><path d="M9 21v-6h6v6"/></svg>
-                Concessionaires
-            </a>
-            <a href="{{ route('admin.reviews') }}" class="sidebar-link {{ request()->routeIs('admin.reviews*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M7 21h10"/><path d="M12 17v4"/><path d="M5 3h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="m9 9 2 2 4-4"/></svg>
-                Reviews
-            </a>
-            <a href="{{ route('admin.transaction-logs') }}" class="sidebar-link {{ request()->routeIs('admin.transaction-logs*') ? 'active' : '' }}">
-            <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="width:16px;height:16px;">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/>
-            </svg>
-            Transaction Logs
-        </a>
+            <div class="sb-group">
+                <h3 class="sb-group-label">Management</h3>
+                <ul>
+                    <li>
+                        <a href="{{ route('admin.users') }}" class="sb-item {{ request()->routeIs('admin.users') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <span>Users</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.stocks') }}" class="sb-item {{ request()->routeIs('admin.stocks*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 7.5L12 3l9 4.5-9 4.5L3 7.5Z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l9 4.5 9-4.5"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5L12 21l9-4.5"/>
+                            </svg>
+                            <span>Stocks</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.partnerships') }}" class="sb-item {{ request()->routeIs('admin.partnerships') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                            <span>Partnerships</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.concessionaires') }}" class="sb-item {{ request()->routeIs('admin.concessionaires*') || request()->routeIs('admin.payments*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9l1-5h16l1 5"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 9v11a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V9"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 9h18"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 21v-6h6v6"/>
+                            </svg>
+                            <span>Concessionaires</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.reviews') }}" class="sb-item {{ request()->routeIs('admin.reviews*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M7 21h10"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 17v4"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 3h14a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m9 9 2 2 4-4"/>
+                            </svg>
+                            <span>Reviews</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.transaction-logs') }}" class="sb-item {{ request()->routeIs('admin.transaction-logs*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/>
+                            </svg>
+                            <span>Transaction Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-            <div class="sidebar-section">System</div>
-            <a href="{{ route('admin.site-settings') }}" class="sidebar-link {{ request()->routeIs('admin.site-settings*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 011.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.56.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.893.149c-.425.07-.765.383-.93.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 01-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.397.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 01-.12-1.45l.527-.737c.25-.35.273-.806.108-1.204-.165-.397-.505-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 01.12-1.45l.773-.773a1.125 1.125 0 011.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                Site Settings
-            </a>
-            <a href="{{ route('admin.activity-logs') }}" class="sidebar-link {{ request()->routeIs('admin.activity-logs*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-                Activity Logs
-            </a>
-            <a href="{{ route('admin.logs') }}" class="sidebar-link {{ request()->routeIs('admin.logs*') ? 'active' : '' }}">
-                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/></svg>
-                System Logs
-            </a>
-
-            <div class="sidebar-section">General</div>
-            <form method="POST" action="{{ route('admin.logout') }}" class="sidebar-logout-form">
-                @csrf
-                <button type="submit" class="sidebar-link">
-                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                    Logout
-                </button>
-            </form>
+            <div class="sb-group">
+                <h3 class="sb-group-label">System</h3>
+                <ul>
+                    <li>
+                        <a href="{{ route('admin.site-settings') }}" class="sb-item {{ request()->routeIs('admin.site-settings*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            <span>Site Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.activity-logs') }}" class="sb-item {{ request()->routeIs('admin.activity-logs*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                            </svg>
+                            <span>Activity Logs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.logs') }}" class="sb-item {{ request()->routeIs('admin.logs*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5.586a1 1 0 0 1 .707.293l5.414 5.414a1 1 0 0 1 .293.707V19a2 2 0 0 1-2 2Z"/>
+                            </svg>
+                            <span>System Logs</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </nav>
 
-        <div class="sidebar-footer">
-            <div class="sidebar-user">
-                <div class="sidebar-avatar">{{ auth()->user()->initials() }}</div>
-                <div class="sidebar-user-info">
-                    <div class="sidebar-user-name">{{ auth()->user()->name }}</div>
-                    <div class="sidebar-user-role">Administrator</div>
-                </div>
-            </div>
+        <div class="sb-foot">
+            <form method="POST" action="{{ route('admin.logout') }}">
+                @csrf
+                <button type="submit" class="sb-item sb-item-danger">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span>Logout</span>
+                </button>
+            </form>
         </div>
     </aside>
+    <div class="sb-backdrop" id="sb-backdrop"></div>
 
-    <!-- HEADER -->
-    <header class="main-header">
-        <div class="header-left">
-            <button class="hamburger" onclick="document.getElementById('sidebar').classList.toggle('open')">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    <!-- NAVBAR -->
+    <header class="nb">
+        <div class="nb-left">
+            <button type="button" class="nb-icon-btn mobile-only" id="sb-toggle" aria-controls="admin-sidebar" aria-expanded="false">
+                <span class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">Open sidebar</span>
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" d="M3 12h18M3 6h18M3 18h18"/></svg>
             </button>
-            <div style="display: flex; flex-direction: column;">
-                @php
-                    $breadcrumbs = [];
-                    if (request()->routeIs('admin.dashboard')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.users*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'Users', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.stocks*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'Stocks', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.partnerships*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'Partnerships', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.concessionaires*') || request()->routeIs('admin.payments*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'Concessionaires', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.reviews*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'Reviews', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.activity-logs*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'Activity Logs', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.logs*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'System Logs', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.transaction-logs*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'Transaction Logs', 'active' => true]
-                        ];
-                    } elseif (request()->routeIs('admin.site-settings*')) {
-                        $breadcrumbs = [
-                            ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                            ['label' => 'Site Settings', 'active' => true]
-                        ];
-                    }
-                @endphp
-                @if(count($breadcrumbs) > 0)
-                    <div class="breadcrumb d-none d-sm-flex" aria-label="Breadcrumb">
-                        @foreach($breadcrumbs as $index => $crumb)
-                            @if($index > 0)
-                                <span class="breadcrumb-separator">/</span>
-                            @endif
-                            @if(isset($crumb['active']) && $crumb['active'])
-                                <span class="breadcrumb-current">{{ $crumb['label'] }}</span>
-                            @else
-                                <a href="{{ $crumb['url'] }}">{{ $crumb['label'] }}</a>
-                            @endif
-                        @endforeach
-                    </div>
-                @endif
-            </div>
+
+            @php
+                $breadcrumbs = [];
+                if (request()->routeIs('admin.dashboard')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.users*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Users', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.stocks*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Stocks', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.partnerships*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Partnerships', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.concessionaires*') || request()->routeIs('admin.payments*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Concessionaires', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.reviews*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Reviews', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.activity-logs*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Activity Logs', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.logs*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'System Logs', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.transaction-logs*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Transaction Logs', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.site-settings*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Site Settings', 'active' => true]
+                    ];
+                }
+            @endphp
+            @if(count($breadcrumbs) > 0)
+                <div class="nb-crumbs" aria-label="Breadcrumb">
+                    @foreach($breadcrumbs as $index => $crumb)
+                        @if($index > 0)
+                            <span class="nb-crumb-sep">/</span>
+                        @endif
+                        @if(isset($crumb['active']) && $crumb['active'])
+                            <span class="nb-crumb-current">{{ $crumb['label'] }}</span>
+                        @else
+                            <a href="{{ $crumb['url'] }}">{{ $crumb['label'] }}</a>
+                        @endif
+                    @endforeach
+                </div>
+            @endif
         </div>
 
-        <div class="header-right">
-            <button id="application-notification-button" type="button" class="admin-notif-btn" title="Notifications" data-unread-count="{{ $unreadApplicationCount }}" aria-expanded="false" aria-controls="application-notification-dropdown">
-                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.437L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                </svg>
-                @if($unreadApplicationCount > 0)
-                    <span id="application-notification-badge" class="admin-notif-badge">{{ $unreadApplicationCount }}</span>
-                @endif
-            </button>
+        <div class="nb-search">
+            <svg class="nb-search-icon" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input
+                id="portal-search-input"
+                class="nb-search-input"
+                type="search"
+                placeholder="Search pages, users or partnerships…"
+                autocomplete="off"
+                role="combobox"
+                aria-expanded="false"
+                aria-controls="portal-search-panel"
+            >
+            <kbd class="nb-search-kbd">Ctrl K</kbd>
+            <div id="portal-search-panel" class="nb-search-panel pop" role="listbox"></div>
+        </div>
 
-            <div id="application-notification-dropdown" class="admin-notif-dropdown hidden" role="menu" aria-labelledby="application-notification-button">
-                <div class="admin-notif-head">
-                    Notifications
-                </div>
-                <div class="admin-notif-list">
+        <div class="nb-right">
+            <div class="nb-pop-wrap">
+                <button id="application-notification-button" type="button" class="nb-icon-btn" title="Notifications" data-unread-count="{{ $unreadApplicationCount }}" aria-expanded="false" aria-controls="application-notification-dropdown">
+                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.437L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                    </svg>
                     @if($unreadApplicationCount > 0)
-                        @foreach($unreadApplicationSteps as $event)
-                            <a href="{{ route('admin.partnerships', ['search' => $event['concessionaire_name']]) }}" class="admin-notif-item">
-                                <div class="admin-notif-item-icon">
-                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        <span id="application-notification-badge" class="nb-badge">{{ $unreadApplicationCount }}</span>
+                    @endif
+                </button>
+
+                <div id="application-notification-dropdown" class="nb-pop pop notif-pop" role="menu" aria-labelledby="application-notification-button">
+                    <div class="notif-head">Notifications</div>
+                    <div class="notif-list">
+                        @if($unreadApplicationCount > 0)
+                            @foreach($unreadApplicationSteps as $event)
+                                <a href="{{ route('admin.partnerships', ['search' => $event['concessionaire_name']]) }}" class="notif-item">
+                                    <div class="notif-item-icon">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="notif-item-title">{{ $event['step_label'] }}</p>
+                                        <p class="notif-item-meta">{{ $event['concessionaire_name'] }}</p>
+                                        <p class="notif-item-time">{{ $event['submitted_at']->diffForHumans() }}</p>
+                                    </div>
+                                </a>
+                            @endforeach
+                        @else
+                            <div class="notif-item">
+                                <div class="notif-item-icon" style="background:#F0F2F0;color:var(--muted);">
+                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
                                 </div>
                                 <div>
-                                    <p class="admin-notif-item-title">{{ $event['step_label'] }}</p>
-                                    <p class="admin-notif-item-meta">
-                                        {{ $event['concessionaire_name'] }}
-                                    </p>
-                                    <p class="admin-notif-item-meta">
-                                        {{ $event['submitted_at']->diffForHumans() }}
-                                    </p>
+                                    <p class="notif-item-title">No new submissions</p>
+                                    <p class="notif-item-meta">You're all caught up.</p>
                                 </div>
-                            </a>
-                        @endforeach
-                    @else
-                        <div class="admin-notif-item">
-                            <div class="admin-notif-item-icon" style="background:#f3f4f6;color:#6b7280;">
-                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
                             </div>
-                            <div>
-                                <p class="admin-notif-item-title" style="color:#374151;">No New Submissions</p>
-                                <p class="admin-notif-item-meta">
-                                    You're all caught up
-                                </p>
+                        @endif
+                    </div>
+                    <div class="notif-foot">
+                        <a href="{{ route('admin.partnerships') }}" class="notif-foot-link">View Partnerships &rarr;</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nb-divider"></div>
+
+            <div class="nb-pop-wrap">
+                <button id="admin-user-menu-button" type="button" class="nb-user-btn" aria-expanded="false" aria-controls="admin-user-menu">
+                    @if($adminAvatarUrl)
+                        <img src="{{ $adminAvatarUrl }}" alt="{{ $adminName }}" class="nb-avatar">
+                    @else
+                        <span class="nb-avatar-fallback">{{ $adminInitials }}</span>
+                    @endif
+                    <span class="nb-user-meta">
+                        <span class="nb-user-name">{{ $adminName }}</span>
+                        <span class="eyebrow" style="font-size:9.5px;">Administrator</span>
+                    </span>
+                    <svg class="nb-user-chevron" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+                    </svg>
+                </button>
+
+                <div id="admin-user-menu" class="nb-pop pop" style="width:256px;" role="menu" aria-labelledby="admin-user-menu-button">
+                    <div style="border-bottom:1px solid var(--line);padding:14px 16px;">
+                        <div style="display:flex;align-items:center;gap:12px;">
+                            @if($adminAvatarUrl)
+                                <img src="{{ $adminAvatarUrl }}" alt="{{ $adminName }}" class="nb-avatar" style="width:38px;height:38px;">
+                            @else
+                                <span class="nb-avatar-fallback" style="width:38px;height:38px;font-size:15px;">{{ $adminInitials }}</span>
+                            @endif
+                            <div style="min-width:0;flex:1;">
+                                <div style="font-size:13px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $adminName }}</div>
+                                <div style="font-size:12px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ $adminEmail }}</div>
                             </div>
                         </div>
-                    @endif
-                </div>
-                <div class="admin-notif-foot">
-                    <a href="{{ route('admin.partnerships') }}" class="admin-notif-foot-link">
-                        View Partnerships &rarr;
-                    </a>
+                    </div>
+                    <div style="padding:6px 0;">
+                        <form method="POST" action="{{ route('admin.logout') }}">
+                            @csrf
+                            <button type="submit" class="pop-item pop-item-danger">
+                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                                </svg>
+                                <span>Logout</span>
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
-
     </header>
 
     <!-- MAIN CONTENT -->
@@ -728,37 +1206,81 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const notificationButton = document.getElementById('application-notification-button');
-            const notificationDropdown = document.getElementById('application-notification-dropdown');
-            const notificationBadge = document.getElementById('application-notification-badge');
+        // ---------- Mobile sidebar drawer ----------
+        (() => {
+            const sidebar = document.getElementById('admin-sidebar');
+            const backdrop = document.getElementById('sb-backdrop');
+            const toggle = document.getElementById('sb-toggle');
+            if (!sidebar || !backdrop || !toggle) return;
 
-            if (!notificationButton || !notificationDropdown) {
-                return;
-            }
+            const setOpen = (open) => {
+                sidebar.classList.toggle('is-open', open);
+                backdrop.classList.toggle('is-open', open);
+                toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+            };
+
+            toggle.addEventListener('click', () => setOpen(!sidebar.classList.contains('is-open')));
+            backdrop.addEventListener('click', () => setOpen(false));
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') setOpen(false);
+            });
+        })();
+
+        // ---------- Navbar dropdowns (notifications + user menu) ----------
+        (() => {
+            const pairs = [
+                ['application-notification-button', 'application-notification-dropdown'],
+                ['admin-user-menu-button', 'admin-user-menu'],
+            ];
+
+            const closeAll = () => {
+                pairs.forEach(([btnId, popId]) => {
+                    const btn = document.getElementById(btnId);
+                    const pop = document.getElementById(popId);
+                    if (btn && pop) {
+                        pop.classList.remove('is-open');
+                        btn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            };
+
+            pairs.forEach(([btnId, popId]) => {
+                const btn = document.getElementById(btnId);
+                const pop = document.getElementById(popId);
+                if (!btn || !pop) return;
+
+                btn.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const willOpen = !pop.classList.contains('is-open');
+                    closeAll();
+                    if (willOpen) {
+                        pop.classList.add('is-open');
+                        btn.setAttribute('aria-expanded', 'true');
+                    }
+                });
+            });
+
+            document.addEventListener('click', (event) => {
+                if (!event.target.closest('.nb-pop-wrap')) closeAll();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') closeAll();
+            });
+        })();
+
+        // ---------- Mark application notifications as read ----------
+        (() => {
+            const notificationButton = document.getElementById('application-notification-button');
+            const notificationBadge = document.getElementById('application-notification-badge');
+            if (!notificationButton) return;
 
             let markedRead = false;
 
-            notificationButton.addEventListener('click', (event) => {
-                event.stopPropagation();
-
-                const isHidden = notificationDropdown.classList.contains('hidden');
-                if (isHidden) {
-                    notificationDropdown.classList.remove('hidden');
-                    notificationButton.setAttribute('aria-expanded', 'true');
-                } else {
-                    notificationDropdown.classList.add('hidden');
-                    notificationButton.setAttribute('aria-expanded', 'false');
-                }
-
-                if (markedRead) {
-                    return;
-                }
+            notificationButton.addEventListener('click', () => {
+                if (markedRead) return;
 
                 const unreadCount = Number(notificationButton.dataset.unreadCount || '0');
-                if (unreadCount < 1) {
-                    return;
-                }
+                if (unreadCount < 1) return;
 
                 fetch("{{ route('admin.notifications.mark-read') }}", {
                     method: 'POST',
@@ -768,33 +1290,145 @@
                         'Accept': 'application/json',
                     },
                 }).then((response) => {
-                    if (!response.ok) {
-                        return;
-                    }
-
+                    if (!response.ok) return;
                     markedRead = true;
                     notificationButton.dataset.unreadCount = '0';
-                    if (notificationBadge) {
-                        notificationBadge.remove();
-                    }
+                    if (notificationBadge) notificationBadge.remove();
                 }).catch(() => {
                     // Keep UI unchanged if request fails.
                 });
             });
+        })();
+
+        // ---------- Ctrl+K page search palette ----------
+        (() => {
+            const input = document.getElementById('portal-search-input');
+            const panel = document.getElementById('portal-search-panel');
+            if (!input || !panel) return;
+
+            const pages = [
+                { label: 'Dashboard', hint: 'Page', url: @json(route('admin.dashboard')), keywords: 'home overview stats charts summary' },
+                { label: 'Users', hint: 'Page', url: @json(route('admin.users')), keywords: 'accounts roles staff cashier faculty concessionaire create' },
+                { label: 'Stocks', hint: 'Page', url: @json(route('admin.stocks')), keywords: 'uniforms inventory items sizes prices quantity' },
+                { label: 'Partnerships', hint: 'Page', url: @json(route('admin.partnerships')), keywords: 'applications loi documents approve reject wizard' },
+                { label: 'Concessionaires', hint: 'Page', url: @json(route('admin.concessionaires')), keywords: 'payments monthly fees stalls vendors business' },
+                { label: 'Reviews', hint: 'Page', url: @json(route('admin.reviews')), keywords: 'ratings feedback stores products stars' },
+                { label: 'Transaction Logs', hint: 'Page', url: @json(route('admin.transaction-logs')), keywords: 'orders purchases receipts sales' },
+                { label: 'Site Settings', hint: 'Page', url: @json(route('admin.site-settings')), keywords: 'cms landing content homepage hero about' },
+                { label: 'Activity Logs', hint: 'Page', url: @json(route('admin.activity-logs')), keywords: 'audit actions history admin trail' },
+                { label: 'System Logs', hint: 'Page', url: @json(route('admin.logs')), keywords: 'errors laravel debug exceptions' },
+            ];
+            const usersSearchUrl = @json(route('admin.users'));
+            const partnershipsSearchUrl = @json(route('admin.partnerships'));
+
+            const pageIcon = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5-5 5M6 7l5 5-5 5"/></svg>';
+            const searchIcon = '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>';
+
+            let options = [];
+            let selectedIndex = -1;
+
+            const escapeHtml = (value) => value.replace(/[&<>"']/g, (ch) => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+            }[ch]));
+
+            const closePanel = () => {
+                panel.classList.remove('is-open');
+                input.setAttribute('aria-expanded', 'false');
+                selectedIndex = -1;
+            };
+
+            const render = () => {
+                const query = input.value.trim().toLowerCase();
+                const matches = query === ''
+                    ? pages
+                    : pages.filter((page) =>
+                        page.label.toLowerCase().includes(query) || page.keywords.includes(query));
+
+                options = matches.map((page) => ({ url: page.url, label: page.label, hint: page.hint, icon: pageIcon }));
+                if (query !== '') {
+                    options.push({
+                        url: usersSearchUrl + '?search=' + encodeURIComponent(input.value.trim()),
+                        label: 'Search users for "' + input.value.trim() + '"',
+                        hint: 'Users',
+                        icon: searchIcon,
+                    });
+                    options.push({
+                        url: partnershipsSearchUrl + '?search=' + encodeURIComponent(input.value.trim()),
+                        label: 'Search partnerships for "' + input.value.trim() + '"',
+                        hint: 'Partnerships',
+                        icon: searchIcon,
+                    });
+                }
+
+                if (!options.length) {
+                    panel.innerHTML = '<div class="nb-search-empty">Nothing matches that search.</div>';
+                } else {
+                    panel.innerHTML = '<div class="nb-search-group">Go to</div>' + options.map((option, index) =>
+                        '<a class="nb-search-option" role="option" data-index="' + index + '" href="' + escapeHtml(option.url) + '">'
+                        + option.icon
+                        + '<span>' + escapeHtml(option.label) + '</span>'
+                        + '<small>' + escapeHtml(option.hint) + '</small>'
+                        + '</a>'
+                    ).join('');
+                }
+
+                selectedIndex = -1;
+                panel.classList.add('is-open');
+                input.setAttribute('aria-expanded', 'true');
+            };
+
+            const highlight = () => {
+                panel.querySelectorAll('.nb-search-option').forEach((el, index) => {
+                    el.classList.toggle('is-selected', index === selectedIndex);
+                });
+            };
+
+            input.addEventListener('input', render);
+            input.addEventListener('focus', render);
+
+            input.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape') {
+                    closePanel();
+                    input.blur();
+                    return;
+                }
+                if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                    event.preventDefault();
+                    if (!panel.classList.contains('is-open')) render();
+                    if (!options.length) return;
+                    const step = event.key === 'ArrowDown' ? 1 : -1;
+                    selectedIndex = (selectedIndex + step + options.length) % options.length;
+                    highlight();
+                    return;
+                }
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    if (selectedIndex >= 0 && options[selectedIndex]) {
+                        window.location.href = options[selectedIndex].url;
+                    } else if (input.value.trim() !== '') {
+                        window.location.href = usersSearchUrl + '?search=' + encodeURIComponent(input.value.trim());
+                    }
+                }
+            });
 
             document.addEventListener('click', (event) => {
-                if (notificationDropdown.classList.contains('hidden')) {
-                    return;
+                if (!panel.contains(event.target) && event.target !== input) {
+                    closePanel();
                 }
-
-                if (notificationDropdown.contains(event.target) || notificationButton.contains(event.target)) {
-                    return;
-                }
-
-                notificationDropdown.classList.add('hidden');
-                notificationButton.setAttribute('aria-expanded', 'false');
             });
-        });
+
+            document.addEventListener('keydown', (event) => {
+                const tag = document.activeElement ? document.activeElement.tagName : '';
+                const typing = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+                if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+                    event.preventDefault();
+                    input.focus();
+                } else if (event.key === '/' && !typing) {
+                    event.preventDefault();
+                    input.focus();
+                }
+            });
+        })();
     </script>
 
     @yield('scripts')

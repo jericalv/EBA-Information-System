@@ -6,120 +6,46 @@
 <style>
     .payments-overview {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        margin-bottom: 28px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+        margin-bottom: 20px;
     }
     .payments-card {
         background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        padding: 24px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        position: relative;
-        overflow: hidden;
-        border-top-width: 3px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 20px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
-        cursor: pointer;
-    }
-    .payments-card::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        height: 80px;
-        opacity: 0.03;
-        pointer-events: none;
-        background: linear-gradient(180deg, transparent 0%, currentColor 100%);
-        transition: opacity 0.3s ease;
-    }
-    .payments-card:nth-child(1) { border-top-color: #10b981; color: #10b981; }
-    .payments-card:nth-child(2) { border-top-color: #3b82f6; color: #3b82f6; }
-    .payments-card:nth-child(3) { border-top-color: #f59e0b; color: #f59e0b; }
-    .payments-card:hover {
-        transform: translateY(-4px) scale(1.02);
-        box-shadow: 0 12px 28px rgba(0,0,0,0.12), 0 0 40px rgba(0,0,0,0.04);
-        border-color: currentColor;
-    }
-    .payments-card:hover::after {
-        opacity: 0.05;
-    }
-    .payments-card:active {
-        transform: translateY(-2px) scale(1.01);
-        transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .payments-card-top {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-        margin-bottom: 8px;
-    }
-    .payments-card-info {
-        flex: 1;
+        gap: 10px;
+        box-shadow: var(--shadow-card);
         min-width: 0;
     }
     .payments-card-label {
-        font-size: 12px;
-        color: #64748b;
+        font-family: var(--font-mono);
+        font-size: 10.5px;
         font-weight: 600;
+        letter-spacing: 0.12em;
         text-transform: uppercase;
-        letter-spacing: 0.8px;
-        margin-bottom: 6px;
-    }
-    .payments-card-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-        flex-shrink: 0;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .payments-card:hover .payments-card-icon {
-        transform: scale(1.1) rotate(5deg);
-    }
-    .payments-card:active .payments-card-icon {
-        transform: scale(1.05) rotate(2deg);
-    }
-    .payments-card:nth-child(1) .payments-card-icon { 
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%); 
-        color: #fff;
-        box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3);
-    }
-    .payments-card:nth-child(2) .payments-card-icon { 
-        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); 
-        color: #fff;
-        box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
-    }
-    .payments-card:nth-child(3) .payments-card-icon { 
-        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); 
-        color: #fff;
-        box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3);
+        color: var(--muted);
     }
     .payments-card-value {
-        font-size: 36px;
+        font-family: var(--font-ui);
+        font-size: 34px;
         font-weight: 800;
-        color: #0f172a;
-        line-height: 1;
-        margin-bottom: 12px;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+        color: var(--ink);
+        font-variant-numeric: tabular-nums;
     }
-    .payments-card:hover .payments-card-value {
-        transform: translateX(2px);
-        color: #1e293b;
-    }
+    .payments-card-value.is-pine { color: var(--pine); }
+    .payments-card-value.is-danger { color: var(--danger); }
     .payments-card-note {
-        font-size: 11px;
-        color: #94a3b8;
-        font-weight: 500;
-        margin-bottom: 8px;
+        margin-top: auto;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        font-size: 12px;
+        color: var(--muted);
     }
     @media (max-width: 992px) {
         .payments-overview {
@@ -137,16 +63,25 @@
     .status-badge {
         display: inline-flex;
         align-items: center;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        font-weight: 700;
+        gap: 5px;
+        padding: 3px 9px;
+        border-radius: 5px;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
         white-space: nowrap;
     }
-    .status-badge-overdue { background: #fee2e2; color: #991b1b; }
-    .status-badge-paid { background: #dcfce7; color: #166534; }
-    .status-badge-due { background: #fef3c7; color: #92400e; }
-    .status-badge-none { background: #e2e8f0; color: #475569; }
+    .status-badge::before {
+        content: '';
+        width: 5px;
+        height: 5px;
+        border-radius: 999px;
+        background: currentColor;
+    }
+    .status-badge-overdue { background: #FBEAEA; color: #B3261E; }
+    .status-badge-paid { background: #E5F3EA; color: #14532D; }
+    .status-badge-due { background: #FDF8EC; color: #92400E; }
+    .status-badge-none { background: #F0F2F0; color: var(--muted); }
     .fee-form {
         display: flex;
         align-items: center;
@@ -156,21 +91,28 @@
     .fee-form input {
         width: 120px;
         padding: 8px 10px;
-        border: 1px solid #cbd5e1;
-        border-radius: 8px;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
         font: inherit;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .fee-form input:focus {
+        outline: none;
+        border-color: var(--pine);
+        box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
     }
     .fee-form button {
         padding: 8px 12px;
         border: 0;
-        border-radius: 8px;
-        background: #0a5c2f;
+        border-radius: 6px;
+        background: var(--pine);
         color: #fff;
         font-weight: 700;
         cursor: pointer;
+        transition: background-color 0.15s ease;
     }
     .fee-form button:hover {
-        background: #0d7a3e;
+        background: var(--pine-strong);
     }
     .concessionaire-table-wrap {
         overflow-x: auto;
@@ -183,16 +125,18 @@
     .concessionaire-table th,
     .concessionaire-table td {
         padding: 14px 18px;
-        border-bottom: 1px solid #eef2f7;
+        border-bottom: 1px solid var(--line);
         text-align: left;
         vertical-align: top;
     }
     .concessionaire-table th {
-        background: #f8fafc;
-        color: #64748b;
-        font-size: 12px;
+        background: #FAFCFA;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.1em;
     }
     .concessionaire-table tr:last-child td {
         border-bottom: none;
@@ -224,36 +168,21 @@
 
 @section('content')
     <div class="payments-overview">
-        <div class="payments-card">
-            <div class="payments-card-top">
-                <div class="payments-card-info">
-                    <div class="payments-card-label">Total Collected</div>
-                    <div class="payments-card-value">₱{{ number_format((float) $totalCollected, 2) }}</div>
-                </div>
-                <div class="payments-card-icon">₱</div>
-            </div>
-            <div class="payments-card-note">Filtered payment total</div>
-        </div>
-        <div class="payments-card">
-            <div class="payments-card-top">
-                <div class="payments-card-info">
-                    <div class="payments-card-label">Records Found</div>
-                    <div class="payments-card-value">{{ $payments->total() }}</div>
-                </div>
-                <div class="payments-card-icon">📋</div>
-            </div>
-            <div class="payments-card-note">Across all concessionaires</div>
-        </div>
-        <div class="payments-card">
-            <div class="payments-card-top">
-                <div class="payments-card-info">
-                    <div class="payments-card-label">Overdue This Month</div>
-                    <div class="payments-card-value">{{ $overdueCount }}</div>
-                </div>
-                <div class="payments-card-icon">⚠</div>
-            </div>
-            <div class="payments-card-note">Active concessionaires with a fee and no payment</div>
-        </div>
+        <article class="payments-card">
+            <span class="payments-card-label">Total collected</span>
+            <span class="payments-card-value is-pine">₱{{ number_format((float) $totalCollected, 2) }}</span>
+            <span class="payments-card-note">Filtered payment total</span>
+        </article>
+        <article class="payments-card">
+            <span class="payments-card-label">Records found</span>
+            <span class="payments-card-value">{{ $payments->total() }}</span>
+            <span class="payments-card-note">Across all concessionaires</span>
+        </article>
+        <article class="payments-card">
+            <span class="payments-card-label">Overdue this month</span>
+            <span class="payments-card-value {{ $overdueCount > 0 ? 'is-danger' : '' }}">{{ $overdueCount }}</span>
+            <span class="payments-card-note">Active concessionaires with a fee and no payment</span>
+        </article>
     </div>
 
     <div class="card" style="margin-bottom:20px;">
