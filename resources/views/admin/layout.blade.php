@@ -910,6 +910,16 @@
                         </a>
                     </li>
                     <li>
+                        <a href="{{ route('admin.uniform-checkout') }}" class="sb-item {{ request()->routeIs('admin.uniform-checkout') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <circle cx="9" cy="21" r="1"/>
+                                <circle cx="20" cy="21" r="1"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                            </svg>
+                            <span>Uniform Checkout</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="{{ route('admin.partnerships') }}" class="sb-item {{ request()->routeIs('admin.partnerships') ? 'is-active' : '' }}">
                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -929,6 +939,16 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 21v-6h6v6"/>
                             </svg>
                             <span>Concessionaires</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.record-payment') }}" class="sb-item {{ request()->routeIs('admin.record-payment*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <rect x="2" y="6" width="20" height="12" rx="2"/>
+                                <circle cx="12" cy="12" r="2.5"/>
+                                <path stroke-linecap="round" d="M6 12h.01M18 12h.01"/>
+                            </svg>
+                            <span>Record Payment</span>
                         </a>
                     </li>
                     <li>
@@ -1027,6 +1047,16 @@
                     $breadcrumbs = [
                         ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
                         ['label' => 'Partnerships', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.uniform-checkout')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Uniform Checkout', 'active' => true]
+                    ];
+                } elseif (request()->routeIs('admin.record-payment*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Record Payment', 'active' => true]
                     ];
                 } elseif (request()->routeIs('admin.concessionaires*') || request()->routeIs('admin.payments*')) {
                     $breadcrumbs = [
@@ -1310,6 +1340,8 @@
                 { label: 'Dashboard', hint: 'Page', url: @json(route('admin.dashboard')), keywords: 'home overview stats charts summary' },
                 { label: 'Users', hint: 'Page', url: @json(route('admin.users')), keywords: 'accounts roles staff cashier faculty concessionaire create' },
                 { label: 'Stocks', hint: 'Page', url: @json(route('admin.stocks')), keywords: 'uniforms inventory items sizes prices quantity' },
+                { label: 'Uniform Checkout', hint: 'Page', url: @json(route('admin.uniform-checkout')), keywords: 'sale sell pos cart books uniforms checkout' },
+                { label: 'Record Payment', hint: 'Page', url: @json(route('admin.record-payment')), keywords: 'collections monthly fee concessionaire cash arrears advance record' },
                 { label: 'Partnerships', hint: 'Page', url: @json(route('admin.partnerships')), keywords: 'applications loi documents approve reject wizard' },
                 { label: 'Concessionaires', hint: 'Page', url: @json(route('admin.concessionaires')), keywords: 'payments monthly fees stalls vendors business' },
                 { label: 'Reviews', hint: 'Page', url: @json(route('admin.reviews')), keywords: 'ratings feedback stores products stars' },
