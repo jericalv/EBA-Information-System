@@ -58,7 +58,12 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::get('/concessionaires', [AdminController::class, 'paymentsIndex'])->name('concessionaires');
     Route::get('/payments/history/view', [CashierController::class, 'viewHistoryPdf'])->name('payments.history.view');
     Route::get('/payments/history/pdf', [CashierController::class, 'downloadHistoryPdf'])->name('payments.history.pdf');
+    Route::get('/payments/{concessionaire}/history/view', [CashierController::class, 'viewConcessionaireHistoryPdf'])->name('payments.concessionaire.history.view');
+    Route::get('/payments/{concessionaire}/history/pdf', [CashierController::class, 'downloadConcessionaireHistoryPdf'])->name('payments.concessionaire.history.pdf');
     Route::get('/payments/{payment}/receipt', [CashierController::class, 'downloadReceipt'])->name('payments.receipt');
+    Route::get('/record-payment', [AdminController::class, 'recordPayment'])->name('record-payment');
+    Route::post('/record-payment', [AdminController::class, 'storeRecordedPayment'])->name('record-payment.store');
+    Route::get('/uniform-checkout', [AdminController::class, 'uniformCheckout'])->name('uniform-checkout');
     Route::get('/reviews', [AdminController::class, 'reviewsIndex'])->name('reviews');
     Route::delete('/reviews/product/{id}', [AdminController::class, 'deleteProductReview'])->name('reviews.delete-product');
     Route::delete('/reviews/store/{id}', [AdminController::class, 'deleteStoreReview'])->name('reviews.delete-store');
