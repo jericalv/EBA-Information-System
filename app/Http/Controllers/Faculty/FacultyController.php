@@ -208,12 +208,15 @@ class FacultyController extends Controller
                     'Date',
                 ]);
 
+                $grandTotalQty = 0;
+                $grandTotalPrice = 0.0;
+
                 SalesOrder::query()
                     ->with(['cashier', 'items.uniformStock'])
                     ->whereDate('created_at', '>=', $startDate)
                     ->whereDate('created_at', '<=', $endDate)
                     ->latest('id')
-                    ->chunkById(200, function ($orders) use ($output): void {
+                    ->chunkById(200, function ($orders) use ($output, &$grandTotalQty, &$grandTotalPrice): void {
                         foreach ($orders as $order) {
                             $items = $order->items->map(function ($item) {
                                 $name = $item->uniformStock?->item_name ?? 'Unknown Item';
@@ -228,9 +231,13 @@ class FacultyController extends Controller
                             // text (prevents the "######" too-narrow-date-column display).
                             $date = optional($order->created_at)->format('M d, Y g:i A');
 
+                            $orderQty = (int) $order->items->sum('quantity');
+                            $grandTotalQty += $orderQty;
+                            $grandTotalPrice += (float) $order->total_amount;
+
                             fputcsv($output, [
                                 $items,
-                                $order->items->sum('quantity'),
+                                $orderQty,
                                 $order->cashier?->name ?? 'N/A',
                                 $order->payment_type,
                                 number_format((float) $order->total_amount, 2, '.', ''),
@@ -238,6 +245,16 @@ class FacultyController extends Controller
                             ]);
                         }
                     });
+
+                // Grand total row summarising the whole selected range.
+                fputcsv($output, [
+                    'TOTAL',
+                    $grandTotalQty,
+                    '',
+                    '',
+                    number_format($grandTotalPrice, 2, '.', ''),
+                    '',
+                ]);
 
                 fclose($output);
             }, $filename, [

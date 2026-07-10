@@ -3,6 +3,7 @@
 @section('title', 'Record Payment')
 
 @section('extra-css')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 <style>
     /* ---------- Table + status badges (ported from cashier portal) ---------- */
     .payments-table {
@@ -163,6 +164,94 @@
     }
     .required { color: var(--danger); }
 
+    /* ---------- Pre-save confirmation modal (stacked above payment modal) ---------- */
+    #paymentConfirmModal { z-index: 2300; }
+    #paymentConfirmModal .modal { width: min(460px, 100%); }
+    .confirm-lead {
+        font-size: 13.5px;
+        color: var(--ink);
+        line-height: 1.55;
+        margin-bottom: 14px;
+    }
+    .confirm-months {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 14px;
+    }
+    .confirm-months .cm-chip {
+        font-family: var(--font-mono);
+        font-size: 11.5px;
+        font-weight: 600;
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: var(--pine-soft, #EAF3ED);
+        color: #14532D;
+        border: 1px solid #CDE3D4;
+    }
+    .confirm-total {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 14px;
+        border: 1px solid var(--line-strong);
+        border-radius: 8px;
+        background: #FAFCFA;
+        margin-bottom: 8px;
+    }
+    .confirm-total .ct-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--muted);
+    }
+    .confirm-total .ct-value {
+        font-family: var(--font-mono);
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--pine);
+    }
+    .confirm-hint {
+        font-size: 12.5px;
+        color: #92400E;
+        background: #FDF8EC;
+        border: 1px solid #F0DCB0;
+        border-radius: 6px;
+        padding: 9px 12px;
+        line-height: 1.5;
+    }
+
+    /* ---------- Contract period cell + edit button ---------- */
+    .contract-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .contract-edit-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 24px;
+        height: 24px;
+        flex: 0 0 auto;
+        border: 1px solid var(--line-strong);
+        border-radius: 6px;
+        background: #fff;
+        color: var(--muted);
+        cursor: pointer;
+        transition: color 0.12s ease, border-color 0.12s ease;
+    }
+    .contract-edit-btn:hover {
+        color: var(--pine);
+        border-color: var(--pine);
+    }
+    .contract-edit-btn svg {
+        width: 13px;
+        height: 13px;
+    }
+
     /* ---------- Month calendar (modal) ---------- */
     .mcal {
         border: 1px solid var(--line);
@@ -244,26 +333,27 @@
     }
     .mcal-sub svg { width: 10px; height: 10px; }
 
-    /* Unpaid past months — draw attention. */
-    .mcal-cell.st-arrears { border-color: #EBC7C7; background: #FDF5F5; }
+    /* Unpaid past months (red) — draw attention. */
+    .mcal-cell.st-arrears { border-color: #E39B9B; background: #FBE7E7; color: #8A1D18; }
     .mcal-cell.st-arrears .mcal-sub { color: #B3261E; }
-    /* Current month. */
-    .mcal-cell.st-current { border-color: #E6D6AE; background: #FDFAF0; }
+    /* Current month (amber). */
+    .mcal-cell.st-current { border-color: #E4B759; background: #FBEFCF; color: #7A3D0B; }
     .mcal-cell.st-current .mcal-sub { color: #92400E; }
-    /* Future months available to prepay. */
-    .mcal-cell.st-advance .mcal-sub { color: var(--muted); }
+    /* Future months available to prepay (blue). */
+    .mcal-cell.st-advance { border-color: #9DC2E6; background: #E9F2FB; color: #1B4F86; }
+    .mcal-cell.st-advance .mcal-sub { color: #1D5C9E; }
 
-    /* Already recorded — locked. */
+    /* Already recorded — locked (grey-green, muted). */
     .mcal-cell.st-paid,
     .mcal-cell.is-locked {
         cursor: default;
     }
     .mcal-cell.st-paid {
-        border-color: #CDE3D4;
-        background: #EFF6F1;
-        color: #14532D;
+        border-color: #BAC9BE;
+        background: #EAEFEB;
+        color: #4A5B4F;
     }
-    .mcal-cell.st-paid .mcal-sub { color: #2E7D4F; }
+    .mcal-cell.st-paid .mcal-sub { color: #5C7061; }
     /* Outside the contract window. */
     .mcal-cell.st-before,
     .mcal-cell.st-after {
@@ -308,10 +398,10 @@
         flex-shrink: 0;
     }
     .mcal-legend .sw-selected { background: var(--pine); border-color: var(--pine); }
-    .mcal-legend .sw-arrears { background: #FDF5F5; border-color: #EBC7C7; }
-    .mcal-legend .sw-current { background: #FDFAF0; border-color: #E6D6AE; }
-    .mcal-legend .sw-advance { background: #fff; border-color: var(--line-strong); }
-    .mcal-legend .sw-paid { background: #EFF6F1; border-color: #CDE3D4; }
+    .mcal-legend .sw-arrears { background: #FBE7E7; border-color: #E39B9B; }
+    .mcal-legend .sw-current { background: #FBEFCF; border-color: #E4B759; }
+    .mcal-legend .sw-advance { background: #E9F2FB; border-color: #9DC2E6; }
+    .mcal-legend .sw-paid { background: #EAEFEB; border-color: #BAC9BE; }
 
     .mcal-summary {
         margin-top: 10px;
@@ -454,11 +544,29 @@
                                     </div>
                                 </td>
                                 <td>
-                                    @if ($contractStart && $contractEnd)
-                                        <span class="table-num">{{ $contractStart->format('M d, Y') }} &rarr; {{ $contractEnd->format('M d, Y') }}</span>
-                                    @else
-                                        <span class="table-dim">&mdash;</span>
-                                    @endif
+                                    <div class="contract-cell">
+                                        @if ($contractStart && $contractEnd)
+                                            <span class="table-num">{{ $contractStart->format('M d, Y') }} &rarr; {{ $contractEnd->format('M d, Y') }}</span>
+                                        @else
+                                            <span class="table-dim">&mdash;</span>
+                                        @endif
+                                        @if ($latestApplication && in_array($latestApplication->status, ['pending', 'under_review', 'approved', 'registered'], true))
+                                            <button
+                                                type="button"
+                                                class="contract-edit-btn"
+                                                aria-label="Set contract period"
+                                                title="{{ $contractStart && $contractEnd ? 'Edit contract period' : 'Set contract period' }}"
+                                                data-application-id="{{ $latestApplication->id }}"
+                                                data-business="{{ $concessionaire->business_name ?: $concessionaire->name }}"
+                                                data-start="{{ $contractStart?->format('Y-m-d') }}"
+                                                data-end="{{ $contractEnd?->format('Y-m-d') }}"
+                                            >
+                                                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                </svg>
+                                            </button>
+                                        @endif
+                                    </div>
                                 </td>
                                 <td>
                                     @if (! is_null($concessionaire->monthly_fee))
@@ -599,7 +707,56 @@
 
                 <div class="modal-actions">
                     <button type="button" class="btn btn-secondary" id="closePaymentModalButton">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="submitPaymentButton">Save Payment</button>
+                    <button type="submit" class="btn btn-primary" id="submitPaymentButton">Review Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="paymentConfirmModal">
+        <div class="modal">
+            <h3>Confirm Payment</h3>
+            <div class="notice" id="confirmConcessionaireLine"></div>
+            <p class="confirm-lead">Record the following <strong id="confirmCountText">0 months</strong>. Please double-check — only the months listed here will be billed.</p>
+            <div class="confirm-months" id="confirmMonths"></div>
+            <div class="confirm-total">
+                <span class="ct-label">Total to record</span>
+                <span class="ct-value" id="confirmTotal">&#8369;0.00</span>
+            </div>
+            <div class="confirm-hint">If the payer is only settling specific months, go back and deselect the ones they are not paying for today.</div>
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" id="confirmGoBackButton">Go back</button>
+                <button type="button" class="btn btn-primary" id="confirmSaveButton">Confirm &amp; Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="contractModal">
+        <div class="modal">
+            <h3>Set Contract Period</h3>
+            <div class="notice" id="contractModalSubtitle"></div>
+            <form method="POST" action="#" id="contractForm">
+                @csrf
+                @method('PATCH')
+
+                <div class="field">
+                    <label>Concessionaire</label>
+                    <input type="text" id="contractBusinessName" readonly>
+                </div>
+
+                <div class="field">
+                    <label for="contract_range">Contract period <span class="required">*</span></label>
+                    <input id="contract_range" type="text" placeholder="Select start and end dates" autocomplete="off">
+                    <small class="field-help">Pick the contract start date, then the end date. The months available in Record Payment follow this window.</small>
+                    <input type="hidden" name="contract_period_start" id="contractStartInput">
+                    <input type="hidden" name="contract_period_end" id="contractEndInput">
+                </div>
+
+                <div id="contractFeedback" class="modal-feedback"></div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-secondary" id="closeContractModalButton">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitContractButton">Save Period</button>
                 </div>
             </form>
         </div>
@@ -607,7 +764,106 @@
 @endsection
 
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
+        // ---- Contract period modal (flatpickr range) ----
+        (() => {
+            const contractModal = document.getElementById('contractModal');
+            if (!contractModal) return;
+
+            const contractForm = document.getElementById('contractForm');
+            const rangeInput = document.getElementById('contract_range');
+            const startInput = document.getElementById('contractStartInput');
+            const endInput = document.getElementById('contractEndInput');
+            const businessInput = document.getElementById('contractBusinessName');
+            const subtitle = document.getElementById('contractModalSubtitle');
+            const feedback = document.getElementById('contractFeedback');
+            const submitButton = document.getElementById('submitContractButton');
+            const actionTemplate = "{{ route('admin.partnerships.contract-period', ['application' => '__ID__']) }}";
+
+            let picker = null;
+            if (typeof flatpickr !== 'undefined') {
+                picker = flatpickr(rangeInput, {
+                    mode: 'range',
+                    dateFormat: 'Y-m-d',
+                    onChange(selectedDates) {
+                        if (selectedDates.length === 2) {
+                            startInput.value = flatpickr.formatDate(selectedDates[0], 'Y-m-d');
+                            endInput.value = flatpickr.formatDate(selectedDates[1], 'Y-m-d');
+                        } else {
+                            startInput.value = '';
+                            endInput.value = '';
+                        }
+                    },
+                });
+            }
+
+            function setFeedback(message) {
+                feedback.classList.remove('error', 'success');
+                if (!message) {
+                    feedback.textContent = '';
+                    return;
+                }
+                feedback.textContent = message;
+                feedback.classList.add('error');
+            }
+
+            function closeContractModal() {
+                contractModal.classList.remove('active');
+                if (picker) picker.clear();
+                startInput.value = '';
+                endInput.value = '';
+                setFeedback('');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Save Period';
+            }
+
+            document.querySelectorAll('.contract-edit-btn').forEach((button) => {
+                button.addEventListener('click', function () {
+                    contractForm.action = actionTemplate.replace('__ID__', this.dataset.applicationId);
+                    businessInput.value = this.dataset.business || '';
+                    subtitle.textContent = (this.dataset.start && this.dataset.end)
+                        ? 'Update the contract window for ' + (this.dataset.business || 'this concessionaire') + '.'
+                        : 'Set the contract window for ' + (this.dataset.business || 'this concessionaire') + '.';
+
+                    setFeedback('');
+                    startInput.value = this.dataset.start || '';
+                    endInput.value = this.dataset.end || '';
+                    if (picker) {
+                        if (this.dataset.start && this.dataset.end) {
+                            picker.setDate([this.dataset.start, this.dataset.end], false);
+                        } else {
+                            picker.clear();
+                        }
+                    }
+
+                    contractModal.classList.add('active');
+                });
+            });
+
+            document.getElementById('closeContractModalButton').addEventListener('click', closeContractModal);
+
+            contractModal.addEventListener('click', function (event) {
+                if (event.target === contractModal) closeContractModal();
+            });
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && contractModal.classList.contains('active')) {
+                    closeContractModal();
+                }
+            });
+
+            contractForm.addEventListener('submit', function (event) {
+                if (!startInput.value || !endInput.value) {
+                    event.preventDefault();
+                    setFeedback('Select both a start and an end date for the contract period.');
+                    return;
+                }
+                submitButton.disabled = true;
+                submitButton.textContent = 'Saving...';
+            });
+        })();
+
         (() => {
             const paymentPlans = @json($paymentPlans ?? []);
 
@@ -621,6 +877,14 @@
             const paymentConcessionaireId = document.getElementById('paymentConcessionaireId');
             const paymentTotal = document.getElementById('paymentTotal');
             const paymentCountLabel = document.getElementById('paymentCountLabel');
+
+            const paymentConfirmModal = document.getElementById('paymentConfirmModal');
+            const confirmConcessionaireLine = document.getElementById('confirmConcessionaireLine');
+            const confirmCountText = document.getElementById('confirmCountText');
+            const confirmMonths = document.getElementById('confirmMonths');
+            const confirmTotal = document.getElementById('confirmTotal');
+            const confirmGoBackButton = document.getElementById('confirmGoBackButton');
+            const confirmSaveButton = document.getElementById('confirmSaveButton');
 
             const mcalGrid = document.getElementById('mcalGrid');
             const mcalYear = document.getElementById('mcalYear');
@@ -737,6 +1001,14 @@
                 mcalGrid.innerHTML = '';
                 selectedInputs.innerHTML = '';
                 setPaymentFeedback('', 'error');
+                closeConfirmModal();
+            }
+
+            function closeConfirmModal() {
+                paymentConfirmModal.classList.remove('active');
+                confirmMonths.innerHTML = '';
+                confirmSaveButton.disabled = false;
+                confirmSaveButton.textContent = 'Confirm & Save';
             }
 
             mcalGrid.addEventListener('click', (event) => {
@@ -772,7 +1044,7 @@
                     paymentConcessionaireName.value = `${plan.business} (${plan.name})`;
 
                     const owed = Number(plan.owed_count || 0);
-                    let subtitle = `Recording payment for ${plan.business}.`;
+                    let subtitle = `Recording payment for ${plan.business}. Select the month(s) being paid.`;
                     if (owed > 0) {
                         subtitle += ` ${owed} ${owed === 1 ? 'month is' : 'months are'} overdue.`;
                     }
@@ -789,7 +1061,7 @@
                         year: initYear,
                         minYear,
                         maxYear,
-                        selected: new Set(plan.preselect || []),
+                        selected: new Set(),
                     };
 
                     paymentDateInput.value = new Date().toISOString().slice(0, 10);
@@ -805,18 +1077,44 @@
                 if (event.target === paymentModal) closePaymentModal();
             });
 
+            // "Review Payment" opens a separate confirmation modal instead of saving directly.
             paymentForm.addEventListener('submit', function (event) {
+                event.preventDefault();
                 if (!cal || cal.selected.size === 0) {
-                    event.preventDefault();
                     setPaymentFeedback('Select at least one month to record.', 'error');
                     return;
                 }
+                const labels = [...cal.selected].sort();
+                confirmConcessionaireLine.textContent = paymentConcessionaireName.value;
+                confirmCountText.textContent = labels.length + ' ' + (labels.length === 1 ? 'month' : 'months');
+                confirmMonths.innerHTML = labels
+                    .map((key) => '<span class="cm-chip">' + escapeHtml(keyLabel(key)) + '</span>')
+                    .join('');
+                confirmTotal.textContent = peso(labels.length * cal.fee);
+                confirmSaveButton.disabled = false;
+                confirmSaveButton.textContent = 'Confirm & Save';
+                paymentConfirmModal.classList.add('active');
+            });
+
+            confirmGoBackButton.addEventListener('click', closeConfirmModal);
+
+            paymentConfirmModal.addEventListener('click', function (event) {
+                if (event.target === paymentConfirmModal) closeConfirmModal();
+            });
+
+            confirmSaveButton.addEventListener('click', function () {
+                confirmSaveButton.disabled = true;
+                confirmSaveButton.textContent = 'Saving...';
                 submitPaymentButton.disabled = true;
-                submitPaymentButton.textContent = 'Saving...';
+                // Native submit bypasses the submit handler above and posts the form.
+                paymentForm.submit();
             });
 
             document.addEventListener('keydown', function (event) {
-                if (event.key === 'Escape' && paymentModal.classList.contains('active')) {
+                if (event.key !== 'Escape') return;
+                if (paymentConfirmModal.classList.contains('active')) {
+                    closeConfirmModal();
+                } else if (paymentModal.classList.contains('active')) {
                     closePaymentModal();
                 }
             });

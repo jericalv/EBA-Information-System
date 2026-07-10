@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
+use App\Mail\ContractPeriodSavedMail;
 use App\Mail\PaymentsRecordedMail;
 use App\Models\ActivityLog;
 use App\Models\ConcessionairePayment;
@@ -10,6 +11,7 @@ use App\Models\PartnershipApplication;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -522,5 +524,93 @@ class CashierController extends Controller
         }
 
         return back()->with('success', $summary);
+    }
+
+    /**
+     * Save contract period updates for partnership applications.
+     */
+    public function saveContractPeriod(Request $request, PartnershipApplication $application)
+    {
+        $editableStatuses = ['pending', 'under_review', 'approved', 'registered'];
+        if (! in_array($application->status, $editableStatuses, true)) {
+            return back()->withErrors([
+                'contract_period' => 'Contract period can only be edited for pending, under review, approved, or registered applications.',
+            ]);
+        }
+
+        $validated = $request->validate([
+            'contract_period_start' => 'required|date',
+            'contract_period_end' => 'required|date|after_or_equal:contract_period_start',
+        ]);
+
+        $application->contract_period_start = $validated['contract_period_start'];
+        $application->contract_period_end = $validated['contract_period_end'];
+        $application->save();
+
+        $freshApplication = $application->fresh();
+        if (! $freshApplication || ! $freshApplication->contract_period_start || ! $freshApplication->contract_period_end) {
+            Log::warning('Contract period save verification failed: dates still null after save.', [
+                'controller' => self::class,
+                'application_id' => $application->id,
+                'cashier_id' => Auth::id(),
+            ]);
+
+            return back()->with('error', 'Contract period could not be saved. Please try again.');
+        }
+
+        if ($this->shouldSendPartnershipUpdateEmail($freshApplication)) {
+            $this->sendMail($freshApplication->email, new ContractPeriodSavedMail($freshApplication->fresh()));
+        }
+
+        ActivityLog::log(
+            'contract_period_saved',
+            'partnership',
+            (string) $freshApplication->id,
+            "Cashier saved contract period for partnership application #{$freshApplication->id}",
+            [
+                'application_id' => $freshApplication->id,
+                'contract_period_start' => $validated['contract_period_start'],
+                'contract_period_end' => $validated['contract_period_end'],
+                'cashier_id' => Auth::id(),
+                'cashier_email' => Auth::user()?->email,
+            ]
+        );
+
+        return back()
+            ->with('success', 'Contract period saved successfully.')
+            ->with('contract_period_saved', true);
+    }
+
+    private function sendMail(string $recipient, Mailable $mailable): void
+    {
+        try {
+            if (config('queue.default') !== 'sync') {
+                Mail::to($recipient)->queue($mailable);
+                return;
+            }
+
+            Mail::to($recipient)->send($mailable);
+        } catch (\Exception $e) {
+            Log::warning('Mail failed: ' . $e->getMessage(), [
+                'controller' => self::class,
+                'recipient' => $recipient,
+                'mailable' => $mailable::class,
+            ]);
+        }
+    }
+
+    private function shouldSendPartnershipUpdateEmail(PartnershipApplication $application): bool
+    {
+        if (! $application->user_id) {
+            return true;
+        }
+
+        $user = User::find($application->user_id);
+
+        if (! $user) {
+            return true;
+        }
+
+        return $user->getNotificationPreference('email_partnership_updates');
     }
 }
