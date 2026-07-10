@@ -148,6 +148,7 @@ Route::middleware(['auth', 'restrict.admin.panel', 'cashier'])->prefix('cashier'
     Route::get('/payments/{concessionaire}/history/view', [CashierController::class, 'viewConcessionaireHistoryPdf'])->name('payments.concessionaire.history.view');
     Route::get('/payments/{concessionaire}/history/pdf', [CashierController::class, 'downloadConcessionaireHistoryPdf'])->name('payments.concessionaire.history.pdf');
     Route::get('/payments/{payment}/receipt', [CashierController::class, 'downloadReceipt'])->name('payments.receipt');
+    Route::patch('/partnerships/{application}/contract-period', [CashierController::class, 'saveContractPeriod'])->name('partnerships.contract-period');
 });
 
 // Staff Panel (protected)

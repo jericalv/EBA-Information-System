@@ -1,6 +1,23 @@
 <div class="w-full">
-    <div class="mb-4 flex flex-wrap items-start justify-between gap-3">
-    </div>
+    <section class="tx-stat-grid" aria-label="Transaction summary">
+        <article class="tx-stat-card">
+            <span class="tx-stat-label">Total Transactions</span>
+            <span class="tx-stat-value is-pine">{{ number_format($totalTransactions) }}</span>
+            <span class="tx-stat-foot">
+                @if ($startDate === $endDate)
+                    Sales recorded on {{ \Illuminate\Support\Carbon::parse($startDate)->format('M d, Y') }}
+                @else
+                    From {{ \Illuminate\Support\Carbon::parse($startDate)->format('M d, Y') }} to {{ \Illuminate\Support\Carbon::parse($endDate)->format('M d, Y') }}
+                @endif
+            </span>
+        </article>
+
+        <article class="tx-stat-card">
+            <span class="tx-stat-label">Total Sales</span>
+            <span class="tx-stat-value">₱{{ number_format($totalSales, 2) }}</span>
+            <span class="tx-stat-foot">Combined value of all transactions in range</span>
+        </article>
+    </section>
 
     <div class="mb-3 flex flex-wrap items-center justify-end gap-2">
         {{-- Date range picker: border lives on the wrapper so flatpickr can't override it --}}

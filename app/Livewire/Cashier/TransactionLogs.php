@@ -59,8 +59,16 @@ class TransactionLogs extends Component
             ->latest()
             ->paginate($this->perPage);
 
+        // Summary of the whole selected range (all pages), shown as statcards.
+        $totalSales = (float) SalesOrder::query()
+            ->whereDate('created_at', '>=', $start)
+            ->whereDate('created_at', '<=', $end)
+            ->sum('total_amount');
+
         return view('livewire.cashier.transaction-logs', [
             'orders' => $orders,
+            'totalTransactions' => $orders->total(),
+            'totalSales' => $totalSales,
         ]);
     }
 }
