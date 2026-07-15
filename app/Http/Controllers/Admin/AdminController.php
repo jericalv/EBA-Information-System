@@ -68,6 +68,7 @@ class AdminController extends Controller
                 'user_id',
                 'business_name',
                 'first_name',
+                'middle_name',
                 'last_name',
                 'loi_submitted_at',
                 'form_submitted_at',
@@ -77,13 +78,6 @@ class AdminController extends Controller
                 $query->whereNotNull('loi_submitted_at')
                     ->orWhereNotNull('form_submitted_at')
                     ->orWhereNotNull('receipt_submitted_at');
-            })
-            ->when($readAt, function ($query) use ($readAt) {
-                $query->where(function ($innerQuery) use ($readAt) {
-                    $innerQuery->where('loi_submitted_at', '>', $readAt)
-                        ->orWhere('form_submitted_at', '>', $readAt)
-                        ->orWhere('receipt_submitted_at', '>', $readAt);
-                });
             })
             ->get();
 
@@ -95,6 +89,16 @@ class AdminController extends Controller
                 ?: $application->user?->name
                 ?: trim(($application->first_name ?? '') . ' ' . ($application->last_name ?? ''))
                 ?: 'Concessionaire';
+
+            // Search term for the notification link. Built from the application's
+            // own name columns (first/middle/last) so it reliably matches the
+            // partnerships search — never from user->name, which may carry a
+            // suffix that isn't stored on the application. Falls back to the id.
+            $searchTerm = trim(implode(' ', array_filter([
+                $application->first_name,
+                $application->middle_name,
+                $application->last_name,
+            ]))) ?: (string) $application->id;
 
             $steps = [
                 ['key' => 'loi_submitted_at', 'label' => 'Submitted Letter of Intent'],
@@ -109,22 +113,24 @@ class AdminController extends Controller
                     continue;
                 }
 
-                if ($readAt && $submittedAt->lte($readAt)) {
-                    continue;
-                }
-
                 $events->push([
                     'application_id' => $application->id,
                     'concessionaire_name' => $concessionaireName,
+                    'search_term' => $searchTerm,
                     'step_label' => $step['label'],
                     'submitted_at' => $submittedAt,
+                    // "New" until the admin next opens the bell (marks read).
+                    // Read items still stay in the list — only the count clears.
+                    'is_unread' => $readAt ? $submittedAt->gt($readAt) : true,
                 ]);
             }
         }
 
+        // Keep the 5 most recent submissions; a 6th pushes out the oldest.
         return $events
             ->sortByDesc('submitted_at')
-            ->values();
+            ->values()
+            ->take(5);
     }
 
     public function markApplicationNotificationsRead(Request $request)
@@ -228,8 +234,10 @@ class AdminController extends Controller
         $lowStockAlerts = $this->getLowStockAlerts();
 
         return view($view, array_merge($data, [
-            'unreadApplicationSteps' => $unreadApplicationSteps->take(10),
-            'unreadApplicationCount' => $unreadApplicationSteps->count(),
+            // Latest 5 submissions (already capped) — shown even after being read.
+            'unreadApplicationSteps' => $unreadApplicationSteps,
+            // Badge/count tracks only genuinely-new ones, so it clears after clicking.
+            'unreadApplicationCount' => $unreadApplicationSteps->where('is_unread', true)->count(),
             'overdueFeeAlerts' => $overdueFeeAlerts->take(10),
             'overdueFeeAlertCount' => $overdueFeeAlerts->count(),
             'lowStockAlerts' => $lowStockAlerts->take(10),
@@ -605,12 +613,16 @@ class AdminController extends Controller
             $query->where('status', $status);
         }
 
-        if ($search = $request->input('search')) {
+        if ($search = trim((string) $request->input('search'))) {
             $query->where(function ($q) use ($search) {
                 $q->where('first_name', 'like', "%{$search}%")
+                  ->orWhere('middle_name', 'like', "%{$search}%")
                   ->orWhere('last_name', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('business_name', 'like', "%{$search}%");
+                  ->orWhere('business_name', 'like', "%{$search}%")
+                  // Match against the full name so a "first middle last" search
+                  // (e.g. from the notification bell) resolves to the applicant.
+                  ->orWhereRaw("CONCAT_WS(' ', first_name, middle_name, last_name) LIKE ?", ["%{$search}%"]);
 
                 if (is_numeric($search)) {
                     $q->orWhere('id', (int) $search);

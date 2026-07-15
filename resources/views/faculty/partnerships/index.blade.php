@@ -444,6 +444,7 @@
         padding: 16px;
         box-shadow: var(--shadow-card);
     }
+    .wizard-action-panel.is-busy { pointer-events: none; opacity: 0.65; }
     .wizard-action-title { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
     .wizard-action-subtitle { margin: -4px 0 10px; font-size: 12px; color: var(--muted); }
     .wizard-inline-error {
@@ -1169,18 +1170,31 @@
 
             const finalApproveBtn = document.getElementById('wizardFinalApproveBtn');
 
+            const wizardActionPanel = document.getElementById('wizardActionPanel');
+            let wizardActionInFlight = false;
+
             const performAction = async (url, method, payload, successMessage, reloadDelay = 1500) => {
+                // Guard against double-clicks: a second request would hit the server
+                // after the status has already advanced and return "Invalid state."
+                if (wizardActionInFlight) return;
+                wizardActionInFlight = true;
+                if (wizardActionPanel) wizardActionPanel.classList.add('is-busy');
                 showWizardPanelMessage(null, '');
                 try {
                     const { response, data } = await wizardFetchJson(url, method, payload);
                     if (!response.ok || !data.success) {
                         showWizardPanelMessage('error', data.message || 'Action failed.');
+                        wizardActionInFlight = false;
+                        if (wizardActionPanel) wizardActionPanel.classList.remove('is-busy');
                         return;
                     }
                     showWizardPanelMessage('success', successMessage);
+                    // Keep the lock engaged — the page is about to reload.
                     setTimeout(() => window.location.reload(), reloadDelay);
                 } catch (error) {
                     showWizardPanelMessage('error', 'Action failed. Please try again.');
+                    wizardActionInFlight = false;
+                    if (wizardActionPanel) wizardActionPanel.classList.remove('is-busy');
                 }
             };
 
