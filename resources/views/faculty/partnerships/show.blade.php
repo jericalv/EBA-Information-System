@@ -5,25 +5,29 @@
 @section('extra-css')
 <style>
     .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
-    .panel { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 18px; }
-    .label { font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; font-weight: 700; }
-    .value { font-size: 14px; color: #111827; margin-bottom: 12px; }
+    .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; }
+    .label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; font-weight: 700; }
+    .value { font-size: 14px; color: var(--ink); margin-bottom: 12px; }
     .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; }
     .badge-pending { background: rgba(245,158,11,0.1); color: #d97706; }
-    .badge-approved { background: #E9EDF1; color: #1F2937; }
+    .badge-approved { background: var(--hover-2); color: var(--ink); }
     .badge-rejected { background: rgba(239,68,68,0.1); color: #dc2626; }
     .badge-registered { background: rgba(59,130,246,0.1); color: #2563eb; }
-    .badge-expired { background: #e5e7eb; color: #4b5563; }
-    .badge-rec-approve { background: #E9EDF1; color: #1F2937; }
+    .badge-expired { background: var(--hover-2); color: var(--muted); }
+    .badge-rec-approve { background: var(--hover-2); color: var(--ink); }
     .badge-rec-reject { background: #fee2e2; color: #991b1b; }
-    .proposal { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 14px; line-height: 1.45; color: #374151; }
-    .upload-box { border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; background: #f8fafc; margin-bottom: 12px; }
+    html[data-theme="dark"] .badge-pending { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+    html[data-theme="dark"] .badge-rejected,
+    html[data-theme="dark"] .badge-rec-reject { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+    html[data-theme="dark"] .badge-registered { background: rgba(96, 165, 250, 0.14); color: #9CC4F8; }
+    .proposal { background: var(--hover); border: 1px solid var(--line); border-radius: 8px; padding: 12px; font-size: 14px; line-height: 1.45; color: var(--ink); }
+    .upload-box { border: 1px solid var(--line); border-radius: 10px; padding: 12px; background: var(--hover); margin-bottom: 12px; }
     .upload-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
     .upload-row input[type='file'] { width: 100%; }
     .field { display: grid; gap: 8px; margin-bottom: 12px; }
-    .field textarea { width: 100%; min-height: 96px; border: 1px solid var(--line-strong); border-radius: 6px; padding: 10px 12px; font: inherit; }
+    .field textarea { width: 100%; min-height: 96px; border: 1px solid var(--line-strong); border-radius: 6px; padding: 10px 12px; font: inherit; background: var(--field); color: var(--ink); }
     .field textarea:focus { outline: none; border-color: var(--pine); box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12); }
-    .field textarea[readonly] { background: #f8fafc; color: #334155; }
+    .field textarea[readonly] { background: var(--hover); color: var(--ink); }
     .choice { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; }
     @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
 </style>
@@ -123,7 +127,7 @@
             <div style="margin-bottom:10px;">
                 <span class="badge {{ $recommendationBadgeClass }}">{{ $recommendationLabel }}</span>
                 @if ($application->reviewer)
-                    <span style="font-size:13px;color:#64748b;">by {{ $application->reviewer->name }}</span>
+                    <span style="font-size:13px;color:var(--muted);">by {{ $application->reviewer->name }}</span>
                 @endif
             </div>
             <div class="field">

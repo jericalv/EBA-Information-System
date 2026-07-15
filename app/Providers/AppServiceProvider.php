@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\ConcessionairePayment;
+use App\Services\ConcessionaireFeeService;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -32,26 +32,20 @@ class AppServiceProvider extends ServiceProvider
                 return;
             }
 
-            $user = auth()->user();
-            $monthlyFee = $user->monthly_fee;
-            $hasPaidThisMonth = false;
-            $isOverdue = false;
-            $isDueSoon = false;
-
-            if ($monthlyFee && $monthlyFee > 0) {
-                $now = now();
-                $hasPaidThisMonth = ConcessionairePayment::where('concessionaire_id', $user->id)
-                    ->whereYear('payment_date', $now->year)
-                    ->whereMonth('payment_date', $now->month)
-                    ->exists();
-
-                $isDueSoon = ! $hasPaidThisMonth && $now->day >= 25 && $monthlyFee && $monthlyFee > 0;
-                $isOverdue = ! $hasPaidThisMonth && $now->day >= 1 && $now->day < 25;
+            // Composers fire for every partial, so compute the plan once per request.
+            $plan = request()->attributes->get('concessionaireFeePlan');
+            if ($plan === null) {
+                $plan = app(ConcessionaireFeeService::class)->planForUser(auth()->user());
+                request()->attributes->set('concessionaireFeePlan', $plan);
             }
 
-            $view->with('hasOverduePayment', $isOverdue);
-            $view->with('isDueSoon', $isDueSoon);
-            $view->with('hasPaidThisMonth', $hasPaidThisMonth ?? false);
+            $view->with('feePlan', $plan);
+            $view->with('hasPaidThisMonth', $plan['current_paid'] && $plan['monthly_fee'] > 0);
+            $view->with('isDueSoon', in_array($plan['status'], [
+                ConcessionaireFeeService::STATUS_DUE,
+                ConcessionaireFeeService::STATUS_DUE_SOON,
+            ], true));
+            $view->with('hasOverduePayment', $plan['status'] === ConcessionaireFeeService::STATUS_OVERDUE);
         });
     }
 

@@ -21,7 +21,7 @@
     }
     .payments-table th {
         font-family: var(--font-mono);
-        background: #FAFCFA;
+        background: var(--hover);
         color: var(--muted);
         font-size: 10.5px;
         font-weight: 600;
@@ -31,7 +31,7 @@
     }
     .payments-table tr:last-child td { border-bottom: none; }
     .payments-table tbody tr { transition: background-color 0.12s ease; }
-    .payments-table tbody tr:hover { background: #FAFCFA; }
+    .payments-table tbody tr:hover { background: var(--hover); }
 
     .status-badge {
         display: inline-flex;
@@ -56,6 +56,10 @@
     .status-badge-due { background: #FDF8EC; color: #92400E; }
     .status-badge-overdue { background: #FBEAEA; color: #B3261E; }
     .status-badge-none { background: #F0F2F0; color: var(--muted); }
+    html[data-theme="dark"] .status-badge-paid { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
+    html[data-theme="dark"] .status-badge-due { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+    html[data-theme="dark"] .status-badge-overdue { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+    html[data-theme="dark"] .status-badge-none { background: rgba(255, 255, 255, 0.07); }
 
     /* ---------- Modal + form fields ---------- */
     .modal-backdrop {
@@ -71,7 +75,7 @@
     .modal-backdrop.active { display: flex; }
     .modal {
         width: min(540px, 100%);
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         border-radius: 12px;
         padding: 24px;
@@ -110,7 +114,7 @@
         border-radius: 6px;
         font-family: var(--font-ui);
         font-size: 13.5px;
-        background: #fff;
+        background: var(--card);
         color: var(--ink);
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
@@ -126,7 +130,7 @@
         resize: vertical;
     }
     .field input[readonly] {
-        background: #FAFCFA;
+        background: var(--hover);
         color: var(--muted);
     }
     .field-help {
@@ -162,6 +166,8 @@
         border-color: #CDE3D4;
         color: #14532D;
     }
+    html[data-theme="dark"] .modal-feedback.error { background: rgba(227, 106, 106, 0.12); border-color: rgba(227, 106, 106, 0.35); color: #F0A0A0; }
+    html[data-theme="dark"] .modal-feedback.success { background: rgba(30, 149, 96, 0.12); border-color: rgba(30, 149, 96, 0.35); color: #8CD6AF; }
     .required { color: var(--danger); }
 
     /* ---------- Pre-save confirmation modal (stacked above payment modal) ---------- */
@@ -189,6 +195,7 @@
         color: #14532D;
         border: 1px solid #CDE3D4;
     }
+    html[data-theme="dark"] .confirm-months .cm-chip { color: #8CD6AF; border-color: rgba(30, 149, 96, 0.35); }
     .confirm-total {
         display: flex;
         align-items: baseline;
@@ -197,7 +204,7 @@
         padding: 12px 14px;
         border: 1px solid var(--line-strong);
         border-radius: 8px;
-        background: #FAFCFA;
+        background: var(--hover);
         margin-bottom: 8px;
     }
     .confirm-total .ct-label {
@@ -238,7 +245,7 @@
         flex: 0 0 auto;
         border: 1px solid var(--line-strong);
         border-radius: 6px;
-        background: #fff;
+        background: var(--card);
         color: var(--muted);
         cursor: pointer;
         transition: color 0.12s ease, border-color 0.12s ease;
@@ -256,7 +263,7 @@
     .mcal {
         border: 1px solid var(--line);
         border-radius: 10px;
-        background: #FAFCFA;
+        background: var(--hover);
         padding: 12px;
     }
     .mcal-head {
@@ -282,13 +289,13 @@
         height: 30px;
         border: 1px solid var(--line-strong);
         border-radius: 6px;
-        background: #fff;
+        background: var(--card);
         color: var(--ink);
         cursor: pointer;
         transition: background-color 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
     }
     .mcal-nav svg { width: 15px; height: 15px; }
-    .mcal-nav:hover:not(:disabled) { background: #F0F4F1; border-color: #AEC1B4; }
+    .mcal-nav:hover:not(:disabled) { background: var(--hover-2); border-color: var(--line-strong); }
     .mcal-nav:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .mcal-grid {
@@ -304,7 +311,7 @@
         padding: 9px 10px;
         border: 1px solid var(--line-strong);
         border-radius: 7px;
-        background: #fff;
+        background: var(--card);
         color: var(--ink);
         cursor: pointer;
         text-align: left;
@@ -357,7 +364,7 @@
     /* Outside the contract window. */
     .mcal-cell.st-before,
     .mcal-cell.st-after {
-        background: #F6F7F6;
+        background: var(--hover);
         border-style: dashed;
         border-color: var(--line);
         color: var(--faint);
@@ -402,6 +409,20 @@
     .mcal-legend .sw-current { background: #FBEFCF; border-color: #E4B759; }
     .mcal-legend .sw-advance { background: #E9F2FB; border-color: #9DC2E6; }
     .mcal-legend .sw-paid { background: #EAEFEB; border-color: #BAC9BE; }
+
+    /* Dark theme tints for the month calendar states + legend swatches. */
+    html[data-theme="dark"] .mcal-cell.st-arrears { border-color: rgba(227, 106, 106, 0.45); background: rgba(227, 106, 106, 0.12); color: #F0A0A0; }
+    html[data-theme="dark"] .mcal-cell.st-arrears .mcal-sub { color: #E58888; }
+    html[data-theme="dark"] .mcal-cell.st-current { border-color: rgba(227, 164, 72, 0.5); background: rgba(227, 164, 72, 0.12); color: #E9C288; }
+    html[data-theme="dark"] .mcal-cell.st-current .mcal-sub { color: #DDB070; }
+    html[data-theme="dark"] .mcal-cell.st-advance { border-color: rgba(96, 165, 250, 0.45); background: rgba(96, 165, 250, 0.12); color: #9CC4F8; }
+    html[data-theme="dark"] .mcal-cell.st-advance .mcal-sub { color: #8AB5EE; }
+    html[data-theme="dark"] .mcal-cell.st-paid { border-color: rgba(140, 214, 175, 0.35); background: rgba(30, 149, 96, 0.1); color: #9FBFAC; }
+    html[data-theme="dark"] .mcal-cell.st-paid .mcal-sub { color: #8CB69B; }
+    html[data-theme="dark"] .mcal-legend .sw-arrears { background: rgba(227, 106, 106, 0.12); border-color: rgba(227, 106, 106, 0.45); }
+    html[data-theme="dark"] .mcal-legend .sw-current { background: rgba(227, 164, 72, 0.12); border-color: rgba(227, 164, 72, 0.5); }
+    html[data-theme="dark"] .mcal-legend .sw-advance { background: rgba(96, 165, 250, 0.12); border-color: rgba(96, 165, 250, 0.45); }
+    html[data-theme="dark"] .mcal-legend .sw-paid { background: rgba(30, 149, 96, 0.1); border-color: rgba(140, 214, 175, 0.35); }
 
     .mcal-summary {
         margin-top: 10px;
@@ -516,20 +537,12 @@
                                 $latestApplication = $concessionaire->latestPartnershipApplication;
                                 $contractStart = $latestApplication?->contract_period_start;
                                 $contractEnd = $latestApplication?->contract_period_end;
-                                $statusKey = $concessionaireStatuses[$concessionaire->id] ?? 'no_contract';
-                                $statusLabel = match ($statusKey) {
-                                    'paid' => 'Paid',
-                                    'due_soon' => 'Due on 1st',
-                                    'overdue' => 'Overdue',
-                                    default => 'No contract',
-                                };
-                                $statusClass = match ($statusKey) {
-                                    'paid' => 'status-badge-paid',
-                                    'due_soon' => 'status-badge-due',
-                                    'overdue' => 'status-badge-overdue',
-                                    default => 'status-badge-none',
-                                };
                                 $plan = $paymentPlans[$concessionaire->id] ?? null;
+                                $statusLabel = $plan['status_label'] ?? 'No Fee Set';
+                                if ($plan && $plan['status'] === 'overdue' && $plan['owed_count'] > 0) {
+                                    $statusLabel .= ' · ' . $plan['owed_count'] . ' mo';
+                                }
+                                $statusClass = 'status-badge-' . ($plan['badge'] ?? 'none');
                                 $monthlyFee = (float) ($plan['monthly_fee'] ?? ($concessionaire->monthly_fee ?? 0));
                             @endphp
                             <tr>
@@ -604,6 +617,7 @@
                                         aria-haspopup="menu"
                                         data-view-url="{{ route('admin.payments.concessionaire.history.view', $concessionaire->id) }}"
                                         data-download-url="{{ route('admin.payments.concessionaire.history.pdf', $concessionaire->id) }}"
+                                        data-csv-url="{{ route('admin.payments.concessionaire.history.csv', $concessionaire->id) }}"
                                     >
                                         <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                                             <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
@@ -620,17 +634,13 @@
 
     <div id="rowActionMenu" class="pop" role="menu">
         <a id="rowActionView" class="pop-item" role="menuitem" target="_blank" rel="noopener" href="#">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-            </svg>
             <span>View history</span>
         </a>
         <a id="rowActionDownload" class="pop-item" role="menuitem" href="#">
-            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0 0l-4-4m4 4l4-4"/>
-            </svg>
             <span>Download PDF</span>
+        </a>
+        <a id="rowActionCsv" class="pop-item" role="menuitem" href="#">
+            <span>Download CSV</span>
         </a>
     </div>
 
@@ -1125,6 +1135,7 @@
             const menu = document.getElementById('rowActionMenu');
             const viewLink = document.getElementById('rowActionView');
             const downloadLink = document.getElementById('rowActionDownload');
+            const csvLink = document.getElementById('rowActionCsv');
             if (!menu) return;
 
             let activeButton = null;
@@ -1138,6 +1149,7 @@
             function openMenu(button) {
                 viewLink.href = button.dataset.viewUrl;
                 downloadLink.href = button.dataset.downloadUrl;
+                if (csvLink) csvLink.href = button.dataset.csvUrl;
 
                 const rect = button.getBoundingClientRect();
                 const width = menu.offsetWidth || 172;

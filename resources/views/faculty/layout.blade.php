@@ -11,6 +11,16 @@
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|ibm-plex-mono:400,500,600&display=swap" rel="stylesheet" />
+    <script>
+        // Apply saved theme before first paint to avoid a light-mode flash.
+        (function () {
+            try {
+                if (localStorage.getItem('eba-faculty-theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
@@ -30,10 +40,41 @@
             --line-strong: #CBD1D8;
             --amber: #B45309;
             --danger: #B91C1C;
+            --field: #FFFFFF;
+            --hover: #F2F4F6;
+            --hover-2: #E9EDF1;
+            --header-h: 65px;
             --font-ui: 'Manrope', ui-sans-serif, system-ui, sans-serif;
             --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
             --shadow-card: 0 1px 2px rgba(17, 24, 39, 0.05);
             --shadow-pop: 0 12px 32px rgba(17, 24, 39, 0.14);
+        }
+
+        /* ---------- Dark theme (graphite, no green — matches faculty monochrome) ---------- */
+        html[data-theme="dark"] {
+            color-scheme: dark;
+            --green: #A9B4C4;
+            --green-dark: #C5CDD9;
+            --pine: #A9B4C4;
+            --pine-strong: #C5CDD9;
+            --pine-soft: rgba(169, 180, 196, 0.12);
+            --ink: #E7EAEF;
+            --muted: #9CA5B1;
+            --faint: #6C7581;
+            --paper: #0F1216;
+            --card: #171B21;
+            --line: #262C35;
+            --line-strong: #39424E;
+            --amber: #E3A448;
+            --danger: #E36A6A;
+            --field: #1A1F26;
+            --hover: #1C222A;
+            --hover-2: #222933;
+            --accent-soft: rgba(169, 180, 196, 0.12);
+            --accent-line: rgba(169, 180, 196, 0.30);
+            --accent-text: #C5CDD9;
+            --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.40);
+            --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.55);
         }
 
         body {
@@ -73,7 +114,7 @@
         .pop {
             border-radius: 10px;
             border: 1px solid var(--line);
-            background: #fff;
+            background: var(--card);
             box-shadow: var(--shadow-pop);
             overflow: hidden;
         }
@@ -101,7 +142,7 @@
             font-weight: 500;
             line-height: 1.5;
         }
-        .alert-success { background: #F2F4F6; border-color: var(--line-strong); color: var(--ink); }
+        .alert-success { background: var(--hover); border-color: var(--line-strong); color: var(--ink); }
         .alert-error { background: #FDF3F3; border-color: #F2D8D8; color: var(--danger); }
 
         /* ---------- Legacy shared components (used across faculty pages) ---------- */
@@ -130,7 +171,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #fff;
+            background: var(--field);
             border: 1px solid var(--line-strong);
             border-radius: 6px;
             padding: 0 12px;
@@ -160,7 +201,7 @@
             border-radius: 6px;
             font-size: 13.5px;
             font-family: inherit;
-            background-color: #fff;
+            background-color: var(--field);
             color: var(--ink);
             cursor: pointer;
             appearance: none;
@@ -204,12 +245,12 @@
             background: var(--pine-strong);
         }
         .btn-outline {
-            background: #fff;
+            background: var(--field);
             color: var(--ink);
             border-color: var(--line-strong);
         }
         .btn-outline:hover {
-            background: #F2F4F6;
+            background: var(--hover);
             border-color: #AEB6C0;
         }
         .btn-red {
@@ -268,7 +309,7 @@
             padding: 0 10px;
             border: 1px solid var(--line-strong);
             border-radius: 6px;
-            background: #fff;
+            background: var(--field);
             color: var(--ink);
             font-family: var(--font-mono);
             font-size: 12.5px;
@@ -277,7 +318,7 @@
             transition: background-color 0.15s ease, border-color 0.15s ease;
         }
         .pg-btn:hover {
-            background: #F2F4F6;
+            background: var(--hover);
             border-color: #AEB6C0;
         }
         .pg-btn.is-current {
@@ -315,13 +356,15 @@
         .sb-brand {
             display: flex;
             align-items: center;
-            gap: 11px;
-            padding: 18px 14px;
+            gap: 10px;
+            height: var(--header-h);
+            padding: 0 14px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            box-sizing: border-box;
         }
         .sb-brand-logo {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 6px;
             background: #fff;
             padding: 3px;
@@ -329,8 +372,8 @@
             flex-shrink: 0;
         }
         .sb-brand-logo-fallback {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 6px;
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
@@ -351,11 +394,14 @@
         }
         .sb-brand-campus {
             font-family: var(--font-mono);
-            font-size: 10px;
+            font-size: 9.5px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.45);
-            margin-top: 3px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .sb-group-label {
             font-family: var(--font-mono);
@@ -401,8 +447,21 @@
 
         /* ---------- Navbar ---------- */
         .nb {
-            background: #fff;
+            background: var(--card);
             border-bottom: 1px solid var(--line);
+        }
+        /* Lock the navbar and sidebar brand block to the same height so their
+           bottom borders align (nav border sits at var(--header-h)). */
+        .nb > div {
+            height: calc(var(--header-h) - 1px);
+            padding-top: 0;
+            padding-bottom: 0;
+            display: flex;
+            align-items: center;
+        }
+        .nb > div > div {
+            flex: 1;
+            min-width: 0;
         }
         .nb-icon-btn {
             position: relative;
@@ -455,7 +514,7 @@
         .nb-search-input::placeholder { color: var(--faint); }
         .nb-search-input:focus {
             outline: none;
-            background: #fff;
+            background: var(--field);
             border-color: var(--pine);
             box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
         }
@@ -479,7 +538,7 @@
             color: var(--faint);
             border: 1px solid var(--line);
             border-radius: 4px;
-            background: #fff;
+            background: var(--card);
             padding: 2px 5px;
             pointer-events: none;
         }
@@ -580,7 +639,7 @@
             font-weight: 600;
             line-height: 15px;
             text-align: center;
-            box-shadow: 0 0 0 2px #fff;
+            box-shadow: 0 0 0 2px var(--card);
         }
 
         .pop-item {
@@ -605,6 +664,51 @@
         .pop-item.pop-item-danger { color: var(--danger); }
         .pop-item.pop-item-danger svg { color: var(--danger); }
         .pop-item.pop-item-danger:hover { background: #FDF3F3; }
+
+        /* ---------- Dark-only overrides ---------- */
+        /* --pine flips to a light graphite in dark, so anything sitting on it
+           needs dark text instead of white. */
+        html[data-theme="dark"] .btn-green { color: #10151B; }
+        html[data-theme="dark"] .pg-btn.is-current { color: #10151B; }
+        html[data-theme="dark"] .nb-avatar-fallback { color: #10151B; }
+        html[data-theme="dark"] .btn-outline:hover { border-color: var(--line-strong); }
+        html[data-theme="dark"] .pg-btn:hover { border-color: var(--line-strong); }
+        html[data-theme="dark"] .btn-red {
+            background: rgba(227, 106, 106, 0.12);
+            border-color: rgba(227, 106, 106, 0.35);
+            color: #F0A0A0;
+        }
+        html[data-theme="dark"] .btn-red:hover { background: rgba(227, 106, 106, 0.2); }
+        html[data-theme="dark"] .btn-danger { color: #fff; }
+        html[data-theme="dark"] .alert-error {
+            background: rgba(227, 106, 106, 0.12);
+            border-color: rgba(227, 106, 106, 0.35);
+            color: #F0A0A0;
+        }
+        html[data-theme="dark"] .pop-item.pop-item-danger:hover { background: rgba(227, 106, 106, 0.12); }
+        html[data-theme="dark"] .filter-select {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239CA5B1' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        }
+        html[data-theme="dark"] .search-box:focus-within,
+        html[data-theme="dark"] .filter-select:focus,
+        html[data-theme="dark"] .nb-search-input:focus {
+            box-shadow: 0 0 0 3px rgba(169, 180, 196, 0.18);
+        }
+        html[data-theme="dark"] .btn:focus-visible,
+        html[data-theme="dark"] .nb-icon-btn:focus-visible,
+        html[data-theme="dark"] .nb-user-btn:focus-visible {
+            outline-color: rgba(169, 180, 196, 0.55);
+        }
+        /* Sidebar is dark in both themes; nudge it to match the dark page chrome. */
+        html[data-theme="dark"] .sb { background: #12161C; border-right-color: #0B0E12; }
+
+        /* Theme toggle: show the icon for the mode you'd switch to. */
+        .nb-theme-btn .icon-moon { display: inline-flex; }
+        .nb-theme-btn .icon-sun { display: none; }
+        html[data-theme="dark"] .nb-theme-btn .icon-moon { display: none; }
+        html[data-theme="dark"] .nb-theme-btn .icon-sun { display: inline-flex; }
+        .nb-theme-btn svg { width: 22px; height: 22px; }
+        .nb-icon-btn svg { width: 22px; height: 22px; }
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -664,7 +768,6 @@
 
             <div class="flex-1 overflow-y-auto px-3 py-5">
                 <div class="mb-6">
-                    <h3 class="sb-group-label">Main</h3>
                     <ul class="space-y-0.5">
                         <li>
                             <a href="{{ route('staff.dashboard') }}" class="sb-item {{ request()->routeIs('staff.dashboard') ? 'is-active' : '' }}">
@@ -674,6 +777,12 @@
                                 <span>Dashboard</span>
                             </a>
                         </li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="sb-group-label">Concessionaire</h3>
+                    <ul class="space-y-0.5">
                         <li>
                             <a href="{{ $partnershipsRoute }}" class="sb-item {{ request()->routeIs('staff.partnerships') || request()->routeIs('staff.partnerships.*') ? 'is-active' : '' }}">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -685,11 +794,17 @@
                         <li>
                             <a href="{{ $concessionairesRoute }}" class="sb-item {{ request()->routeIs('staff.concessionaires') || request()->routeIs('staff.concessionaires.*') ? 'is-active' : '' }}">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span>Concessionaires</span>
+                                <span>Set Fee</span>
                             </a>
                         </li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="sb-group-label">POS</h3>
+                    <ul class="space-y-0.5">
                         <li>
                             <a href="{{ route('staff.stocks.index') }}" class="sb-item {{ request()->routeIs('staff.stocks*') ? 'is-active' : '' }}">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -705,7 +820,7 @@
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
                                 </svg>
-                                <span>Uniform Checkout</span>
+                                <span>Item Checkout</span>
                             </a>
                         </li>
                         <li>
@@ -716,6 +831,12 @@
                                 <span>Transaction Logs</span>
                             </a>
                         </li>
+                    </ul>
+                </div>
+
+                <div class="mb-6">
+                    <h3 class="sb-group-label">General</h3>
+                    <ul class="space-y-0.5">
                         <li>
                             <a href="{{ route('staff.history') }}" class="sb-item {{ request()->routeIs('staff.history') ? 'is-active' : '' }}">
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
@@ -724,12 +845,6 @@
                                 <span>History</span>
                             </a>
                         </li>
-                    </ul>
-                </div>
-
-                <div class="mb-6">
-                    <h3 class="sb-group-label">General</h3>
-                    <ul class="space-y-0.5">
                         @if ($settingsRoute)
                             <li>
                                 <a href="{{ $settingsRoute }}" class="sb-item {{ request()->routeIs('staff.settings') || request()->routeIs('staff.settings.*') ? 'is-active' : '' }}">
@@ -793,7 +908,7 @@
                             } elseif (request()->routeIs('staff.concessionaires*')) {
                                 $breadcrumbs = [
                                     ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                    ['label' => 'Concessionaires', 'active' => true]
+                                    ['label' => 'Set Fee', 'active' => true]
                                 ];
                             } elseif (request()->routeIs('staff.stocks*')) {
                                 $breadcrumbs = [
@@ -803,7 +918,7 @@
                             } elseif (request()->routeIs('staff.uniform-checkout*')) {
                                 $breadcrumbs = [
                                     ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                    ['label' => 'Uniform Checkout', 'active' => true]
+                                    ['label' => 'Item Checkout', 'active' => true]
                                 ];
                             } elseif (request()->routeIs('staff.transaction-logs')) {
                                 $breadcrumbs = [
@@ -857,8 +972,17 @@
                     </div>
 
                     <div class="flex items-center gap-1.5 sm:gap-2.5">
+                        <button type="button" class="nb-icon-btn nb-theme-btn" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+                            <svg class="icon-moon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                            </svg>
+                            <svg class="icon-sun" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <circle cx="12" cy="12" r="4"/>
+                                <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/>
+                            </svg>
+                        </button>
                         <button id="payment-notification-button" type="button" class="nb-icon-btn" title="Notifications" data-dropdown-toggle="payment-notification-dropdown" data-dropdown-placement="bottom-end" data-unread-count="{{ $unreadCount }}">
-                            <svg class="h-[18px] w-[18px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                            <svg class="h-[22px] w-[22px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.437L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                             </svg>
                             @if($unreadCount > 0)
@@ -984,6 +1108,23 @@
     </div>
 
     <script>
+        // ---------- Dark mode toggle ----------
+        (() => {
+            const btn = document.getElementById('theme-toggle');
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const root = document.documentElement;
+                const dark = root.getAttribute('data-theme') !== 'dark';
+                if (dark) {
+                    root.setAttribute('data-theme', 'dark');
+                } else {
+                    root.removeAttribute('data-theme');
+                }
+                try { localStorage.setItem('eba-faculty-theme', dark ? 'dark' : 'light'); } catch (e) {}
+                window.dispatchEvent(new CustomEvent('eba:theme', { detail: { theme: dark ? 'dark' : 'light' } }));
+            });
+        })();
+
         document.addEventListener('DOMContentLoaded', () => {
             const notificationButton = document.getElementById('payment-notification-button');
             const notificationBadge = document.getElementById('payment-notification-badge');
@@ -1035,9 +1176,9 @@
             const pages = [
                 { label: 'Dashboard', hint: 'Page', url: @json(route('staff.dashboard')), keywords: 'home overview stats charts applications summary' },
                 { label: 'Partnerships', hint: 'Page', url: @json($partnershipsRoute), keywords: 'applications review approve reject recommend loi documents wizard' },
-                { label: 'Concessionaires', hint: 'Page', url: @json($concessionairesRoute), keywords: 'vendors stores business monthly fee edit contract' },
+                { label: 'Set Fee', hint: 'Page', url: @json($concessionairesRoute), keywords: 'concessionaires vendors stores business monthly fee edit contract' },
                 { label: 'Stocks', hint: 'Page', url: @json(route('staff.stocks.index')), keywords: 'uniform inventory sizes quantity add stock items' },
-                { label: 'Uniform Checkout', hint: 'Page', url: @json(route('staff.uniform-checkout')), keywords: 'sell pos sale student purchase cart' },
+                { label: 'Item Checkout', hint: 'Page', url: @json(route('staff.uniform-checkout')), keywords: 'uniform sell pos sale student purchase cart' },
                 { label: 'Transaction Logs', hint: 'Page', url: @json(route('staff.transaction-logs')), keywords: 'payments sales records receipts logs' },
                 { label: 'History', hint: 'Page', url: @json(route('staff.history')), keywords: 'past archive previous contracts records' },
             ];

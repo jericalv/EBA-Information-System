@@ -63,7 +63,7 @@
     }
     .modal {
         width: min(560px, 100%);
-        background: #fff;
+        background: var(--card);
         border-radius: 16px;
         padding: 24px;
         box-shadow: 0 20px 60px rgba(0,0,0,0.18);
@@ -73,9 +73,10 @@
         font-size: 20px;
         color: #064420;
     }
+    html[data-theme="dark"] .modal h3 { color: var(--ink); }
     .modal .notice {
         font-size: 13px;
-        color: #64748b;
+        color: var(--muted);
         margin-bottom: 14px;
     }
     .field {
@@ -86,21 +87,21 @@
     .field label {
         font-size: 13px;
         font-weight: 700;
-        color: #334155;
+        color: var(--ink);
     }
     .field input,
     .field select {
         width: 100%;
         padding: 10px 12px;
-        border: 1px solid #cbd5e1;
+        border: 1px solid var(--line-strong);
         border-radius: 8px;
         font: inherit;
-        background: #fff;
-        color: #0f172a;
+        background: var(--card);
+        color: var(--ink);
     }
     .field input[readonly] {
-        background: #f8fafc;
-        color: #475569;
+        background: var(--hover);
+        color: var(--muted);
     }
     .modal-actions {
         display: flex;
@@ -127,6 +128,8 @@
         border: 1px solid rgba(10,92,47,0.18);
         color: #0a5c2f;
     }
+    html[data-theme="dark"] .modal-feedback.error { background: rgba(227, 106, 106, 0.12); border-color: rgba(227, 106, 106, 0.35); color: #F0A0A0; }
+    html[data-theme="dark"] .modal-feedback.success { background: rgba(30, 149, 96, 0.12); border-color: rgba(30, 149, 96, 0.35); color: #8CD6AF; }
 
     /* === Compact Users Table === */
     #users-data-table thead th {
@@ -162,7 +165,7 @@
     #users-data-table .user-email {
         font-size: 11px;
         margin-top: 1px;
-        color: #64748b;
+        color: var(--muted);
     }
     .you-badge {
         font-size: 9px;
@@ -193,16 +196,27 @@
         background: currentColor;
         flex-shrink: 0;
     }
+    .role-badge.role-admin { background: #FEE2E2; color: #DC2626; }
+    .role-badge.role-cashier { background: #DBEAFE; color: #1D4ED8; }
+    .role-badge.role-faculty { background: #EDE9FE; color: #7C3AED; }
+    .role-badge.role-concessionaire { background: #D1FAE5; color: #059669; }
+    .role-badge.role-student { background: #FEF3C7; color: #D97706; }
+    .role-badge.role-other { background: var(--hover-2); color: var(--muted); }
+    html[data-theme="dark"] .role-badge.role-admin { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+    html[data-theme="dark"] .role-badge.role-cashier { background: rgba(96, 165, 250, 0.14); color: #9CC4F8; }
+    html[data-theme="dark"] .role-badge.role-faculty { background: rgba(167, 139, 250, 0.15); color: #C6B4FA; }
+    html[data-theme="dark"] .role-badge.role-concessionaire { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
+    html[data-theme="dark"] .role-badge.role-student { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
 
     .joined-cell {
-        color: #475569;
+        color: var(--muted);
         font-size: 12px;
         white-space: nowrap;
     }
     .joined-cell .joined-rel {
         display: block;
         font-size: 10.5px;
-        color: #94a3b8;
+        color: var(--faint);
         margin-top: 1px;
     }
 
@@ -221,7 +235,7 @@
         border: 1px solid transparent;
         border-radius: 6px;
         background: transparent;
-        color: #64748b;
+        color: var(--muted);
         font-size: 16px;
         font-weight: 700;
         letter-spacing: 1px;
@@ -231,9 +245,9 @@
     }
     .kebab-btn:hover,
     .kebab-btn[aria-expanded="true"] {
-        background: #f1f5f9;
-        border-color: #e2e8f0;
-        color: #0f172a;
+        background: var(--hover-2);
+        border-color: var(--line-strong);
+        color: var(--ink);
     }
     .kebab-btn:focus-visible {
         outline: 2px solid var(--green);
@@ -243,8 +257,8 @@
         position: fixed;
         z-index: 1200;
         min-width: 200px;
-        background: #fff;
-        border: 1px solid #e2e8f0;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 10px;
         box-shadow: 0 12px 32px rgba(15,23,42,0.14);
         padding: 6px;
@@ -265,19 +279,19 @@
         font: inherit;
         font-size: 12.5px;
         font-weight: 600;
-        color: #1e293b;
+        color: var(--ink);
         text-align: left;
         cursor: pointer;
         transition: background 0.12s ease;
     }
     .kebab-menu button:hover {
-        background: #f1f5f9;
+        background: var(--hover-2);
     }
     .kebab-menu button svg {
         width: 14px;
         height: 14px;
         flex-shrink: 0;
-        color: #64748b;
+        color: var(--muted);
     }
     .kebab-menu button.danger {
         color: #dc2626;
@@ -288,10 +302,11 @@
     .kebab-menu button.danger:hover {
         background: #fef2f2;
     }
+    html[data-theme="dark"] .kebab-menu button.danger:hover { background: rgba(227, 106, 106, 0.12); }
     .kebab-menu .menu-divider {
         height: 1px;
         margin: 5px 4px;
-        background: #e2e8f0;
+        background: var(--line);
     }
 
     /* User detail modal */
@@ -306,17 +321,17 @@
         font-weight: 700;
         letter-spacing: 0.5px;
         text-transform: uppercase;
-        color: #94a3b8;
+        color: var(--faint);
         margin-bottom: 2px;
     }
     .detail-item .detail-value {
         font-size: 13px;
-        color: #0f172a;
+        color: var(--ink);
         font-weight: 600;
         overflow-wrap: anywhere;
     }
     .detail-item .detail-value .muted {
-        color: #94a3b8;
+        color: var(--faint);
         font-weight: 500;
     }
     .detail-pill {
@@ -330,16 +345,18 @@
     }
     .detail-pill.ok { background: rgba(10,92,47,0.1); color: var(--green); }
     .detail-pill.warn { background: #FEF3C7; color: #D97706; }
-    .detail-pill.off { background: #F1F5F9; color: #64748b; }
+    .detail-pill.off { background: var(--hover-2); color: var(--muted); }
+    html[data-theme="dark"] .detail-pill.ok { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
+    html[data-theme="dark"] .detail-pill.warn { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
     .detail-section-title {
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 0.6px;
         text-transform: uppercase;
-        color: #64748b;
+        color: var(--muted);
         margin: 18px 0 8px;
         padding-top: 14px;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid var(--line);
     }
     .activity-list {
         list-style: none;
@@ -355,22 +372,22 @@
         justify-content: space-between;
         gap: 12px;
         font-size: 12.5px;
-        color: #334155;
+        color: var(--ink);
     }
     .activity-list li .activity-when {
-        color: #94a3b8;
+        color: var(--faint);
         font-size: 11.5px;
         white-space: nowrap;
         flex-shrink: 0;
     }
     .activity-empty {
         font-size: 12.5px;
-        color: #94a3b8;
+        color: var(--faint);
     }
     .detail-loading {
         text-align: center;
         padding: 24px 0;
-        color: #94a3b8;
+        color: var(--faint);
         font-size: 13px;
     }
 </style>
@@ -382,8 +399,8 @@
         <div style="padding: 16px 24px;">
             <div class="users-toolbar" style="margin-bottom:14px;">
                 <div>
-                    <h3 style="margin:0;font-size:18px;color:#064420;">Users</h3>
-                    <p style="margin:4px 0 0;color:#64748b;font-size:13px;">Manage all user accounts from one place.</p>
+                    <h3 style="margin:0;font-size:18px;color:var(--ink);">Users</h3>
+                    <p style="margin:4px 0 0;color: var(--muted);font-size:13px;">Manage all user accounts from one place.</p>
                 </div>
                 <div class="users-toolbar-actions">
                     <button type="button" class="btn btn-green" id="openStaffAccountModalButton">
@@ -394,15 +411,22 @@
             </div>
             <form method="GET" action="{{ route('admin.users') }}" class="toolbar">
                 @php
-                    $activeSort = in_array(request('sort'), ['asc', 'desc'], true) ? request('sort') : 'desc';
+                    $sortOptions = [
+                        'newest'    => 'Newest first',
+                        'oldest'    => 'Oldest first',
+                        'name_asc'  => 'Name (A–Z)',
+                        'name_desc' => 'Name (Z–A)',
+                    ];
+                    $activeSort = array_key_exists(request('sort'), $sortOptions) ? request('sort') : 'newest';
                 @endphp
                 <div class="search-box">
                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
                     <input id="users-search-input" type="text" name="search" placeholder="Search by name or email..." value="{{ request('search') }}" oninput="filterRows()">
                 </div>
-                <select name="sort" class="filter-select" onchange="this.form.submit()">
-                    <option value="asc" {{ $activeSort === 'asc' ? 'selected' : '' }}>Ascending</option>
-                    <option value="desc" {{ $activeSort === 'desc' ? 'selected' : '' }}>Descending</option>
+                <select name="sort" class="filter-select" aria-label="Sort users" onchange="this.form.submit()">
+                    @foreach ($sortOptions as $value => $label)
+                        <option value="{{ $value }}" {{ $activeSort === $value ? 'selected' : '' }}>{{ $label }}</option>
+                    @endforeach
                 </select>
                 <select name="role" class="filter-select" onchange="this.form.submit()">
                     <option value="">All Roles</option>
@@ -456,16 +480,11 @@
                             </td>
                             <td>
                                 @php
-                                    $roleBadgeStyle = match ($user->role) {
-                                        'admin'          => 'background:#FEE2E2;color:#DC2626;',
-                                        'cashier'        => 'background:#DBEAFE;color:#1D4ED8;',
-                                        'faculty'        => 'background:#EDE9FE;color:#7C3AED;',
-                                        'concessionaire' => 'background:#D1FAE5;color:#059669;',
-                                        'student'        => 'background:#FEF3C7;color:#D97706;',
-                                        default          => 'background:#F1F5F9;color:#475569;',
-                                    };
+                                    $roleBadgeClass = in_array($user->role, ['admin', 'cashier', 'faculty', 'concessionaire', 'student'], true)
+                                        ? 'role-' . $user->role
+                                        : 'role-other';
                                 @endphp
-                                <span class="role-badge" style="{{ $roleBadgeStyle }}">
+                                <span class="role-badge {{ $roleBadgeClass }}">
                                     <span class="dot"></span>
                                     {{ ucfirst($user->role) }}
                                 </span>
@@ -497,13 +516,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" style="text-align:center; padding:32px; color:#94a3b8;">
+                            <td colspan="4" style="text-align:center; padding:32px; color: var(--faint);">
                                 No users found.
                             </td>
                         </tr>
                     @endforelse
                     <tr id="users-no-results-row" style="display:none;">
-                        <td colspan="4" style="text-align:center; padding:32px; color:#94a3b8;">
+                        <td colspan="4" style="text-align:center; padding:32px; color: var(--faint);">
                             No results found.
                         </td>
                     </tr>

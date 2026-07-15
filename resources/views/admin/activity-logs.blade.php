@@ -5,39 +5,39 @@
 <style>
     .logs-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
     .logs-title h1 { font-size: 22px; font-weight: 800; color: var(--green); margin: 0; }
-    .logs-title p { font-size: 13px; color: #64748b; margin: 4px 0 0; }
+    .logs-title p { font-size: 13px; color:var(--muted); margin: 4px 0 0; }
 
     .logs-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
     .logs-toolbar input[type="text"] {
-        flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+        flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px;
         font-size: 13px; outline: none; transition: border .2s;
     }
     .logs-toolbar input[type="text"]:focus { border-color: var(--green); }
     .logs-toolbar select {
-        padding: 9px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;
-        background: #fff; outline: none; cursor: pointer;
+        padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px;
+        background: var(--card); outline: none; cursor: pointer;
     }
     .btn-filter { padding: 9px 18px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
     .btn-filter:hover { opacity: 0.9; }
 
-    .activity-table { width: 100%; border-collapse: separate; border-spacing: 0; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .activity-table { width: 100%; border-collapse: separate; border-spacing: 0; background: var(--card); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
     .activity-table th {
-        background: #f8fafc; padding: 12px 16px; text-align: left; font-size: 12px;
-        font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; border-bottom: 1px solid #e2e8f0;
+        background: var(--hover); padding: 12px 16px; text-align: left; font-size: 12px;
+        font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color:var(--muted); border-bottom: 1px solid var(--line);
     }
     .activity-table td {
-        padding: 14px 16px; font-size: 13px; border-bottom: 1px solid #f1f5f9; vertical-align: top;
+        padding: 14px 16px; font-size: 13px; border-bottom: 1px solid var(--line); vertical-align: top;
     }
     .activity-table tr:last-child td { border-bottom: none; }
-    .activity-table tr:hover td { background: #fafbfc; }
+    .activity-table tr:hover td { background: var(--hover); }
 
     .user-cell { display: flex; align-items: center; gap: 10px; }
     .user-avatar {
         width: 32px; height: 32px; border-radius: 50%; background: var(--green); color: #fff;
         display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0;
     }
-    .user-name { font-weight: 600; color: #1e293b; }
-    .user-ip { font-size: 11px; color: #94a3b8; }
+    .user-name { font-weight: 600; color: var(--ink); }
+    .user-ip { font-size: 11px; color: var(--faint); }
 
     .action-badge {
         display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11px;
@@ -45,31 +45,31 @@
     }
     .type-badge {
         display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 11px;
-        font-weight: 600; background: #f1f5f9; color: #475569;
+        font-weight: 600; background: var(--hover-2); color: var(--muted);
     }
 
-    .description-text { color: #334155; line-height: 1.5; }
+    .description-text { color: var(--ink); line-height: 1.5; }
     .subject-id { font-family: monospace; font-size: 12px; color: var(--green); font-weight: 600; }
-    .timestamp { font-size: 12px; color: #94a3b8; white-space: nowrap; }
+    .timestamp { font-size: 12px; color: var(--faint); white-space: nowrap; }
     .details-toggle {
         font-size: 11px; color: var(--green); cursor: pointer; font-weight: 600;
         margin-top: 4px; display: inline-block;
     }
     .details-toggle:hover { text-decoration: underline; }
     .details-json {
-        display: none; margin-top: 6px; padding: 8px 10px; background: #f8fafc; border-radius: 6px;
-        font-family: monospace; font-size: 11px; color: #475569; white-space: pre-wrap; word-break: break-all;
+        display: none; margin-top: 6px; padding: 8px 10px; background: var(--hover); border-radius: 6px;
+        font-family: monospace; font-size: 11px; color: var(--muted); white-space: pre-wrap; word-break: break-all;
     }
 
-    .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--faint); }
     .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.4; }
     .empty-state p { font-size: 15px; }
 
     .pagination-wrap { display: flex; justify-content: center; margin-top: 24px; }
 
     .stats-row { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-    .stat-chip { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 16px; font-size: 13px; color: #475569; }
-    .stat-chip strong { color: #1e293b; }
+    .stat-chip { background: var(--hover); border: 1px solid var(--line); border-radius: 8px; padding: 8px 16px; font-size: 13px; color: var(--muted); }
+    .stat-chip strong { color: var(--ink); }
 </style>
 
 <div class="logs-header">
@@ -99,7 +99,7 @@
     </select>
     <button type="submit" class="btn-filter">Filter</button>
     @if(request('search') || request('action') || request('type'))
-        <a href="{{ route('admin.activity-logs') }}" style="font-size:13px;color:#64748b;text-decoration:none;">Reset</a>
+        <a href="{{ route('admin.activity-logs') }}" style="font-size:13px;color:var(--muted);text-decoration:none;">Reset</a>
     @endif
 </form>
 

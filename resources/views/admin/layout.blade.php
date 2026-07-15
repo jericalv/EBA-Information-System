@@ -11,6 +11,16 @@
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|ibm-plex-mono:400,500,600&display=swap" rel="stylesheet" />
+    <script>
+        // Apply saved theme before first paint to avoid a light-mode flash.
+        (function () {
+            try {
+                if (localStorage.getItem('eba-admin-theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
@@ -29,12 +39,37 @@
             --line-strong: #CBD6CE;
             --amber: #B45309;
             --danger: #B91C1C;
+            --field: #FFFFFF;
+            --hover: #FAFCFA;
+            --hover-2: #F6F9F7;
             --font-ui: 'Manrope', ui-sans-serif, system-ui, sans-serif;
             --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
             --shadow-card: 0 1px 2px rgba(23, 37, 28, 0.04);
             --shadow-pop: 0 12px 32px rgba(23, 37, 28, 0.14);
             --sidebar-w: 256px;
             --header-h: 60px;
+        }
+        html[data-theme="dark"] {
+            --green: #1E9560;
+            --green-light: #26AC72;
+            --pine: #1E9560;
+            --pine-strong: #177A4E;
+            --pine-soft: rgba(30, 149, 96, 0.14);
+            --ink: #E8EEEA;
+            --muted: #9DAFA4;
+            --faint: #6C7D73;
+            --paper: #0F1512;
+            --card: #171F1A;
+            --line: #26312A;
+            --line-strong: #35443B;
+            --amber: #E3A448;
+            --danger: #E36A6A;
+            --field: #1B2620;
+            --hover: #1C2721;
+            --hover-2: #223029;
+            --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.25);
+            --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.55);
+            color-scheme: dark;
         }
         body {
             font-family: var(--font-ui);
@@ -125,8 +160,8 @@
         .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
         .btn-primary, .btn-green { background: var(--pine); color: #fff; }
         .btn-primary:hover, .btn-green:hover { background: var(--pine-strong); }
-        .btn-secondary, .btn-outline { background: #fff; color: var(--ink); border-color: var(--line-strong); }
-        .btn-secondary:hover, .btn-outline:hover { background: #F6F9F7; border-color: #AEC1B4; }
+        .btn-secondary, .btn-outline { background: var(--field); color: var(--ink); border-color: var(--line-strong); }
+        .btn-secondary:hover, .btn-outline:hover { background: var(--hover-2); border-color: var(--line-strong); }
         .btn-red, .btn-danger-soft { background: #FDF3F3; color: var(--danger); border-color: #F2D8D8; }
         .btn-red:hover, .btn-danger-soft:hover { background: #FAE5E5; }
         .btn-danger { background: var(--danger); color: #fff; }
@@ -139,7 +174,7 @@
         .control {
             border: 1px solid var(--line-strong);
             border-radius: 6px;
-            background: #fff;
+            background: var(--field);
             color: var(--ink);
             font-family: var(--font-ui);
             font-size: 13.5px;
@@ -157,7 +192,7 @@
         }
         .search-box {
             display: flex; align-items: center; gap: 8px;
-            background: #fff; border: 1px solid var(--line-strong); border-radius: 6px;
+            background: var(--field); border: 1px solid var(--line-strong); border-radius: 6px;
             padding: 0 12px; flex: 1; max-width: 320px;
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
@@ -173,7 +208,7 @@
         .search-box input::placeholder { color: var(--faint); }
         .filter-select {
             padding: 9px 34px 9px 12px; border: 1px solid var(--line-strong); border-radius: 6px;
-            font-size: 13px; font-family: var(--font-ui); background: #fff; color: var(--ink);
+            font-size: 13px; font-family: var(--font-ui); background: var(--field); color: var(--ink);
             cursor: pointer;
             appearance: none;
             -webkit-appearance: none;
@@ -192,7 +227,7 @@
         .pop {
             border-radius: 10px;
             border: 1px solid var(--line);
-            background: #fff;
+            background: var(--card);
             box-shadow: var(--shadow-pop);
             overflow: hidden;
         }
@@ -256,7 +291,7 @@
             font-family: var(--font-mono);
             font-size: 10.5px; font-weight: 600;
             text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted);
-            background: #FAFCFA; border-bottom: 1px solid var(--line);
+            background: var(--hover); border-bottom: 1px solid var(--line);
             white-space: nowrap;
         }
         tbody td {
@@ -264,7 +299,7 @@
             vertical-align: middle;
         }
         tbody tr { transition: background-color 0.12s ease; }
-        tbody tr:hover { background: #FAFCFA; }
+        tbody tr:hover { background: var(--hover); }
         tbody tr:last-child td { border-bottom: none; }
         .table-num {
             font-family: var(--font-mono);
@@ -302,7 +337,7 @@
         .badge-danger { background: #FBEAEA; color: #B3261E; }
         .badge-secondary { background: #F0F2F0; color: var(--muted); }
         .empty-state {
-            background: #fff;
+            background: var(--card);
             border: 1px dashed var(--line-strong);
             border-radius: 10px;
             padding: 28px;
@@ -355,16 +390,16 @@
             padding: 5px 11px; border-radius: 6px; font-size: 12.5px; font-weight: 600;
             text-decoration: none;
             color: var(--ink); border: 1px solid var(--line-strong);
-            background: #fff;
+            background: var(--field);
             transition: background-color 0.15s ease, border-color 0.15s ease;
         }
         .pagination-wrap .page-item.disabled .page-link {
             color: var(--faint);
-            background: #FAFCFA;
+            background: var(--hover);
             border-color: var(--line);
             cursor: not-allowed;
         }
-        .pagination-wrap .page-link:hover { background: #F6F9F7; border-color: #AEC1B4; }
+        .pagination-wrap .page-link:hover { background: var(--hover-2); border-color: var(--line-strong); }
         .pagination-wrap .page-item.active .page-link {
             background: var(--pine); color: #fff; border-color: var(--pine);
         }
@@ -392,14 +427,15 @@
         .sb-brand {
             display: flex;
             align-items: center;
-            gap: 11px;
-            padding: 18px 14px;
+            gap: 10px;
+            height: var(--header-h);
+            padding: 0 14px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             text-decoration: none;
         }
         .sb-brand-logo {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 6px;
             background: #fff;
             padding: 3px;
@@ -407,8 +443,8 @@
             flex-shrink: 0;
         }
         .sb-brand-logo-fallback {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 6px;
             background: rgba(255, 255, 255, 0.1);
             color: #fff;
@@ -430,11 +466,14 @@
         }
         .sb-brand-campus {
             font-family: var(--font-mono);
-            font-size: 10px;
+            font-size: 9.5px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             color: rgba(255, 255, 255, 0.45);
-            margin-top: 3px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .sb-nav {
             flex: 1;
@@ -510,7 +549,7 @@
         .nb {
             position: fixed; top: 0; right: 0; left: var(--sidebar-w);
             height: var(--header-h); z-index: 90;
-            background: #fff;
+            background: var(--card);
             border-bottom: 1px solid var(--line);
             display: flex; align-items: center; justify-content: space-between;
             gap: 16px;
@@ -532,7 +571,7 @@
             cursor: pointer;
             transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
         }
-        .nb-icon-btn svg { width: 19px; height: 19px; }
+        .nb-icon-btn svg { width: 22px; height: 22px; }
         .nb-icon-btn:hover { background: var(--pine-soft); color: var(--pine); }
         .nb-icon-btn:focus-visible { outline: 2px solid rgba(10, 92, 47, 0.45); outline-offset: 2px; }
         .nb-crumbs {
@@ -568,7 +607,7 @@
         .nb-search-input::placeholder { color: var(--faint); }
         .nb-search-input:focus {
             outline: none;
-            background: #fff;
+            background: var(--field);
             border-color: var(--pine);
             box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
         }
@@ -592,7 +631,7 @@
             color: var(--faint);
             border: 1px solid var(--line);
             border-radius: 4px;
-            background: #fff;
+            background: var(--field);
             padding: 2px 5px;
             pointer-events: none;
         }
@@ -661,7 +700,7 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            border: 2px solid #fff;
+            border: 2px solid var(--card);
             line-height: 1;
         }
         .nb-pop-wrap { position: relative; }
@@ -782,7 +821,7 @@
         }
         .notif-foot {
             border-top: 1px solid var(--line);
-            background: #FAFCFA;
+            background: var(--hover);
             padding: 6px;
         }
         .notif-foot-link {
@@ -828,6 +867,38 @@
         @media (max-width: 480px) {
             .nb-search { display: none; }
         }
+
+        /* ===== Dark theme overrides (pastel tints that can't be tokenized) ===== */
+        html[data-theme="dark"] .btn-red, html[data-theme="dark"] .btn-danger-soft {
+            background: rgba(227, 106, 106, 0.12); color: #F0A0A0; border-color: rgba(227, 106, 106, 0.35);
+        }
+        html[data-theme="dark"] .btn-red:hover, html[data-theme="dark"] .btn-danger-soft:hover {
+            background: rgba(227, 106, 106, 0.2);
+        }
+        html[data-theme="dark"] .alert-success { background: rgba(30, 149, 96, 0.12); border-color: rgba(30, 149, 96, 0.35); color: #8CD6AF; }
+        html[data-theme="dark"] .alert-warning { background: rgba(227, 164, 72, 0.1); border-color: rgba(227, 164, 72, 0.35); color: #E9C288; }
+        html[data-theme="dark"] .alert-error { background: rgba(227, 106, 106, 0.1); border-color: rgba(227, 106, 106, 0.35); color: #F0A0A0; }
+        html[data-theme="dark"] .badge-admin,
+        html[data-theme="dark"] .badge-success { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
+        html[data-theme="dark"] .badge-warning { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+        html[data-theme="dark"] .badge-danger { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+        html[data-theme="dark"] .badge-user,
+        html[data-theme="dark"] .badge-secondary { background: rgba(255, 255, 255, 0.07); color: var(--muted); }
+        html[data-theme="dark"] .pop-item.pop-item-danger:hover { background: rgba(227, 106, 106, 0.12); }
+        html[data-theme="dark"] .filter-select {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239DAFA4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        }
+        html[data-theme="dark"] .btn:focus-visible,
+        html[data-theme="dark"] .nb-icon-btn:focus-visible,
+        html[data-theme="dark"] .nb-user-btn:focus-visible { outline-color: rgba(30, 149, 96, 0.6); }
+        /* Sidebar is dark in both themes; nudge it to match the dark page chrome. */
+        html[data-theme="dark"] .sb { background: #0C1911; border-right-color: #17251C; }
+
+        /* Theme toggle: show the icon for the mode you'd switch to. */
+        .nb-theme-btn .icon-moon { display: inline-flex; }
+        .nb-theme-btn .icon-sun { display: none; }
+        html[data-theme="dark"] .nb-theme-btn .icon-moon { display: none; }
+        html[data-theme="dark"] .nb-theme-btn .icon-sun { display: inline-flex; }
 
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
@@ -935,6 +1006,15 @@
                                 <path stroke-linecap="round" d="M6 12h.01M18 12h.01"/>
                             </svg>
                             <span>Record Payment</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('admin.payment-logs') }}" class="sb-item {{ request()->routeIs('admin.payment-logs*') ? 'is-active' : '' }}">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 7h6m-6 4h6m-6 4h3m5.25 6H6.75A1.75 1.75 0 0 1 5 19.25V4.75C5 3.784 5.784 3 6.75 3h8.086a1 1 0 0 1 .707.293l3.164 3.164a1 1 0 0 1 .293.707v12.086A1.75 1.75 0 0 1 17.25 21Z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 3v3.25c0 .414.336.75.75.75H19"/>
+                            </svg>
+                            <span>Payment Logs</span>
                         </a>
                     </li>
                     <li>
@@ -1070,10 +1150,15 @@
                         ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
                         ['label' => 'Record Payment', 'active' => true]
                     ];
+                } elseif (request()->routeIs('admin.payment-logs*')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Payment Logs', 'active' => true]
+                    ];
                 } elseif (request()->routeIs('admin.concessionaires*') || request()->routeIs('admin.payments*')) {
                     $breadcrumbs = [
                         ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
-                        ['label' => 'Concessionaires', 'active' => true]
+                        ['label' => 'Fee Tracking', 'active' => true]
                     ];
                 } elseif (request()->routeIs('admin.reviews*')) {
                     $breadcrumbs = [
@@ -1137,6 +1222,16 @@
         </div>
 
         <div class="nb-right">
+            <button type="button" class="nb-icon-btn nb-theme-btn" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+                <svg class="icon-moon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                </svg>
+                <svg class="icon-sun" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                    <circle cx="12" cy="12" r="4"/>
+                    <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/>
+                </svg>
+            </button>
+
             <div class="nb-pop-wrap">
                 <button id="application-notification-button" type="button" class="nb-icon-btn" title="Notifications" data-unread-count="{{ $unreadApplicationCount }}" aria-expanded="false" aria-controls="application-notification-dropdown">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -1167,7 +1262,7 @@
                             @endforeach
                         @else
                             <div class="notif-item">
-                                <div class="notif-item-icon" style="background:#F0F2F0;color:var(--muted);">
+                                <div class="notif-item-icon" style="background:var(--hover-2);color:var(--muted);">
                                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                     </svg>
@@ -1248,6 +1343,23 @@
     </div>
 
     <script>
+        // ---------- Dark mode toggle ----------
+        (() => {
+            const btn = document.getElementById('theme-toggle');
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const root = document.documentElement;
+                const dark = root.getAttribute('data-theme') !== 'dark';
+                if (dark) {
+                    root.setAttribute('data-theme', 'dark');
+                } else {
+                    root.removeAttribute('data-theme');
+                }
+                try { localStorage.setItem('eba-admin-theme', dark ? 'dark' : 'light'); } catch (e) {}
+                window.dispatchEvent(new CustomEvent('eba:theme', { detail: { theme: dark ? 'dark' : 'light' } }));
+            });
+        })();
+
         // ---------- Mobile sidebar drawer ----------
         (() => {
             const sidebar = document.getElementById('admin-sidebar');
@@ -1355,7 +1467,8 @@
                 { label: 'Uniform Checkout', hint: 'Page', url: @json(route('admin.uniform-checkout')), keywords: 'sale sell pos cart books uniforms checkout' },
                 { label: 'Record Payment', hint: 'Page', url: @json(route('admin.record-payment')), keywords: 'collections monthly fee concessionaire cash arrears advance record' },
                 { label: 'Partnerships', hint: 'Page', url: @json(route('admin.partnerships')), keywords: 'applications loi documents approve reject wizard' },
-                { label: 'Concessionaires', hint: 'Page', url: @json(route('admin.concessionaires')), keywords: 'payments monthly fees stalls vendors business' },
+                { label: 'Fee Tracking', hint: 'Page', url: @json(route('admin.concessionaires')), keywords: 'concessionaires monthly fees stalls vendors business overdue status' },
+                { label: 'Payment Logs', hint: 'Page', url: @json(route('admin.payment-logs')), keywords: 'payments collections receipts fee history month ledger recorded' },
                 { label: 'Reviews', hint: 'Page', url: @json(route('admin.reviews')), keywords: 'ratings feedback stores products stars' },
                 { label: 'Transaction Logs', hint: 'Page', url: @json(route('admin.transaction-logs')), keywords: 'orders purchases receipts sales' },
                 { label: 'Site Settings', hint: 'Page', url: @json(route('admin.site-settings')), keywords: 'cms landing content homepage hero about' },

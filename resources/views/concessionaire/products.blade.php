@@ -49,6 +49,11 @@
         padding: 12px 16px;
         font-size: 13.5px;
     }
+    html[data-theme="dark"] .error-box {
+        border-color: rgba(227, 106, 106, 0.35);
+        background: rgba(227, 106, 106, 0.12);
+        color: #F0A0A0;
+    }
     .filters-bar {
         display: flex;
         gap: 12px;
@@ -74,7 +79,7 @@
     .product-card {
         border: 1px solid var(--line);
         border-radius: 10px;
-        background: #fff;
+        background: var(--card);
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -205,6 +210,10 @@
         color: #14532D;
         background: #EAF3ED;
     }
+    html[data-theme="dark"] .toggle-btn.available {
+        color: var(--green-dark);
+        background: var(--pine-soft);
+    }
     .toggle-btn.unavailable {
         color: var(--muted);
         background: var(--paper);
@@ -259,7 +268,7 @@
         font-weight: 500;
         text-decoration: none;
         color: var(--muted);
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         transition: border-color 0.15s, color 0.15s;
         display: inline-block;
@@ -273,6 +282,7 @@
         border-color: var(--pine);
         color: #fff;
     }
+    html[data-theme="dark"] .pagination-wrap span[aria-current="page"] { color: #0C130F; }
     .pagination-wrap span.cursor-default {
         color: var(--line-strong);
         background: var(--paper);
@@ -281,7 +291,7 @@
         margin-top: 0;
         border: 1px dashed var(--line-strong);
         border-radius: 12px;
-        background: #fff;
+        background: var(--card);
         text-align: center;
         padding: 56px 20px;
     }
@@ -320,7 +330,7 @@
     .modal-card {
         width: 100%;
         max-width: 720px;
-        background: #fff;
+        background: var(--card);
         border-radius: 12px;
         border: 1px solid var(--line);
         padding: 22px;
@@ -396,7 +406,7 @@
         font-family: var(--font-ui);
         font-size: 13.5px;
         color: var(--ink);
-        background: #fff;
+        background: var(--field);
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
     .field input:focus,
@@ -405,6 +415,11 @@
         outline: none;
         border-color: var(--pine);
         box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+    }
+    html[data-theme="dark"] .field input:focus,
+    html[data-theme="dark"] .field textarea:focus,
+    html[data-theme="dark"] .field select:focus {
+        box-shadow: 0 0 0 3px rgba(123, 211, 160, 0.18);
     }
     .modal-card .field input::placeholder,
     .modal-card .field textarea::placeholder {

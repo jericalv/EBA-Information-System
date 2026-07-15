@@ -15,9 +15,11 @@
         white-space: nowrap;
     }
     .status-badge-overdue { background: #fee2e2; color: #991b1b; }
-    .status-badge-paid { background: #E9EDF1; color: #1F2937; }
+    .status-badge-paid { background: var(--hover-2); color: var(--ink); }
     .status-badge-due { background: #fef3c7; color: #92400e; }
-    .status-badge-none { background: #e2e8f0; color: #475569; }
+    .status-badge-none { background: var(--hover-2); color: var(--muted); }
+    html[data-theme="dark"] .status-badge-overdue { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+    html[data-theme="dark"] .status-badge-due { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
 
     .fee-form {
         display: flex;
@@ -31,6 +33,7 @@
         border: 1px solid var(--line-strong);
         border-radius: 6px;
         font: inherit;
+        background: var(--field);
         color: var(--ink);
         transition: border-color 0.15s ease, box-shadow 0.15s ease;
     }
@@ -39,6 +42,7 @@
         border-color: var(--pine);
         box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
     }
+    html[data-theme="dark"] .fee-form input:focus { box-shadow: 0 0 0 3px rgba(169, 180, 196, 0.18); }
 
     .concessionaire-table-wrap {
         overflow-x: auto;
@@ -51,13 +55,13 @@
     .concessionaire-table th,
     .concessionaire-table td {
         padding: 14px 18px;
-        border-bottom: 1px solid #eef2f7;
+        border-bottom: 1px solid var(--line);
         text-align: left;
         vertical-align: top;
     }
     .concessionaire-table th {
-        background: #f8fafc;
-        color: #64748b;
+        background: var(--hover);
+        color: var(--muted);
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -78,18 +82,18 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        background: #E9EDF1;
-        color: #1F2937;
+        background: var(--hover-2);
+        color: var(--ink);
         font-weight: 700;
         font-size: 13px;
     }
     .user-name {
         font-weight: 700;
-        color: #0f172a;
+        color: var(--ink);
     }
     .user-email {
         font-size: 12px;
-        color: #64748b;
+        color: var(--muted);
     }
 </style>
 @endsection
@@ -98,10 +102,10 @@
     <div class="card" style="margin-bottom:20px;">
         <div class="card-header" style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
             <div>
-                <strong style="font-size:16px;color:#111827;">Monthly Fee Tracking</strong>
-                <div style="font-size:13px;color:#64748b;margin-top:4px;">Set a fee per concessionaire and monitor current-month payment status.</div>
+                <strong style="font-size:16px;color:var(--ink);">Monthly Fee Tracking</strong>
+                <div style="font-size:13px;color:var(--muted);margin-top:4px;">Set a fee per concessionaire and monitor payment status across the contract period.</div>
             </div>
-            <div style="font-weight:700;color:#0f172a;">{{ $overdueCount }} concessionaire(s) overdue this month</div>
+            <div style="font-weight:700;color:var(--ink);">{{ $overdueCount }} concessionaire(s) overdue</div>
         </div>
         <div class="card-body concessionaire-table-wrap">
             @if ($concessionaires->isEmpty())
@@ -121,32 +125,12 @@
                     <tbody>
                         @foreach ($concessionaires as $concessionaire)
                             @php
-                                $monthlyFee = (float) ($concessionaire->monthly_fee ?? 0);
-                                $paidThisMonth = (int) ($concessionaire->current_month_payment_count ?? 0) > 0;
-                                $today = now()->day;
-
-                                if ($monthlyFee <= 0) {
-                                    $statusKey = 'no_contract';
-                                } elseif ($paidThisMonth) {
-                                    $statusKey = 'paid';
-                                } elseif ($today >= 25) {
-                                    $statusKey = 'due_soon';
-                                } else {
-                                    $statusKey = 'overdue';
+                                $plan = $feePlans[$concessionaire->id] ?? null;
+                                $statusLabel = $plan['status_label'] ?? '—';
+                                if ($plan && $plan['status'] === 'overdue' && $plan['owed_count'] > 0) {
+                                    $statusLabel .= ' · ' . $plan['owed_count'] . ' mo';
                                 }
-
-                                $statusLabel = match ($statusKey) {
-                                    'paid' => 'Paid',
-                                    'due_soon' => 'Due Soon',
-                                    'overdue' => 'Overdue',
-                                    default => '—',
-                                };
-                                $statusClass = match ($statusKey) {
-                                    'paid' => 'status-badge-paid',
-                                    'due_soon' => 'status-badge-due',
-                                    'overdue' => 'status-badge-overdue',
-                                    default => 'status-badge-none',
-                                };
+                                $statusClass = 'status-badge-' . ($plan['badge'] ?? 'none');
                             @endphp
                             <tr>
                                 <td>

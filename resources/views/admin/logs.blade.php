@@ -5,30 +5,30 @@
 <style>
     .logs-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px; }
     .logs-title h1 { font-size: 22px; font-weight: 800; color: var(--green); margin: 0; }
-    .logs-title p { font-size: 13px; color: #64748b; margin: 4px 0 0; }
+    .logs-title p { font-size: 13px; color:var(--muted); margin: 4px 0 0; }
     .logs-meta { display: flex; gap: 16px; align-items: center; }
-    .meta-badge { background: #f1f5f9; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #475569; }
-    .meta-badge strong { color: #1e293b; }
+    .meta-badge { background: var(--hover-2); border-radius: 8px; padding: 8px 14px; font-size: 13px; color: var(--muted); }
+    .meta-badge strong { color: var(--ink); }
 
     .logs-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 20px; }
     .logs-toolbar input[type="text"] {
-        flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid #e2e8f0; border-radius: 8px;
+        flex: 1; min-width: 200px; padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px;
         font-size: 13px; outline: none; transition: border .2s;
     }
     .logs-toolbar input[type="text"]:focus { border-color: var(--green); }
     .logs-toolbar select {
-        padding: 9px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 13px;
-        background: #fff; outline: none; cursor: pointer;
+        padding: 9px 14px; border: 1px solid var(--line); border-radius: 8px; font-size: 13px;
+        background: var(--card); outline: none; cursor: pointer;
     }
     .btn-filter { padding: 9px 18px; background: var(--green); color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
     .btn-filter:hover { opacity: 0.9; }
     .btn-clear { padding: 9px 18px; background: #dc2626; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; }
     .btn-clear:hover { opacity: 0.9; }
 
-    .log-entry { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 10px; transition: box-shadow .2s; }
+    .log-entry { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px; margin-bottom: 10px; transition: box-shadow .2s; }
     .log-entry:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .log-meta { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; flex-wrap: wrap; }
-    .log-time { font-size: 12px; color: #94a3b8; font-family: monospace; }
+    .log-time { font-size: 12px; color: var(--faint); font-family: monospace; }
     .log-level {
         display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px;
         font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
@@ -38,15 +38,20 @@
     .level-warning { background: #fffbeb; color: #d97706; }
     .level-notice, .level-info { background: #eff6ff; color: #2563eb; }
     .level-debug { background: #f0fdf4; color: #16a34a; }
+    html[data-theme="dark"] .level-emergency, html[data-theme="dark"] .level-alert, html[data-theme="dark"] .level-critical { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+    html[data-theme="dark"] .level-error { background: rgba(234, 124, 58, 0.15); color: #F0B08A; }
+    html[data-theme="dark"] .level-warning { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+    html[data-theme="dark"] .level-notice, html[data-theme="dark"] .level-info { background: rgba(96, 165, 250, 0.14); color: #9CC4F8; }
+    html[data-theme="dark"] .level-debug { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
     .log-message {
-        font-size: 13px; color: #334155; font-family: 'Courier New', monospace;
+        font-size: 13px; color: var(--ink); font-family: 'Courier New', monospace;
         white-space: pre-wrap; word-break: break-all; max-height: 200px; overflow-y: auto;
-        background: #f8fafc; padding: 10px 12px; border-radius: 6px; line-height: 1.5;
+        background: var(--hover); padding: 10px 12px; border-radius: 6px; line-height: 1.5;
     }
     .log-toggle { font-size: 12px; color: var(--green); cursor: pointer; font-weight: 600; margin-top: 6px; display: inline-block; }
     .log-toggle:hover { text-decoration: underline; }
 
-    .empty-state { text-align: center; padding: 60px 20px; color: #94a3b8; }
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--faint); }
     .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.4; }
     .empty-state p { font-size: 15px; }
 
@@ -79,7 +84,7 @@
     </select>
     <button type="submit" class="btn-filter">Filter</button>
     @if(request('search') || request('level'))
-        <a href="{{ route('admin.logs') }}" style="font-size:13px;color:#64748b;text-decoration:none;">Reset</a>
+        <a href="{{ route('admin.logs') }}" style="font-size:13px;color:var(--muted);text-decoration:none;">Reset</a>
     @endif
 </form>
 

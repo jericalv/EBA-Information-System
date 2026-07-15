@@ -14,6 +14,26 @@
     .bg-emerald-100 { background-color: #E9EDF1 !important; }
     .text-emerald-800 { color: #1F2937 !important; }
 
+    /* Dark theme: re-map the component's Tailwind slate/white utilities to the
+       dark graphite tokens (scoped to this page; cashier portal unaffected). */
+    html[data-theme="dark"] .bg-white { background-color: var(--card) !important; }
+    html[data-theme="dark"] .bg-slate-50,
+    html[data-theme="dark"] .bg-slate-50\/90 { background-color: var(--hover) !important; }
+    html[data-theme="dark"] .bg-slate-100,
+    html[data-theme="dark"] .bg-slate-200 { background-color: var(--hover-2) !important; }
+    html[data-theme="dark"] .text-slate-900,
+    html[data-theme="dark"] .text-slate-800,
+    html[data-theme="dark"] .text-slate-700 { color: var(--ink) !important; }
+    html[data-theme="dark"] .text-slate-600,
+    html[data-theme="dark"] .text-slate-500 { color: var(--muted) !important; }
+    html[data-theme="dark"] .text-slate-400 { color: var(--faint) !important; }
+    html[data-theme="dark"] .border-slate-100,
+    html[data-theme="dark"] .border-slate-200 { border-color: var(--line) !important; }
+    html[data-theme="dark"] .border-slate-300 { border-color: var(--line-strong) !important; }
+    html[data-theme="dark"] .bg-emerald-100 { background-color: rgba(169, 180, 196, 0.14) !important; }
+    html[data-theme="dark"] .text-emerald-800 { color: #C5CDD9 !important; }
+    html[data-theme="dark"] .bg-\[\#1a3c2e\] { color: #10151B !important; }
+
     /* Transaction summary statcards — mirrors the admin portal exactly so the
        two roles share one identical design (colors hardcoded, not from the
        faculty graphite tokens). */
@@ -24,8 +44,8 @@
         margin-bottom: 20px;
     }
     .tx-stat-card {
-        background: #fff;
-        border: 1px solid #e2e8f0;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 14px;
         padding: 20px;
         display: flex;
@@ -40,23 +60,23 @@
         font-weight: 600;
         letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: #64748b;
+        color: var(--muted);
     }
     .tx-stat-value {
         font-size: 34px;
         font-weight: 800;
         line-height: 1.05;
         letter-spacing: -0.03em;
-        color: #0f172a;
+        color: var(--ink);
         font-variant-numeric: tabular-nums;
     }
-    .tx-stat-value.is-pine { color: #0A5C2F; }
+    .tx-stat-value.is-pine { color: var(--pine); }
     .tx-stat-foot {
         margin-top: auto;
         padding-top: 12px;
-        border-top: 1px solid #e2e8f0;
+        border-top: 1px solid var(--line);
         font-size: 12px;
-        color: #94a3b8;
+        color: var(--faint);
     }
     @media (max-width: 900px) {
         .tx-stat-grid { grid-template-columns: 1fr; }

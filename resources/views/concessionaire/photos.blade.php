@@ -29,7 +29,7 @@
     }
     .photo-card {
         aspect-ratio: 1;
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         border-radius: 10px;
         overflow: hidden;
@@ -56,7 +56,7 @@
     .empty-state {
         text-align: center;
         padding: 56px 20px;
-        background: #fff;
+        background: var(--card);
         border: 1px dashed var(--line-strong);
         border-radius: 12px;
     }

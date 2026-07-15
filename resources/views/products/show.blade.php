@@ -223,6 +223,13 @@
             align-items: center;
             justify-content: center;
         }
+        @media (min-width: 901px) {
+            .pd-media {
+                position: sticky;
+                top: 94px;
+                align-self: start;
+            }
+        }
         .pd-media img {
             width: 100%;
             height: 100%;
@@ -306,13 +313,46 @@
         }
         .pd-meta strong { color: var(--ink-soft); font-weight: 600; }
 
+        .pd-price-row {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
         .pd-price {
             font-family: var(--font-mono);
             font-size: 30px;
             font-weight: 600;
             color: var(--green);
-            margin-bottom: 20px;
             font-variant-numeric: tabular-nums;
+        }
+        .pd-availability {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 11px;
+            border-radius: 999px;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.1px;
+            text-transform: uppercase;
+        }
+        .pd-availability::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        .pd-availability.available {
+            background: rgba(10, 92, 47, 0.09);
+            color: var(--green);
+        }
+        .pd-availability.unavailable {
+            background: rgba(180, 35, 42, 0.08);
+            color: var(--red);
         }
         .pd-description {
             font-size: 15px;
@@ -358,12 +398,22 @@
             display: flex;
             align-items: center;
             gap: 12px;
+            text-decoration: none;
+            border-radius: 6px;
+            padding: 3px 8px;
+            margin: -3px -8px;
+            transition: background-color .15s ease;
         }
+        a.rating-bar-row:hover { background: rgba(10, 92, 47, 0.07); }
+        a.rating-bar-row:hover .rating-bar-label { color: var(--green); font-weight: 600; }
+        .rating-bar-row.active { background: rgba(10, 92, 47, 0.07); }
+        .rating-bar-row.active .rating-bar-label { color: var(--green); font-weight: 600; }
         .rating-bar-label {
             font-family: var(--font-mono);
             font-size: 11.5px;
             color: var(--ink-faint);
             width: 46px;
+            transition: color .15s ease;
         }
         .rating-bar {
             flex: 1;
@@ -376,6 +426,13 @@
             height: 100%;
             background: var(--gold);
             border-radius: 3px;
+        }
+        .rating-hint {
+            margin-top: 14px;
+            font-family: var(--font-mono);
+            font-size: 10.5px;
+            letter-spacing: 0.5px;
+            color: var(--ink-faint);
         }
         .rating-bar-count {
             font-family: var(--font-mono);
@@ -423,6 +480,7 @@
             border: 1px solid var(--line);
             border-radius: 14px;
             padding: 32px;
+            scroll-margin-top: 86px;
         }
         .reviews-header {
             display: flex;
@@ -447,6 +505,102 @@
             color: var(--ink-faint);
         }
         .reviews-count strong { color: var(--green); font-weight: 600; }
+
+        /* Review Filters */
+        .reviews-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 26px;
+        }
+        .filter-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .filter-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 13px;
+            border-radius: 999px;
+            border: 1px solid var(--line-strong);
+            background: var(--card);
+            font-family: var(--font-mono);
+            font-size: 11.5px;
+            font-weight: 600;
+            letter-spacing: 0.4px;
+            color: var(--ink-soft);
+            text-decoration: none;
+            transition: border-color .2s ease, background-color .2s ease, color .2s ease;
+        }
+        .filter-chip:hover { border-color: var(--green); color: var(--green); }
+        .filter-chip.active {
+            background: var(--green);
+            border-color: var(--green);
+            color: #fff;
+        }
+        .filter-chip .chip-star {
+            width: 12px;
+            height: 12px;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+        .filter-chip.active .chip-star { color: var(--gold-soft); }
+        .filter-chip .chip-count {
+            font-size: 10px;
+            line-height: 1;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: var(--paper-deep);
+            color: var(--ink-faint);
+        }
+        .filter-chip.active .chip-count {
+            background: rgba(255, 255, 255, 0.18);
+            color: #fff;
+        }
+        .filter-chip.disabled { opacity: 0.4; pointer-events: none; }
+
+        .sort-control {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-left: auto;
+        }
+        .sort-label {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--ink-faint);
+        }
+        .sort-select {
+            font-family: var(--font-body);
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--ink);
+            padding: 8px 32px 8px 13px;
+            border: 1px solid var(--line-strong);
+            border-radius: 8px;
+            background-color: var(--card);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2368786D' stroke-width='2.5'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 11px center;
+            background-size: 12px;
+            appearance: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .sort-select:hover { border-color: var(--green); }
+        .sort-select:focus {
+            outline: none;
+            border-color: var(--green);
+            box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
+        }
 
         /* Review Form */
         .review-form-card {
@@ -833,6 +987,8 @@
             .pd-price { font-size: 26px; }
             .rating-number { font-size: 32px; }
             .reviews-section { padding: 22px; }
+            .sort-control { margin-left: 0; width: 100%; }
+            .sort-select { flex: 1; }
         }
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after { transition-duration: 0.01ms !important; }
@@ -927,7 +1083,12 @@
                         <span><strong>Listed</strong> {{ optional($product->created_at)->format('M d, Y') ?? '—' }}</span>
                     </div>
 
-                    <div class="pd-price">&#8369;{{ number_format($product->price, 2) }}</div>
+                    <div class="pd-price-row">
+                        <div class="pd-price">&#8369;{{ number_format($product->price, 2) }}</div>
+                        <span class="pd-availability {{ $product->is_available ? 'available' : 'unavailable' }}">
+                            {{ $product->is_available ? 'Available' : 'Unavailable' }}
+                        </span>
+                    </div>
 
                     @if($product->description)
                         <p class="pd-description">{{ $product->description }}</p>
@@ -950,29 +1111,83 @@
                         </div>
                         <div class="rating-bars">
                             @foreach ([5, 4, 3, 2, 1] as $star)
-                                @php $percent = $reviewStats['total'] > 0 ? ($reviewStats['distribution'][$star] / $reviewStats['total']) * 100 : 0; @endphp
-                                <div class="rating-bar-row">
+                                @php
+                                    $count = $reviewStats['distribution'][$star];
+                                    $percent = $reviewStats['total'] > 0 ? ($count / $reviewStats['total']) * 100 : 0;
+                                @endphp
+                                @if($count > 0)
+                                    <a href="{{ route('products.show', $product) }}?rating={{ $star }}#reviews" class="rating-bar-row {{ $activeRating === $star ? 'active' : '' }}" title="Show {{ $star }}-star reviews">
+                                @else
+                                    <div class="rating-bar-row">
+                                @endif
                                     <span class="rating-bar-label">{{ $star }} star</span>
                                     <div class="rating-bar">
                                         <div class="rating-bar-fill" style="width: {{ $percent }}%"></div>
                                     </div>
-                                    <span class="rating-bar-count">{{ $reviewStats['distribution'][$star] }}</span>
-                                </div>
+                                    <span class="rating-bar-count">{{ $count }}</span>
+                                @if($count > 0)
+                                    </a>
+                                @else
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
+                        @if($reviewStats['total'] > 0)
+                            <div class="rating-hint">Select a row to filter reviews by rating</div>
+                        @endif
                     </div>
                 </div>
             </div>
 
             <!-- Reviews Section -->
-            <div class="reviews-section">
+            <div class="reviews-section" id="reviews">
                 <div class="reviews-header">
                     <div>
                         <span class="eyebrow">Feedback Ledger</span>
                         <h2>Customer Reviews</h2>
                     </div>
-                    <span class="reviews-count"><strong>{{ $reviewStats['total'] }}</strong> {{ Str::plural('entry', $reviewStats['total']) }} on record</span>
+                    <span class="reviews-count">
+                        @if($activeRating > 0)
+                            <strong>{{ $reviews->total() }}</strong> of {{ $reviewStats['total'] }} {{ Str::plural('entry', $reviewStats['total']) }} shown
+                        @else
+                            <strong>{{ $reviewStats['total'] }}</strong> {{ Str::plural('entry', $reviewStats['total']) }} on record
+                        @endif
+                    </span>
                 </div>
+
+                @if($reviewStats['total'] > 0)
+                    <div class="reviews-toolbar">
+                        <div class="filter-chips" role="group" aria-label="Filter reviews by rating">
+                            <a href="{{ route('products.show', $product) }}{{ $sort !== 'newest' ? '?sort='.$sort : '' }}#reviews" class="filter-chip {{ $activeRating === 0 ? 'active' : '' }}">
+                                All <span class="chip-count">{{ $reviewStats['total'] }}</span>
+                            </a>
+                            @foreach ([5, 4, 3, 2, 1] as $star)
+                                @php $count = $reviewStats['distribution'][$star]; @endphp
+                                <a href="{{ route('products.show', $product) }}?rating={{ $star }}{{ $sort !== 'newest' ? '&sort='.$sort : '' }}#reviews"
+                                   class="filter-chip {{ $activeRating === $star ? 'active' : '' }} {{ $count === 0 ? 'disabled' : '' }}"
+                                   @if($count === 0) aria-disabled="true" tabindex="-1" @endif>
+                                    {{ $star }}
+                                    <svg class="chip-star" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+                                    </svg>
+                                    <span class="chip-count">{{ $count }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                        <form method="GET" action="{{ route('products.show', $product) }}#reviews" class="sort-control">
+                            @if($activeRating > 0)
+                                <input type="hidden" name="rating" value="{{ $activeRating }}">
+                            @endif
+                            <label class="sort-label" for="sortSelect">Sort</label>
+                            <select name="sort" id="sortSelect" class="sort-select" onchange="this.form.submit()">
+                                <option value="newest" {{ $sort === 'newest' ? 'selected' : '' }}>Newest first</option>
+                                <option value="oldest" {{ $sort === 'oldest' ? 'selected' : '' }}>Oldest first</option>
+                                <option value="highest" {{ $sort === 'highest' ? 'selected' : '' }}>Highest rated</option>
+                                <option value="lowest" {{ $sort === 'lowest' ? 'selected' : '' }}>Lowest rated</option>
+                            </select>
+                        </form>
+                    </div>
+                @endif
 
                 <!-- Review Form -->
                 @auth
@@ -1079,7 +1294,16 @@
                             </div>
                         @endforeach
                     </div>
-                    {{ $reviews->links('vendor.pagination.simple') }}
+                    {{ $reviews->fragment('reviews')->links('vendor.pagination.simple') }}
+                @elseif($activeRating > 0)
+                    <div class="no-reviews">
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                        </svg>
+                        <h3>No {{ $activeRating }}-Star Reviews</h3>
+                        <p>No reviews match this rating filter.</p>
+                        <a href="{{ route('products.show', $product) }}#reviews" class="btn btn-outline btn-sm" style="margin-top: 16px;">Clear filter</a>
+                    </div>
                 @else
                     <div class="no-reviews">
                         <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">

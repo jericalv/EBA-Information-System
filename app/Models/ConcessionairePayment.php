@@ -28,6 +28,30 @@ class ConcessionairePayment extends Model
         'period_month' => 'date',
     ];
 
+    /**
+     * Advance / On Time / Late, comparing the month the payment was made
+     * against the month it covers. Null when either date is missing.
+     */
+    public function paymentTiming(): ?string
+    {
+        if (! $this->payment_date || ! $this->period_month) {
+            return null;
+        }
+
+        $paid = $this->payment_date->format('Y-m');
+        $period = $this->period_month->format('Y-m');
+
+        if ($paid < $period) {
+            return 'Advance';
+        }
+
+        if ($paid > $period) {
+            return 'Late';
+        }
+
+        return 'On Time';
+    }
+
     public function concessionaire(): BelongsTo
     {
         return $this->belongsTo(User::class, 'concessionaire_id');

@@ -11,6 +11,16 @@
     <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=manrope:400,500,600,700,800|ibm-plex-mono:400,500,600&display=swap" rel="stylesheet" />
+    <script>
+        // Apply saved theme before first paint to avoid a light-mode flash.
+        (function () {
+            try {
+                if (localStorage.getItem('eba-cashier-theme') === 'dark') {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                }
+            } catch (e) {}
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         [x-cloak] { display: none !important; }
@@ -29,10 +39,35 @@
             --line-strong: #CBD6CE;
             --amber: #B45309;
             --danger: #B91C1C;
+            --field: #FFFFFF;
+            --hover: #F6F9F7;
             --font-ui: 'Manrope', ui-sans-serif, system-ui, sans-serif;
             --font-mono: 'IBM Plex Mono', ui-monospace, 'Cascadia Mono', monospace;
             --shadow-card: 0 1px 2px rgba(23, 37, 28, 0.04);
             --shadow-pop: 0 12px 32px rgba(23, 37, 28, 0.14);
+        }
+
+        /* ---------- Dark theme (mint on forest — keeps the portal's green identity) ---------- */
+        html[data-theme="dark"] {
+            color-scheme: dark;
+            --green: #7BD3A0;
+            --green-dark: #97E0B4;
+            --pine: #7BD3A0;
+            --pine-strong: #97E0B4;
+            --pine-soft: rgba(123, 211, 160, 0.12);
+            --ink: #E6EDE8;
+            --muted: #98A89E;
+            --faint: #66756C;
+            --paper: #0D1210;
+            --card: #151C18;
+            --line: #232D26;
+            --line-strong: #35443A;
+            --amber: #E3A448;
+            --danger: #E36A6A;
+            --field: #181F1B;
+            --hover: #1B241F;
+            --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.40);
+            --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.55);
         }
 
         body {
@@ -123,8 +158,8 @@
         .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
         .btn-primary, .btn-green { background: var(--pine); color: #fff; }
         .btn-primary:hover, .btn-green:hover { background: var(--pine-strong); }
-        .btn-secondary, .btn-outline { background: #fff; color: var(--ink); border-color: var(--line-strong); }
-        .btn-secondary:hover, .btn-outline:hover { background: #F6F9F7; border-color: #AEC1B4; }
+        .btn-secondary, .btn-outline { background: var(--field); color: var(--ink); border-color: var(--line-strong); }
+        .btn-secondary:hover, .btn-outline:hover { background: var(--hover); border-color: var(--line-strong); }
         .btn-danger-soft { background: #FDF3F3; color: var(--danger); border-color: #F2D8D8; }
         .btn-danger-soft:hover { background: #FAE5E5; }
         .btn-danger { background: var(--danger); color: #fff; }
@@ -136,7 +171,7 @@
         .control {
             border: 1px solid var(--line-strong);
             border-radius: 6px;
-            background: #fff;
+            background: var(--field);
             color: var(--ink);
             font-family: var(--font-ui);
             font-size: 13.5px;
@@ -175,7 +210,7 @@
         .pop {
             border-radius: 10px;
             border: 1px solid var(--line);
-            background: #fff;
+            background: var(--card);
             box-shadow: var(--shadow-pop);
             overflow: hidden;
         }
@@ -200,6 +235,56 @@
         .pop-item.pop-item-danger { color: var(--danger); }
         .pop-item.pop-item-danger svg { color: var(--danger); }
         .pop-item.pop-item-danger:hover { background: #FDF3F3; }
+
+        /* ---------- Notification bell + dropdown rows ---------- */
+        .nb-badge {
+            position: absolute;
+            top: 7px;
+            right: 8px;
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--amber);
+            box-shadow: 0 0 0 2px var(--card);
+        }
+        .nb-badge-danger { background: var(--danger); }
+        .notif-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            border-radius: 6px;
+            padding: 10px;
+            text-decoration: none;
+            transition: background-color 0.15s ease;
+        }
+        a.notif-row:hover { background: var(--hover); }
+        .notif-ic {
+            margin-top: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            border-radius: 6px;
+        }
+        .notif-ic-ok { background: var(--pine-soft); color: var(--pine); }
+        .notif-ic-warn { background: rgba(180, 83, 9, 0.10); color: var(--amber); }
+        .notif-ic-danger { background: rgba(185, 28, 28, 0.08); color: var(--danger); }
+        .notif-ic-muted { background: var(--hover); color: var(--muted); }
+        .notif-title { display: block; font-size: 13px; font-weight: 700; color: var(--ink); }
+        .notif-title-ok { color: var(--green-dark); }
+        .notif-title-warn { color: var(--amber); }
+        .notif-title-danger { color: var(--danger); }
+        .notif-body {
+            margin-top: 2px;
+            display: block;
+            font-size: 12px;
+            line-height: 1.4;
+            color: var(--muted);
+        }
+        html[data-theme="dark"] .notif-ic-warn { background: rgba(227, 164, 72, 0.13); }
+        html[data-theme="dark"] .notif-ic-danger { background: rgba(227, 106, 106, 0.13); }
 
         /* ---------- Cards & tables ---------- */
         .card {
@@ -233,7 +318,7 @@
         }
         .payments-table th {
             font-family: var(--font-mono);
-            background: #FAFCFA;
+            background: var(--hover);
             color: var(--muted);
             font-size: 10.5px;
             font-weight: 600;
@@ -243,7 +328,7 @@
         }
         .payments-table tr:last-child td { border-bottom: none; }
         .payments-table tbody tr { transition: background-color 0.12s ease; }
-        .payments-table tbody tr:hover { background: #FAFCFA; }
+        .payments-table tbody tr:hover { background: var(--hover); }
         .table-num {
             font-family: var(--font-mono);
             font-variant-numeric: tabular-nums;
@@ -326,7 +411,7 @@
             flex-wrap: wrap;
         }
         .empty-state {
-            background: #fff;
+            background: var(--card);
             border: 1px dashed var(--line-strong);
             border-radius: 10px;
             padding: 28px;
@@ -340,7 +425,7 @@
         .history-filter-bar {
             padding: 14px 18px;
             border-bottom: 1px solid var(--line);
-            background: #FAFCFA;
+            background: var(--hover);
         }
         .table-search {
             position: relative;
@@ -361,7 +446,7 @@
             width: 100%;
             border: 1px solid var(--line-strong);
             border-radius: 6px;
-            background: #fff;
+            background: var(--field);
             color: var(--ink);
             font-family: var(--font-ui);
             font-size: 13px;
@@ -389,7 +474,7 @@
         .modal-backdrop.active { display: flex; }
         .modal {
             width: min(540px, 100%);
-            background: #fff;
+            background: var(--card);
             border: 1px solid var(--line);
             border-radius: 12px;
             padding: 24px;
@@ -428,7 +513,7 @@
             border-radius: 6px;
             font-family: var(--font-ui);
             font-size: 13.5px;
-            background: #fff;
+            background: var(--field);
             color: var(--ink);
             transition: border-color 0.15s ease, box-shadow 0.15s ease;
         }
@@ -444,7 +529,7 @@
             resize: vertical;
         }
         .field input[readonly] {
-            background: #FAFCFA;
+            background: var(--hover);
             color: var(--muted);
         }
         .field-help {
@@ -495,7 +580,7 @@
         .flash-modal-backdrop.active { display: flex; }
         .flash-modal {
             width: min(480px, 100%);
-            background: #fff;
+            background: var(--card);
             border: 1px solid var(--line);
             border-radius: 12px;
             box-shadow: var(--shadow-pop);
@@ -620,7 +705,7 @@
 
         /* ---------- Navbar ---------- */
         .nb {
-            background: #fff;
+            background: var(--card);
             border-bottom: 1px solid var(--line);
         }
         .nb-icon-btn {
@@ -674,7 +759,7 @@
         .nb-search-input::placeholder { color: var(--faint); }
         .nb-search-input:focus {
             outline: none;
-            background: #fff;
+            background: var(--field);
             border-color: var(--pine);
             box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.12);
         }
@@ -698,7 +783,7 @@
             color: var(--faint);
             border: 1px solid var(--line);
             border-radius: 4px;
-            background: #fff;
+            background: var(--card);
             padding: 2px 5px;
             pointer-events: none;
         }
@@ -785,6 +870,88 @@
             flex-shrink: 0;
         }
 
+        /* ---------- Dark-only overrides ---------- */
+        /* --pine flips to light mint in dark mode, so anything sitting on it
+           needs dark text instead of white. */
+        html[data-theme="dark"] .btn-primary,
+        html[data-theme="dark"] .btn-green { color: #0C130F; }
+        html[data-theme="dark"] .nb-avatar-fallback { color: #0C130F; }
+        html[data-theme="dark"] .user-avatar { color: #0C130F; }
+        html[data-theme="dark"] .btn-danger { color: #fff; }
+        html[data-theme="dark"] .btn-danger-soft {
+            background: rgba(227, 106, 106, 0.12);
+            border-color: rgba(227, 106, 106, 0.35);
+            color: #F0A0A0;
+        }
+        html[data-theme="dark"] .btn-danger-soft:hover { background: rgba(227, 106, 106, 0.2); }
+        html[data-theme="dark"] .alert-success {
+            background: rgba(123, 211, 160, 0.10);
+            border-color: rgba(123, 211, 160, 0.30);
+            color: #A9E4C2;
+        }
+        html[data-theme="dark"] .alert-warning {
+            background: rgba(227, 164, 72, 0.10);
+            border-color: rgba(227, 164, 72, 0.32);
+            color: #EEC084;
+        }
+        html[data-theme="dark"] .alert-error {
+            background: rgba(227, 106, 106, 0.12);
+            border-color: rgba(227, 106, 106, 0.35);
+            color: #F0A0A0;
+        }
+        html[data-theme="dark"] .status-badge-paid { background: rgba(123, 211, 160, 0.16); color: #8CD6AF; }
+        html[data-theme="dark"] .status-badge-due { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+        html[data-theme="dark"] .status-badge-overdue { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+        html[data-theme="dark"] .status-badge-none { background: rgba(255, 255, 255, 0.07); }
+        html[data-theme="dark"] .paid-month-badge {
+            background: rgba(123, 211, 160, 0.12);
+            border-color: rgba(123, 211, 160, 0.30);
+            color: #A9E4C2;
+        }
+        html[data-theme="dark"] .modal-feedback.error {
+            background: rgba(227, 106, 106, 0.12);
+            border-color: rgba(227, 106, 106, 0.35);
+            color: #F0A0A0;
+        }
+        html[data-theme="dark"] .modal-feedback.success {
+            background: rgba(123, 211, 160, 0.10);
+            border-color: rgba(123, 211, 160, 0.30);
+            color: #A9E4C2;
+        }
+        html[data-theme="dark"] .flash-modal-head {
+            background: rgba(123, 211, 160, 0.10);
+            border-bottom-color: rgba(123, 211, 160, 0.28);
+            color: #A9E4C2;
+        }
+        html[data-theme="dark"] .pop-item.pop-item-danger:hover { background: rgba(227, 106, 106, 0.12); }
+        html[data-theme="dark"] select.control {
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2398A89E' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+        }
+        html[data-theme="dark"] .control:focus,
+        html[data-theme="dark"] .table-search input:focus,
+        html[data-theme="dark"] .field input:focus,
+        html[data-theme="dark"] .field select:focus,
+        html[data-theme="dark"] .field textarea:focus,
+        html[data-theme="dark"] .nb-search-input:focus {
+            box-shadow: 0 0 0 3px rgba(123, 211, 160, 0.18);
+        }
+        html[data-theme="dark"] .btn:focus-visible,
+        html[data-theme="dark"] .nb-icon-btn:focus-visible,
+        html[data-theme="dark"] .nb-user-btn:focus-visible {
+            outline-color: rgba(123, 211, 160, 0.55);
+        }
+        /* Sidebar is dark in both themes; nudge it to match the dark page chrome. */
+        html[data-theme="dark"] .sb { background: #0B100D; border-right-color: #070B09; }
+        html[data-theme="dark"] .sb-brand-logo { background: #E6EDE8; }
+
+        /* Theme toggle: show the icon for the mode you'd switch to. */
+        .nb-theme-btn .icon-moon { display: inline-flex; }
+        .nb-theme-btn .icon-sun { display: none; }
+        html[data-theme="dark"] .nb-theme-btn .icon-moon { display: none; }
+        html[data-theme="dark"] .nb-theme-btn .icon-sun { display: inline-flex; }
+        .nb-theme-btn svg { width: 22px; height: 22px; }
+        .nb-icon-btn svg { width: 22px; height: 22px; }
+
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
@@ -811,6 +978,27 @@
         $cashierSettingsRoute = \Illuminate\Support\Facades\Route::has('profile.edit')
             ? route('profile.edit')
             : url('/');
+
+        // Outstanding active concessionaires for the notification bell, using
+        // the shared fee service: overdue = unpaid past months, due = current
+        // month still unpaid.
+        $cashierFeePlans = app(\App\Services\ConcessionaireFeeService::class)->plans(
+            \App\Models\User::query()
+                ->where('role', 'concessionaire')
+                ->where('is_approved', true)
+                ->where('is_active_concessionaire', true)
+                ->where('monthly_fee', '>', 0)
+                ->orderByRaw('COALESCE(NULLIF(business_name, ""), name) asc')
+                ->get(['id', 'name', 'business_name', 'monthly_fee'])
+        );
+        $cashierOverduePlans = collect($cashierFeePlans)->where('status', 'overdue');
+        $cashierDuePlans = collect($cashierFeePlans)->whereIn('status', ['due', 'due_soon']);
+        $cashierOverdueCount = $cashierOverduePlans->count();
+        $cashierDueCount = $cashierDuePlans->count();
+        $cashierOverdueNames = $cashierOverduePlans->take(3)->pluck('business')->implode(', ');
+        $cashierDueNames = $cashierDuePlans->take(3)->pluck('business')->implode(', ');
+        $cashierOverdueMore = max(0, $cashierOverdueCount - 3);
+        $cashierDueMore = max(0, $cashierDueCount - 3);
     @endphp
 
     <aside id="cashier-sidebar" class="sb fixed top-0 left-0 z-40 h-screen w-64 -translate-x-full transition-transform duration-300 lg:translate-x-0" aria-label="Cashier sidebar" data-drawer-backdrop="true">
@@ -959,6 +1147,78 @@
                     </div>
 
                     <div class="flex items-center gap-1.5 sm:gap-2.5">
+                        <button type="button" class="nb-icon-btn nb-theme-btn" id="theme-toggle" title="Toggle dark mode" aria-label="Toggle dark mode">
+                            <svg class="icon-moon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                            </svg>
+                            <svg class="icon-sun" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <circle cx="12" cy="12" r="4"/>
+                                <path stroke-linecap="round" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/>
+                            </svg>
+                        </button>
+
+                        <button id="cashier-notification-button" type="button" class="nb-icon-btn" title="Notifications" data-dropdown-toggle="cashier-notification-dropdown" data-dropdown-placement="bottom-end">
+                            <svg class="h-[22px] w-[22px]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.437L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            @if($cashierOverdueCount + $cashierDueCount > 0)
+                                <span class="nb-badge {{ $cashierOverdueCount > 0 ? 'nb-badge-danger' : '' }}" aria-hidden="true"></span>
+                            @endif
+                        </button>
+
+                        <div id="cashier-notification-dropdown" class="pop z-50 hidden w-[320px]" role="menu" aria-labelledby="cashier-notification-button">
+                            <div class="border-b px-4 py-3" style="border-color: var(--line);">
+                                <span class="panel-title" style="font-size: 13.5px;">Notifications</span>
+                            </div>
+                            <div class="p-2">
+                                @if($cashierOverdueCount > 0)
+                                    <a href="{{ route('cashier.payments') }}" class="notif-row">
+                                        <span class="notif-ic notif-ic-danger">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                                            </svg>
+                                        </span>
+                                        <span>
+                                            <span class="notif-title notif-title-danger">{{ $cashierOverdueCount }} {{ \Illuminate\Support\Str::plural('concessionaire', $cashierOverdueCount) }} overdue</span>
+                                            <span class="notif-body">
+                                                Unpaid past months: {{ $cashierOverdueNames }}{{ $cashierOverdueMore > 0 ? ' +' . $cashierOverdueMore . ' more' : '' }}
+                                            </span>
+                                        </span>
+                                    </a>
+                                @endif
+                                @if($cashierDueCount > 0)
+                                    <a href="{{ route('cashier.payments') }}" class="notif-row">
+                                        <span class="notif-ic notif-ic-warn">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </span>
+                                        <span>
+                                            <span class="notif-title notif-title-warn">{{ $cashierDueCount }} {{ \Illuminate\Support\Str::plural('payment', $cashierDueCount) }} due for {{ now()->format('F') }}</span>
+                                            <span class="notif-body">
+                                                Still unpaid this month: {{ $cashierDueNames }}{{ $cashierDueMore > 0 ? ' +' . $cashierDueMore . ' more' : '' }}
+                                            </span>
+                                        </span>
+                                    </a>
+                                @endif
+                                @if($cashierOverdueCount + $cashierDueCount === 0)
+                                    <div class="notif-row">
+                                        <span class="notif-ic notif-ic-ok">
+                                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </span>
+                                        <span>
+                                            <span class="notif-title notif-title-ok">All caught up</span>
+                                            <span class="notif-body">
+                                                Every active concessionaire is settled for {{ now()->format('F') }}.
+                                            </span>
+                                        </span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
                         <div class="hidden h-6 w-px sm:block" style="background: var(--line);"></div>
 
                         <button id="cashier-user-menu-button" type="button" class="nb-user-btn" data-dropdown-toggle="cashier-user-menu" data-dropdown-placement="bottom-end" aria-expanded="false">
@@ -1024,6 +1284,23 @@
     </div>
 
     <script>
+        // ---------- Dark mode toggle ----------
+        (() => {
+            const btn = document.getElementById('theme-toggle');
+            if (!btn) return;
+            btn.addEventListener('click', () => {
+                const root = document.documentElement;
+                const dark = root.getAttribute('data-theme') !== 'dark';
+                if (dark) {
+                    root.setAttribute('data-theme', 'dark');
+                } else {
+                    root.removeAttribute('data-theme');
+                }
+                try { localStorage.setItem('eba-cashier-theme', dark ? 'dark' : 'light'); } catch (e) {}
+                window.dispatchEvent(new CustomEvent('eba:theme', { detail: { theme: dark ? 'dark' : 'light' } }));
+            });
+        })();
+
         (() => {
             const input = document.getElementById('portal-search-input');
             const panel = document.getElementById('portal-search-panel');

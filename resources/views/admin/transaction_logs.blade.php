@@ -18,7 +18,7 @@
         }
         .tx-subtitle {
             font-size: 13px;
-            color: #64748b;
+            color: var(--muted);
             font-weight: 500;
         }
         .tx-controls {
@@ -38,26 +38,26 @@
             left: 10px;
             width: 16px;
             height: 16px;
-            color: #64748b;
+            color: var(--muted);
             transform: translateY(-50%);
             pointer-events: none;
         }
         #date-picker {
             width: 100%;
             height: 38px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--line);
             border-radius: 8px;
             padding: 0 12px 0 34px;
             font-size: 14px;
-            color: #1e293b;
-            background: #f8fafc;
+            color: var(--ink);
+            background: var(--hover);
             outline: none;
             font-family: inherit;
         }
         #date-picker:focus {
-            border-color: #0a5c2f;
+            border-color: var(--pine);
             box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.1);
-            background: #fff;
+            background: var(--card);
         }
         .tx-export-btn {
             display: inline-flex;
@@ -82,11 +82,11 @@
         }
         .tx-order-id {
             font-weight: 700;
-            color: #0f172a;
+            color: var(--ink);
         }
         .tx-total {
             font-weight: 700;
-            color: #0a5c2f;
+            color: var(--pine);
         }
         .tx-items {
             display: flex;
@@ -98,13 +98,13 @@
             align-items: center;
             border-radius: 999px;
             padding: 4px 10px;
-            background: #f1f5f9;
-            color: #334155;
+            background: var(--hover-2);
+            color: var(--ink);
             font-size: 12px;
             font-weight: 600;
         }
         .tx-muted {
-            color: #94a3b8;
+            color: var(--faint);
             font-size: 13px;
         }
         .tx-empty {
@@ -115,17 +115,17 @@
             gap: 10px;
             padding: 48px 24px;
             text-align: center;
-            color: #64748b;
+            color: var(--muted);
         }
         .tx-empty svg {
             width: 42px;
             height: 42px;
-            color: #cbd5e1;
+            color: var(--faint);
         }
         .tx-empty-title {
             font-size: 15px;
             font-weight: 700;
-            color: #475569;
+            color: var(--muted);
         }
         .tx-stat-grid {
             display: grid;
@@ -134,8 +134,8 @@
             margin-bottom: 20px;
         }
         .tx-stat-card {
-            background: #fff;
-            border: 1px solid #e2e8f0;
+            background: var(--card);
+            border: 1px solid var(--line);
             border-radius: 14px;
             padding: 20px;
             display: flex;
@@ -150,23 +150,23 @@
             font-weight: 600;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #64748b;
+            color: var(--muted);
         }
         .tx-stat-value {
             font-size: 34px;
             font-weight: 800;
             line-height: 1.05;
             letter-spacing: -0.03em;
-            color: #0f172a;
+            color: var(--ink);
             font-variant-numeric: tabular-nums;
         }
         .tx-stat-value.is-pine { color: var(--green, #0a5c2f); }
         .tx-stat-foot {
             margin-top: auto;
             padding-top: 12px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid var(--line);
             font-size: 12px;
-            color: #94a3b8;
+            color: var(--faint);
         }
         @media (max-width: 900px) {
             .tx-controls {

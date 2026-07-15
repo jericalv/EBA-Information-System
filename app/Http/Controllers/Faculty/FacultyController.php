@@ -13,6 +13,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\UniformStock;
 use App\Models\User;
+use App\Services\ConcessionaireFeeService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Mailable;
@@ -1104,39 +1105,22 @@ class FacultyController extends Controller
         return $user->getNotificationPreference('email_partnership_updates');
     }
 
-    public function concessionairesIndex(Request $request)
+    public function concessionairesIndex(Request $request, ConcessionaireFeeService $feeService)
     {
-        $currentMonthStart = now()->startOfMonth();
-        $currentMonthEnd = now()->endOfMonth();
-
         $concessionaires = User::query()
             ->where('role', 'concessionaire')
             ->where('is_approved', true)
             ->where('is_active_concessionaire', true)
-            ->withCount([
-                'concessionairePayments as current_month_payment_count' => function ($paymentQuery) use ($currentMonthStart, $currentMonthEnd) {
-                    $paymentQuery->whereBetween('payment_date', [$currentMonthStart, $currentMonthEnd]);
-                },
-            ])
             ->withSum('concessionairePayments as total_paid', 'amount')
             ->withMax('concessionairePayments as last_payment_date', 'payment_date')
             ->orderBy('business_name')
             ->orderBy('name')
             ->get();
 
-        $today = now()->day;
-        $overdueCount = $concessionaires->filter(function (User $concessionaire) use ($today) {
-            $monthlyFee = (float) ($concessionaire->monthly_fee ?? 0);
-            $hasPaidThisMonth = (int) ($concessionaire->current_month_payment_count ?? 0) > 0;
+        $feePlans = $feeService->plans($concessionaires);
+        $overdueCount = $feeService->statusCounts($feePlans)[ConcessionaireFeeService::STATUS_OVERDUE];
 
-            if ($monthlyFee <= 0 || $hasPaidThisMonth) {
-                return false;
-            }
-
-            return $today >= 1 && $today < 25;
-        })->count();
-
-        return $this->facultyView('faculty.concessionaires.index', compact('concessionaires', 'overdueCount'));
+        return $this->facultyView('faculty.concessionaires.index', compact('concessionaires', 'feePlans', 'overdueCount'));
     }
 
     public function concessionairesEdit(int $id)

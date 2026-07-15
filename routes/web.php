@@ -7,6 +7,7 @@ use App\Http\Controllers\Cashier\CashierController;
 use App\Http\Controllers\Concessionaire\ConcessionaireController;
 use App\Http\Controllers\DevController;
 use App\Http\Controllers\Faculty\FacultyController;
+use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PartnershipApplicationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
@@ -43,6 +44,11 @@ Route::middleware(['auth', 'restrict.admin.panel'])->group(function () {
     Route::post('/partnership/documents', [PartnershipApplicationController::class, 'uploadDocument'])->name('partnership.documents.upload');
 });
 
+// Invoice download from payment emails (signed URL, no login required)
+Route::get('/invoices/{payment}', [InvoiceController::class, 'download'])
+    ->name('invoice.download')
+    ->middleware('signed');
+
 // Admin Authentication (public)
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLoginForm'])->name('login');
@@ -56,10 +62,13 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::get('/transaction-logs', [AdminController::class, 'transactionLogs'])->name('transaction-logs');
     Route::get('/', [AdminController::class, 'dashboard'])->name('dashboard');
     Route::get('/concessionaires', [AdminController::class, 'paymentsIndex'])->name('concessionaires');
+    Route::get('/payment-logs', [AdminController::class, 'paymentLogs'])->name('payment-logs');
     Route::get('/payments/history/view', [CashierController::class, 'viewHistoryPdf'])->name('payments.history.view');
     Route::get('/payments/history/pdf', [CashierController::class, 'downloadHistoryPdf'])->name('payments.history.pdf');
+    Route::get('/payments/history/csv', [CashierController::class, 'downloadHistoryCsv'])->name('payments.history.csv');
     Route::get('/payments/{concessionaire}/history/view', [CashierController::class, 'viewConcessionaireHistoryPdf'])->name('payments.concessionaire.history.view');
     Route::get('/payments/{concessionaire}/history/pdf', [CashierController::class, 'downloadConcessionaireHistoryPdf'])->name('payments.concessionaire.history.pdf');
+    Route::get('/payments/{concessionaire}/history/csv', [CashierController::class, 'downloadConcessionaireHistoryCsv'])->name('payments.concessionaire.history.csv');
     Route::get('/payments/{payment}/receipt', [CashierController::class, 'downloadReceipt'])->name('payments.receipt');
     Route::get('/record-payment', [AdminController::class, 'recordPayment'])->name('record-payment');
     Route::post('/record-payment', [AdminController::class, 'storeRecordedPayment'])->name('record-payment.store');
@@ -145,8 +154,10 @@ Route::middleware(['auth', 'restrict.admin.panel', 'cashier'])->prefix('cashier'
     Route::get('/history', [CashierController::class, 'historyIndex'])->name('history');
     Route::get('/payments/history/view', [CashierController::class, 'viewHistoryPdf'])->name('payments.history.view');
     Route::get('/payments/history/pdf', [CashierController::class, 'downloadHistoryPdf'])->name('payments.history.pdf');
+    Route::get('/payments/history/csv', [CashierController::class, 'downloadHistoryCsv'])->name('payments.history.csv');
     Route::get('/payments/{concessionaire}/history/view', [CashierController::class, 'viewConcessionaireHistoryPdf'])->name('payments.concessionaire.history.view');
     Route::get('/payments/{concessionaire}/history/pdf', [CashierController::class, 'downloadConcessionaireHistoryPdf'])->name('payments.concessionaire.history.pdf');
+    Route::get('/payments/{concessionaire}/history/csv', [CashierController::class, 'downloadConcessionaireHistoryCsv'])->name('payments.concessionaire.history.csv');
     Route::get('/payments/{payment}/receipt', [CashierController::class, 'downloadReceipt'])->name('payments.receipt');
     Route::patch('/partnerships/{application}/contract-period', [CashierController::class, 'saveContractPeriod'])->name('partnerships.contract-period');
 });

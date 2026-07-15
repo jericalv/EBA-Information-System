@@ -9,8 +9,8 @@
         display:flex; align-items:flex-start; justify-content:space-between;
         gap:16px; flex-wrap:wrap; margin-bottom:20px;
     }
-    .ss-head h2 { font-size:22px; font-weight:800; color:#0f172a; }
-    .ss-head p  { font-size:14px; color:#64748b; margin-top:4px; max-width:620px; line-height:1.55; }
+    .ss-head h2 { font-size:22px; font-weight:800; color: var(--ink); }
+    .ss-head p  { font-size:14px; color: var(--muted); margin-top:4px; max-width:620px; line-height:1.55; }
 
     /* Tabbed layout — section nav + single visible panel */
     .ss-layout {
@@ -19,7 +19,7 @@
     }
     .ss-tabs {
         position:sticky; top:84px;
-        background:#fff; border:1px solid #e2e8f0; border-radius:14px;
+        background: var(--card); border:1px solid var(--line); border-radius:14px;
         padding:10px; display:flex; flex-direction:column; gap:3px;
         box-shadow:0 1px 3px rgba(0,0,0,.04);
     }
@@ -27,14 +27,14 @@
         display:flex; align-items:center; gap:11px; width:100%;
         padding:11px 13px; border:none; background:none; cursor:pointer;
         border-radius:10px; font-family:inherit; font-size:14px; font-weight:600;
-        color:#475569; text-align:left; transition:background .15s, color .15s;
+        color: var(--muted); text-align:left; transition:background .15s, color .15s;
     }
     .ss-tab svg { width:18px; height:18px; flex-shrink:0; }
-    .ss-tab:hover { background:#f1f5f9; color:#0f172a; }
-    .ss-tab.active { background:rgba(10,92,47,.1); color:#0A5C2F; }
+    .ss-tab:hover { background: var(--hover-2); color: var(--ink); }
+    .ss-tab.active { background:rgba(10,92,47,.1); color:var(--pine); }
     .ss-tab-num {
-        margin-left:auto; font-size:11px; font-weight:700; color:#94a3b8;
-        background:#f1f5f9; border-radius:999px; padding:1px 8px; min-width:22px; text-align:center;
+        margin-left:auto; font-size:11px; font-weight:700; color: var(--faint);
+        background: var(--hover-2); border-radius:999px; padding:1px 8px; min-width:22px; text-align:center;
     }
     .ss-tab.active .ss-tab-num { background:#0A5C2F; color:#fff; }
 
@@ -43,11 +43,11 @@
     @keyframes ssFade { from { opacity:0; transform:translateY(4px); } to { opacity:1; transform:none; } }
 
     .ss-panel-head { margin-bottom:14px; }
-    .ss-panel-head h3 { font-size:18px; font-weight:800; color:#0f172a; }
-    .ss-panel-head p  { font-size:13px; color:#64748b; margin-top:3px; line-height:1.5; }
+    .ss-panel-head h3 { font-size:18px; font-weight:800; color: var(--ink); }
+    .ss-panel-head p  { font-size:13px; color: var(--muted); margin-top:3px; line-height:1.5; }
 
     .ss-card {
-        background:#fff; border:1px solid #e2e8f0; border-radius:14px;
+        background: var(--card); border:1px solid var(--line); border-radius:14px;
         padding:22px; box-shadow:0 1px 3px rgba(0,0,0,.04);
     }
 
@@ -60,29 +60,29 @@
     }
 
     .ss-field label {
-        display:block; font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;
+        display:block; font-size:13px; font-weight:600; color:var(--ink); margin-bottom:6px;
     }
     .ss-input, .ss-textarea {
-        width:100%; padding:10px 12px; border:1px solid #e2e8f0; border-radius:9px;
-        font-size:14px; font-family:inherit; color:#1e293b; background:#fff; outline:none;
+        width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:9px;
+        font-size:14px; font-family:inherit; color: var(--ink); background: var(--card); outline:none;
         transition:border-color .15s, box-shadow .15s;
     }
     .ss-input:focus, .ss-textarea:focus {
-        border-color:#0A5C2F; box-shadow:0 0 0 3px rgba(10,92,47,.1);
+        border-color:var(--pine); box-shadow:0 0 0 3px rgba(10,92,47,.1);
     }
     .ss-textarea { resize:vertical; min-height:84px; }
 
     .ss-sub {
-        background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:16px;
+        background: var(--hover); border:1px solid var(--line); border-radius:12px; padding:16px;
         display:flex; flex-direction:column; gap:12px;
     }
     .ss-sub-label {
         font-size:11px; font-weight:700; text-transform:uppercase;
-        letter-spacing:.5px; color:#94a3b8;
+        letter-spacing:.5px; color: var(--faint);
     }
 
     .ss-img-card {
-        background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px;
+        background: var(--hover); border:1px solid var(--line); border-radius:12px;
         padding:14px; display:flex; flex-direction:column; gap:10px;
     }
     .ss-img-preview {
@@ -91,22 +91,22 @@
         display:flex; align-items:center; justify-content:center;
     }
     .ss-img-preview img { width:100%; height:100%; object-fit:cover; display:block; }
-    .ss-img-caption { font-size:13px; font-weight:600; color:#374151; }
-    .ss-file { font-size:12px; color:#64748b; }
+    .ss-img-caption { font-size:13px; font-weight:600; color:var(--ink); }
+    .ss-file { font-size:12px; color: var(--muted); }
     .ss-file::file-selector-button {
-        margin-right:10px; padding:7px 12px; border:1px solid #e2e8f0; border-radius:8px;
-        background:#fff; color:#0A5C2F; font-weight:600; font-size:12px; cursor:pointer;
+        margin-right:10px; padding:7px 12px; border:1px solid var(--line); border-radius:8px;
+        background: var(--card); color:var(--pine); font-weight:600; font-size:12px; cursor:pointer;
         font-family:inherit; transition:background .15s;
     }
-    .ss-file::file-selector-button:hover { background:#f1f5f9; }
-    .ss-hint { font-size:11px; color:#94a3b8; }
+    .ss-file::file-selector-button:hover { background: var(--hover-2); }
+    .ss-hint { font-size:11px; color: var(--faint); }
 
     .ss-note {
         display:flex; gap:10px; align-items:flex-start;
         background:rgba(10,92,47,.05); border:1px solid rgba(10,92,47,.18);
-        border-radius:10px; padding:14px 16px; font-size:13px; color:#374151; line-height:1.55;
+        border-radius:10px; padding:14px 16px; font-size:13px; color:var(--ink); line-height:1.55;
     }
-    .ss-note svg { width:18px; height:18px; color:#0A5C2F; flex-shrink:0; margin-top:1px; }
+    .ss-note svg { width:18px; height:18px; color:var(--pine); flex-shrink:0; margin-top:1px; }
 
     /* Sticky save bar — always visible across tabs */
     .ss-save-bar {
@@ -114,10 +114,10 @@
         display:flex; align-items:center; justify-content:space-between; gap:12px;
         padding:14px 28px; background:rgba(255,255,255,.92);
         backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
-        border-top:1px solid #e2e8f0; box-shadow:0 -6px 18px rgba(15,23,42,.05);
+        border-top:1px solid var(--line); box-shadow:0 -6px 18px rgba(15,23,42,.05);
     }
-    .ss-save-hint { font-size:13px; color:#64748b; }
-    .ss-save-hint strong { color:#0f172a; }
+    .ss-save-hint { font-size:13px; color: var(--muted); }
+    .ss-save-hint strong { color: var(--ink); }
 
     @media (max-width: 860px) {
         .ss-layout { grid-template-columns:1fr; }

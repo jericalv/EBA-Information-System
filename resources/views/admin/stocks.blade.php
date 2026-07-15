@@ -22,13 +22,13 @@
         display: block;
         font-size: 13px;
         font-weight: 700;
-        color: #334155;
+        color: var(--ink);
         margin-bottom: 6px;
     }
     .stocks-help {
         margin-top: 5px;
         font-size: 12px;
-        color: #64748b;
+        color: var(--muted);
         line-height: 1.4;
     }
     .stocks-visible-row {
@@ -37,7 +37,7 @@
         gap: 8px;
         font-size: 13px;
         margin: 16px 0 4px;
-        color: #334155;
+        color: var(--ink);
         font-weight: 500;
     }
     .stocks-visible-row input[type="checkbox"] {
@@ -51,11 +51,11 @@
         height: 48px;
         border-radius: 10px;
         overflow: hidden;
-        background: #f8fafc;
+        background: var(--hover);
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--line);
     }
     .stocks-thumb img {
         width: 100%;
@@ -65,7 +65,7 @@
     .stocks-thumb svg {
         width: 22px;
         height: 22px;
-        color: #94a3b8;
+        color: var(--faint);
     }
 
     .stocks-table-card table {
@@ -77,13 +77,13 @@
     .stocks-table-card th,
     .stocks-table-card td {
         padding: 14px 16px;
-        border-bottom: 1px solid #eef2f7;
+        border-bottom: 1px solid var(--line);
         text-align: left;
         vertical-align: middle;
     }
     .stocks-table-card th {
-        background: #f8fafc;
-        color: #64748b;
+        background: var(--hover);
+        color: var(--muted);
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -135,7 +135,7 @@
         position: absolute;
         right: 0;
         top: calc(100% + 4px);
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         border-radius: 10px;
         box-shadow: var(--shadow-pop);
@@ -151,7 +151,7 @@
         width: 100%;
         padding: 8px 12px;
         font-size: 13px;
-        color: #334155;
+        color: var(--ink);
         text-align: left;
         background: none;
         border: none;
@@ -175,6 +175,8 @@
         background: #fef2f2;
         color: #b91c1c;
     }
+    html[data-theme="dark"] .actions-dropdown-item.btn-delete-item { color: #F0A0A0; }
+    html[data-theme="dark"] .actions-dropdown-item.btn-delete-item:hover { background: rgba(227, 106, 106, 0.12); color: #F4B6B6; }
 
     .stock-status-badge {
         display: inline-flex;
@@ -211,6 +213,8 @@
     .stock-status-badge-archived .stock-status-badge-dot {
         background: #f43f5e;
     }
+    html[data-theme="dark"] .stock-status-badge-active { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; border-color: rgba(30, 149, 96, 0.4); }
+    html[data-theme="dark"] .stock-status-badge-archived { background: rgba(244, 63, 94, 0.14); color: #F5A3B1; border-color: rgba(244, 63, 94, 0.4); }
 
     #editStockModal,
     #addStockModal,
@@ -236,7 +240,7 @@
     .edit-modal-content,
     .delete-modal-content,
     .archive-modal-content {
-        background: #fff;
+        background: var(--card);
         border-radius: 16px;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         width: 100%;
@@ -279,7 +283,7 @@
         display: block;
         font-size: 13px;
         font-weight: 700;
-        color: #334155;
+        color: var(--ink);
         margin-bottom: 6px;
     }
     .add-modal-field input[type="text"],
@@ -292,7 +296,7 @@
         font-family: inherit;
         font-size: 14px;
         color: var(--ink);
-        background: #fff;
+        background: var(--card);
     }
     .add-modal-field input[type="text"],
     .add-modal-field input[type="number"],
@@ -317,19 +321,19 @@
         outline: none;
         border-color: var(--pine);
         box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.10);
-        background: #fff;
+        background: var(--card);
     }
     .add-modal-help {
         margin-top: 5px;
         font-size: 12px;
-        color: #64748b;
+        color: var(--muted);
         line-height: 1.4;
     }
 
     .image-dropzone {
-        border: 2px dashed #cbd5e1;
+        border: 2px dashed var(--line-strong);
         border-radius: 12px;
-        background: #fcfcfd;
+        background: var(--hover);
         padding: 26px 20px;
         text-align: center;
         cursor: pointer;
@@ -337,7 +341,7 @@
     }
     .image-dropzone:hover {
         border-color: var(--pine);
-        background: #f8fafc;
+        background: var(--hover);
     }
     .image-dropzone-preview {
         width: 88px;
@@ -345,8 +349,8 @@
         border-radius: 10px;
         overflow: hidden;
         margin: 0 auto 14px;
-        border: 1px solid #e2e8f0;
-        background: #fff;
+        border: 1px solid var(--line);
+        background: var(--card);
     }
     .image-dropzone-preview img {
         width: 100%;
@@ -363,13 +367,13 @@
     .image-dropzone-hint {
         margin-top: 6px;
         font-size: 12px;
-        color: #94a3b8;
+        color: var(--faint);
     }
     .image-dropzone-status {
         margin-top: 10px;
         font-size: 13px;
         font-weight: 700;
-        color: #475569;
+        color: var(--muted);
     }
     .image-dropzone-remove {
         margin-top: 8px;
@@ -389,7 +393,7 @@
         gap: 8px;
         font-size: 13px;
         margin: 16px 0 4px;
-        color: #334155;
+        color: var(--ink);
         font-weight: 500;
     }
     .add-visible-row input[type="checkbox"] {
@@ -403,7 +407,7 @@
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        background: #f8fafc;
+        background: var(--hover);
     }
     .btn:disabled {
         opacity: 0.6;
@@ -425,7 +429,7 @@
     .delete-modal-close,
     .archive-modal-close {
         border: 0;
-        background: #f1f5f9;
+        background: var(--hover-2);
         border-radius: 6px;
         width: 32px;
         height: 32px;
@@ -433,13 +437,13 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        color: #64748b;
+        color: var(--muted);
     }
     .edit-modal-close:hover,
     .delete-modal-close:hover,
     .archive-modal-close:hover {
-        background: #e2e8f0;
-        color: #334155;
+        background: var(--hover-2);
+        color: var(--ink);
     }
     .edit-modal-close svg,
     .delete-modal-close svg,
@@ -459,7 +463,7 @@
         display: block;
         font-size: 13px;
         font-weight: 700;
-        color: #334155;
+        color: var(--ink);
         margin-bottom: 8px;
     }
     .edit-modal-field input[type="text"],
@@ -470,7 +474,7 @@
         font-family: inherit;
         font-size: 14px;
         color: var(--ink);
-        background: #fff;
+        background: var(--card);
         height: 44px;
         padding: 0 14px;
     }
@@ -478,7 +482,7 @@
         outline: none;
         border-color: var(--pine);
         box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.10);
-        background: #fff;
+        background: var(--card);
     }
     .edit-modal-footer,
     .delete-modal-footer,
@@ -488,18 +492,18 @@
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        background: #f8fafc;
+        background: var(--hover);
     }
     .delete-modal-body p,
     .archive-modal-body p {
         margin: 0 0 16px 0;
-        color: #334155;
+        color: var(--ink);
         font-size: 14px;
         line-height: 1.5;
     }
     .delete-modal-body strong,
     .archive-modal-body strong {
-        color: #0f172a;
+        color: var(--ink);
     }
     .delete-modal-warning {
         padding: 12px 14px;
@@ -511,6 +515,7 @@
         font-size: 13px;
         box-sizing: border-box;
     }
+    html[data-theme="dark"] .delete-modal-warning { background: rgba(244, 63, 94, 0.12); border-color: rgba(244, 63, 94, 0.35); color: #F5A3B1; }
     .archive-modal-warning {
         padding: 12px 14px;
         background: #fffbeb;
@@ -523,6 +528,11 @@
         align-items: flex-start;
         gap: 8px;
         box-sizing: border-box;
+    }
+    html[data-theme="dark"] .archive-modal-warning {
+        background: rgba(227, 164, 72, 0.12);
+        border-color: rgba(227, 164, 72, 0.35);
+        color: #E9C288;
     }
     .archive-modal-warning svg {
         flex-shrink: 0;
@@ -572,8 +582,8 @@
     <section class="card stocks-table-card">
         <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
             <div>
-                <strong style="font-size:16px;color:#111827;">Stock Items</strong>
-                <div style="font-size:13px;color:#64748b;margin-top:4px;">Manage your inventory items</div>
+                <strong style="font-size:16px;color: var(--ink);">Stock Items</strong>
+                <div style="font-size:13px;color: var(--muted);margin-top:4px;">Manage your inventory items</div>
             </div>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
                 <button type="button" class="btn btn-green" @click="isAddModalOpen = true; type = ''; quantity = 0; prices = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; quantities = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; imagePreview = ''; imageName = ''; if ($refs.addForm) $refs.addForm.reset(); refreshBodyScrollLock()">
@@ -583,7 +593,7 @@
                     Add Item
                 </button>
                 <div style="position:relative;display:inline-flex;align-items:center;">
-                    <svg style="position:absolute;left:10px;width:15px;height:15px;color:#94a3b8;pointer-events:none;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg style="position:absolute;left:10px;width:15px;height:15px;color: var(--faint);pointer-events:none;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
                     </svg>
                     <input
@@ -591,7 +601,7 @@
                         type="text"
                         placeholder="Search items..."
                         oninput="filterRows()"
-                        style="height:38px;padding:0 14px 0 34px;border:1px solid var(--line-strong);border-radius:6px;font-size:13px;color:var(--ink);background:#fff;width:220px;font-family:inherit;"
+                        style="height:38px;padding:0 14px 0 34px;border:1px solid var(--line-strong);border-radius:6px;font-size:13px;color:var(--ink);background: var(--card);width:220px;font-family:inherit;"
                         onfocus="this.style.borderColor='#0A5C2F';this.style.boxShadow='0 0 0 3px rgba(10,92,47,0.10)'"
                         onblur="this.style.borderColor='#CBD6CE';this.style.boxShadow='none'"
                     >
@@ -627,15 +637,15 @@
                                     @endif
                                 </span>
                             </td>
-                            <td style="font-weight:700;color:#0f172a;">{{ $stock->item_name }}</td>
+                            <td style="font-weight:700;color: var(--ink);">{{ $stock->item_name }}</td>
                             <td>
                                 @if($stock->item_type)
-                                    <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;background:#f1f5f9;color:#334155;font-size:12px;font-weight:700;text-transform:capitalize;">{{ $stock->item_type }}</span>
+                                    <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;background: var(--hover-2);color:var(--muted);font-size:12px;font-weight:700;text-transform:capitalize;">{{ $stock->item_type }}</span>
                                 @else
-                                    <span style="color:#94a3b8;font-size:13px;">—</span>
+                                    <span style="color: var(--faint);font-size:13px;">—</span>
                                 @endif
                             </td>
-                            <td style="font-weight:700;color:#0f172a;">{{ number_format($stock->quantity) }}</td>
+                            <td style="font-weight:700;color: var(--ink);">{{ number_format($stock->quantity) }}</td>
                             <td>
                                 @if($stock->quantity === 0)
                                     <span style="color:#dc2626;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
@@ -648,7 +658,7 @@
                                         Low Stock
                                     </span>
                                 @else
-                                    <span style="color:#15803d;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
+                                    <span style="color:var(--green);font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
                                         <span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;flex-shrink:0;"></span>
                                         Healthy
                                     </span>
@@ -727,11 +737,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No stock items found.</td>
+                            <td colspan="7" style="text-align:center;padding:32px;color: var(--faint);">No stock items found.</td>
                         </tr>
                     @endforelse
                     <tr id="stocks-no-results-row" style="display:none;">
-                        <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No results found.</td>
+                        <td colspan="7" style="text-align:center;padding:32px;color: var(--faint);">No results found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -772,13 +782,13 @@
                         <label>Prices and Sizes</label>
                         <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
                             <span></span>
-                            <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
-                            <span style="font-size:12px;font-weight:700;color:#334155;">Stocks by Size</span>
+                            <span style="font-size:12px;font-weight:700;color: var(--ink);">Prices by Size</span>
+                            <span style="font-size:12px;font-weight:700;color: var(--ink);">Stocks by Size</span>
                         </div>
                         <div style="display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;">
                             @foreach(['XS','S','M','L','XL','2XL','3XL','4XL','5XL'] as $size)
                             <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end;">
-                                <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:0;">{{ $size }}</label>
+                                <label style="display:block;font-size:12px;font-weight:700;color: var(--ink);margin-bottom:0;">{{ $size }}</label>
                                 <input type="number" id="size_{{ strtolower($size) }}" name="price_{{ strtolower($size) }}" min="0" step="0.01" value="0" x-model.number="prices['{{ $size }}']">
                                 <input type="number" id="qty_{{ strtolower($size) }}" name="qty_{{ strtolower($size) }}" min="0" value="0" x-model.number="quantities['{{ $size }}']">
                             </div>
@@ -803,7 +813,7 @@
                             x-model.number="quantity"
                             x-effect="if (type === 'uniforms') quantity = totalQuantity"
                             :readonly="type === 'uniforms'"
-                            :style="type === 'uniforms' ? 'background:#f1f5f9;color:#64748b;cursor:not-allowed;' : ''"
+                            :style="type === 'uniforms' ? 'background: var(--hover-2);color:var(--muted);cursor:not-allowed;' : ''"
                             required
                         >
                         <p class="add-modal-help" x-show="type === 'uniforms'" x-cloak>Automatically totals the stocks entered per size above.</p>
@@ -910,13 +920,13 @@
                     <label>Prices and Sizes</label>
                     <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
                         <span></span>
-                        <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
-                        <span style="font-size:12px;font-weight:700;color:#334155;">Stocks by Size</span>
+                        <span style="font-size:12px;font-weight:700;color: var(--ink);">Prices by Size</span>
+                        <span style="font-size:12px;font-weight:700;color: var(--ink);">Stocks by Size</span>
                     </div>
                     <div style="display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;">
                         @foreach(['XS','S','M','L','XL','2XL','3XL','4XL','5XL'] as $size)
                         <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end;">
-                            <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:0;">{{ $size }}</label>
+                            <label style="display:block;font-size:12px;font-weight:700;color: var(--ink);margin-bottom:0;">{{ $size }}</label>
                             <input type="number" id="edit_price_{{ strtolower($size) }}" name="price_{{ strtolower($size) }}" min="0" step="0.01" x-model.number="prices['{{ $size }}']" :disabled="itemType !== 'uniforms'">
                             <input type="number" id="edit_qty_{{ strtolower($size) }}" name="qty_{{ strtolower($size) }}" min="0" x-model.number="quantities['{{ $size }}']" :disabled="itemType !== 'uniforms'">
                         </div>
@@ -940,7 +950,7 @@
                         x-model.number="quantity"
                         x-effect="if (itemType === 'uniforms') quantity = totalQuantity"
                         :readonly="itemType === 'uniforms'"
-                        :style="itemType === 'uniforms' ? 'background:#f1f5f9;color:#64748b;cursor:not-allowed;' : ''"
+                        :style="itemType === 'uniforms' ? 'background: var(--hover-2);color:var(--muted);cursor:not-allowed;' : ''"
                         oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                         required
                     >
