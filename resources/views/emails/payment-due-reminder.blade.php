@@ -3,9 +3,9 @@
 
 Hi {{ $name }},
 
-This is a reminder that your monthly concessionaire fee of {{ $monthlyFee }} is due on {{ $dueDate }}.
+This is a reminder that your monthly concessionaire fee of {{ $monthlyFee }} for {{ $dueDate }} is still outstanding.
 
-Please coordinate with the EBA cashier to settle your payment before the due date to avoid an overdue status.
+Please coordinate with the EBA cashier to settle your payment before the end of the month to avoid an overdue status.
 
 You can view your payment history here:
 

@@ -19,6 +19,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\UniformStock;
 use App\Models\User;
+use App\Services\ConcessionaireFeeService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -284,10 +285,17 @@ class AdminController extends Controller
     public function users(Request $request)
     {
         $query = User::query();
-        $sort = strtolower((string) $request->query('sort', 'desc'));
 
-        if (! in_array($sort, ['asc', 'desc'], true)) {
-            $sort = 'desc';
+        $sort = strtolower((string) $request->query('sort', 'newest'));
+        $sortMap = [
+            'newest'    => ['created_at', 'desc'],
+            'oldest'    => ['created_at', 'asc'],
+            'name_asc'  => ['name', 'asc'],
+            'name_desc' => ['name', 'desc'],
+        ];
+
+        if (! array_key_exists($sort, $sortMap)) {
+            $sort = 'newest';
         }
 
         if ($search = $request->input('search')) {
@@ -301,7 +309,11 @@ class AdminController extends Controller
             $query->where('role', $role);
         }
 
-        $users = $query->orderBy('name', $sort)->paginate(15)->withQueryString();
+        [$sortColumn, $sortDirection] = $sortMap[$sort];
+
+        $users = $query->orderBy($sortColumn, $sortDirection)
+            ->paginate(15)
+            ->withQueryString();
 
         return $this->adminView('admin.users', compact('users'));
     }
@@ -1023,33 +1035,12 @@ class AdminController extends Controller
     /**
      * Display all concessionaire payments.
      */
-    public function paymentsIndex(Request $request)
+    public function paymentsIndex(Request $request, ConcessionaireFeeService $feeService)
     {
-        $query = ConcessionairePayment::query()->with([
-            'concessionaire:id,name,email,business_name',
-            'recordedBy:id,name',
-        ]);
-
-        $currentMonthStart = now()->startOfMonth();
-        $currentMonthEnd = now()->endOfMonth();
-
         $concessionaires = User::query()
             ->where('role', 'concessionaire')
             ->where('is_approved', true)
             ->where('is_active_concessionaire', true)
-            ->withCount([
-                // "Paid" means the current month is covered, so advance payments
-                // recorded in an earlier month still count.
-                'concessionairePayments as current_month_payment_count' => function ($paymentQuery) use ($currentMonthStart, $currentMonthEnd) {
-                    $paymentQuery->where(function ($q) use ($currentMonthStart, $currentMonthEnd) {
-                        $q->whereBetween('period_month', [$currentMonthStart, $currentMonthEnd])
-                            ->orWhere(function ($fallback) use ($currentMonthStart, $currentMonthEnd) {
-                                $fallback->whereNull('period_month')
-                                    ->whereBetween('payment_date', [$currentMonthStart, $currentMonthEnd]);
-                            });
-                    });
-                },
-            ])
             ->withSum('concessionairePayments as total_paid', 'amount')
             ->withMax('concessionairePayments as last_payment_date', 'payment_date')
             ->withMax('concessionairePayments as paid_through_month', 'period_month')
@@ -1057,26 +1048,60 @@ class AdminController extends Controller
             ->orderBy('name')
             ->get();
 
-        $today = now()->day;
-        $overdueCount = $concessionaires->filter(function (User $concessionaire) use ($today) {
-            $monthlyFee = (float) ($concessionaire->monthly_fee ?? 0);
-            $hasPaidThisMonth = (int) ($concessionaire->current_month_payment_count ?? 0) > 0;
-
-            if ($monthlyFee <= 0 || $hasPaidThisMonth) {
-                return false;
-            }
-
-            return $today >= 1 && $today < 25;
-        })->count();
-
-        $totalCollected = (clone $query)->sum('amount');
-        $payments = $query->latest('payment_date')->latest('id')->paginate(20);
+        $feePlans = $feeService->plans($concessionaires);
+        $overdueCount = $feeService->statusCounts($feePlans)[ConcessionaireFeeService::STATUS_OVERDUE];
 
         return $this->adminView('admin.payments', compact(
+            'concessionaires',
+            'feePlans',
+            'overdueCount'
+        ));
+    }
+
+    /**
+     * Payment logs: every recorded concessionaire fee payment, filterable
+     * by the month the payment was made (counterpart to the POS
+     * transaction logs).
+     */
+    public function paymentLogs(Request $request, ConcessionaireFeeService $feeService)
+    {
+        $month = $request->query('month');
+        $monthStart = null;
+
+        if (is_string($month) && preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $month)) {
+            $monthStart = Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        } else {
+            $month = null;
+        }
+
+        $query = ConcessionairePayment::query()->with([
+            'concessionaire:id,name,email,business_name',
+            'recordedBy:id,name',
+        ]);
+
+        if ($monthStart) {
+            $query->whereBetween('payment_date', [
+                $monthStart->copy()->startOfDay(),
+                $monthStart->copy()->endOfMonth()->endOfDay(),
+            ]);
+        }
+
+        $totalCollected = (clone $query)->sum('amount');
+        $payments = $query->latest('payment_date')->latest('id')->paginate(20)->withQueryString();
+
+        // Same overdue figure as the fee tracking page, for the stat card.
+        $activeConcessionaires = User::query()
+            ->where('role', 'concessionaire')
+            ->where('is_approved', true)
+            ->where('is_active_concessionaire', true)
+            ->get(['id', 'name', 'business_name', 'monthly_fee']);
+        $overdueCount = $feeService->statusCounts($feeService->plans($activeConcessionaires))[ConcessionaireFeeService::STATUS_OVERDUE];
+
+        return $this->adminView('admin.payment-logs', compact(
             'payments',
             'totalCollected',
-            'concessionaires',
-            'overdueCount'
+            'overdueCount',
+            'month'
         ));
     }
 
@@ -2135,153 +2160,22 @@ class AdminController extends Controller
      * Record-payment page for concessionaire monthly fees
      * (ported from the cashier portal).
      */
-    public function recordPayment(Request $request)
+    public function recordPayment(Request $request, ConcessionaireFeeService $feeService)
     {
-        $currentMonthStart = now()->startOfMonth();
-        $currentMonthEnd = now()->endOfMonth();
-
         $concessionaires = User::query()
             ->where('role', 'concessionaire')
             ->where('is_approved', true)
             ->where('is_active_concessionaire', true)
-            ->withCount([
-                'concessionairePayments as current_month_payment_count' => function ($query) use ($currentMonthStart, $currentMonthEnd) {
-                    $query->whereBetween('payment_date', [$currentMonthStart, $currentMonthEnd]);
-                },
-            ])
             ->withSum('concessionairePayments as total_paid', 'amount')
             ->withMax('concessionairePayments as last_payment_date', 'payment_date')
             ->orderBy('business_name')
             ->orderBy('name')
             ->get();
 
-        $now = now();
-        $today = $now->day;
-        $currentMonthKey = $now->format('Y-m');
-
-        $concessionaireStatuses = [];
-        $paymentPlans = [];
-
-        if ($concessionaires->isNotEmpty()) {
-            $latestApplications = PartnershipApplication::query()
-                ->select([
-                    'partnership_applications.id',
-                    'partnership_applications.user_id',
-                    'partnership_applications.contract_period_start',
-                    'partnership_applications.contract_period_end',
-                    'partnership_applications.status',
-                    'partnership_applications.business_name',
-                ])
-                ->joinSub(
-                    PartnershipApplication::query()
-                        ->selectRaw('MAX(partnership_applications.id) as latest_id, partnership_applications.user_id')
-                        ->whereIn('partnership_applications.user_id', $concessionaires->pluck('id'))
-                        ->groupBy('partnership_applications.user_id'),
-                    'latest_pa',
-                    function ($join) {
-                        $join->on('latest_pa.latest_id', '=', 'partnership_applications.id')
-                            ->on('latest_pa.user_id', '=', 'partnership_applications.user_id');
-                    }
-                )
-                ->get()
-                ->keyBy('user_id');
-
-            // Every covered month per concessionaire, so we can flag arrears/advances.
-            $paidMonthsByConcessionaire = ConcessionairePayment::query()
-                ->whereIn('concessionaire_id', $concessionaires->pluck('id'))
-                ->get(['concessionaire_id', 'period_month', 'payment_date'])
-                ->groupBy('concessionaire_id')
-                ->map(function ($payments) {
-                    return $payments
-                        ->map(function ($payment) {
-                            $covered = $payment->period_month ?? $payment->payment_date;
-
-                            return $covered ? Carbon::parse($covered)->format('Y-m') : null;
-                        })
-                        ->filter()
-                        ->flip();
-                });
-
-            foreach ($concessionaires as $concessionaire) {
-                $latestApplication = $latestApplications->get($concessionaire->id);
-                $concessionaire->setRelation('latestPartnershipApplication', $latestApplication);
-
-                $monthlyFee = (float) ($concessionaire->monthly_fee ?? 0);
-                $paidKeys = $paidMonthsByConcessionaire->get($concessionaire->id) ?? collect();
-                $hasPaymentThisMonth = $paidKeys->has($currentMonthKey);
-
-                if ($hasPaymentThisMonth) {
-                    $status = 'paid';
-                } elseif ($monthlyFee <= 0) {
-                    $status = 'no_contract';
-                } elseif ($today >= 25) {
-                    $status = 'due_soon';
-                } else {
-                    $status = 'overdue';
-                }
-
-                $concessionaireStatuses[$concessionaire->id] = $status;
-
-                // The calendar classifies every month itself, so we only need to
-                // hand it the contract window, which months are already paid, and
-                // which unpaid months to pre-select (arrears + the current month).
-                $contractStart = $latestApplication?->contract_period_start;
-                $contractEnd = $latestApplication?->contract_period_end;
-                $owedCount = 0;
-                $preselect = [];
-
-                if ($monthlyFee > 0) {
-                    // Arrears: unpaid in-contract months from contract start to last month.
-                    if ($contractStart) {
-                        $cursor = $contractStart->copy()->startOfMonth();
-                        $floor = $now->copy()->subMonths(24)->startOfMonth();
-                        if ($cursor->lt($floor)) {
-                            $cursor = $floor;
-                        }
-                        $lastMonth = $now->copy()->subMonthNoOverflow()->startOfMonth();
-
-                        while ($cursor->lte($lastMonth)) {
-                            $key = $cursor->format('Y-m');
-                            $withinContract = ! $contractEnd || $cursor->lte($contractEnd);
-                            if ($withinContract && ! $paidKeys->has($key)) {
-                                $preselect[] = $key;
-                                $owedCount++;
-                            }
-                            $cursor = $cursor->addMonthNoOverflow();
-                        }
-                    }
-
-                    // Current month (if unpaid and still within the contract).
-                    $currentCursor = $now->copy()->startOfMonth();
-                    if (! $hasPaymentThisMonth && (! $contractEnd || $currentCursor->lte($contractEnd))) {
-                        $preselect[] = $currentMonthKey;
-                    }
-                }
-
-                // A concessionaire can still be selectable when arrears exist but
-                // the current month is already paid, so key the button off the fee.
-                $hasSelectableMonths = $monthlyFee > 0
-                    && ($contractStart !== null || ! $hasPaymentThisMonth);
-
-                $paymentPlans[$concessionaire->id] = [
-                    'monthly_fee' => $monthlyFee,
-                    'business' => $concessionaire->business_name ?: $concessionaire->name,
-                    'name' => $concessionaire->name,
-                    'owed_count' => $owedCount,
-                    'current_unpaid' => ! $hasPaymentThisMonth && $monthlyFee > 0,
-                    'has_selectable' => $hasSelectableMonths,
-                    'current_month' => $currentMonthKey,
-                    'contract_start' => $contractStart?->format('Y-m'),
-                    'contract_end' => $contractEnd?->format('Y-m'),
-                    'paid_months' => $paidKeys->keys()->values()->all(),
-                    'preselect' => $preselect,
-                ];
-            }
-        }
+        $paymentPlans = $feeService->plans($concessionaires);
 
         return $this->adminView('admin.record-payment', compact(
             'concessionaires',
-            'concessionaireStatuses',
             'paymentPlans'
         ));
     }

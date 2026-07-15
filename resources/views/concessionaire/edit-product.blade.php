@@ -94,6 +94,11 @@
         margin-bottom: 16px;
         font-size: 13.5px;
     }
+    html[data-theme="dark"] .error-list {
+        background: rgba(227, 106, 106, 0.12);
+        border-color: rgba(227, 106, 106, 0.35);
+        color: #F0A0A0;
+    }
     @media (max-width: 700px) {
         .form-grid {
             grid-template-columns: 1fr;

@@ -104,7 +104,7 @@
         vertical-align: middle;
     }
     tbody tr:hover {
-        background: #FAFCFA;
+        background: var(--hover);
     }
     tbody tr:last-child td {
         border-bottom: none;
@@ -218,7 +218,7 @@
         text-decoration: none;
         color: var(--muted);
         border: 1px solid var(--line);
-        background: #fff;
+        background: var(--card);
         transition: border-color 0.15s ease, color 0.15s ease;
     }
     .pagination-wrap .page-item.disabled .page-link {
@@ -236,6 +236,8 @@
         color: #fff;
         border-color: var(--pine);
     }
+    html[data-theme="dark"] .pagination-wrap .page-item.active .page-link { color: #0C130F; }
+    html[data-theme="dark"] .user-avatar { color: #0C130F; }
     .pagination-wrap svg {
         width: 14px;
         height: 14px;

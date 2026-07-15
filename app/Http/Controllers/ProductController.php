@@ -105,14 +105,35 @@ class ProductController extends Controller
     /**
      * Display a single product with reviews.
      */
-    public function show(Product $product)
+    public function show(Request $request, Product $product)
     {
         $product->load('concessionaire');
 
-        $reviews = ProductReview::with('user')
-            ->where('product_id', $product->id)
-            ->latest()
-            ->paginate(10);
+        $activeRating = (int) $request->query('rating', 0);
+        if ($activeRating < 1 || $activeRating > 5) {
+            $activeRating = 0;
+        }
+
+        $sort = $request->query('sort', 'newest');
+        if (! in_array($sort, ['newest', 'oldest', 'highest', 'lowest'], true)) {
+            $sort = 'newest';
+        }
+
+        $reviewsQuery = ProductReview::with('user')
+            ->where('product_id', $product->id);
+
+        if ($activeRating > 0) {
+            $reviewsQuery->where('rating', $activeRating);
+        }
+
+        match ($sort) {
+            'oldest' => $reviewsQuery->oldest(),
+            'highest' => $reviewsQuery->orderByDesc('rating')->latest(),
+            'lowest' => $reviewsQuery->orderBy('rating')->latest(),
+            default => $reviewsQuery->latest(),
+        };
+
+        $reviews = $reviewsQuery->paginate(10)->withQueryString();
 
         // Check if current user has already reviewed
         $userReview = null;
@@ -136,7 +157,7 @@ class ProductController extends Controller
             ],
         ];
 
-        return view('products.show', compact('product', 'reviews', 'userReview', 'reviewStats'));
+        return view('products.show', compact('product', 'reviews', 'userReview', 'reviewStats', 'activeRating', 'sort'));
     }
 
     /**

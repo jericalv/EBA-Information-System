@@ -209,4 +209,25 @@
         justify-content: flex-end;
         padding: 0 18px 18px;
     }
+
+    /* ---------- Dark theme (portals that support it set data-theme="dark") ----------
+       Accent falls back to admin green; faculty overrides --accent-* to graphite. */
+    html[data-theme="dark"] .co-cash-badge {
+        background: var(--accent-soft, rgba(30, 149, 96, 0.14));
+        border-color: var(--accent-line, rgba(30, 149, 96, 0.35));
+        color: var(--accent-text, #8CD6AF);
+    }
+    html[data-theme="dark"] .co-table thead th { background: var(--hover, #1C2721); }
+    html[data-theme="dark"] .co-table tbody tr:hover { background: var(--hover, #1C2721); }
+    html[data-theme="dark"] input.co-control { background: var(--field, #1B2620); }
+    html[data-theme="dark"] input.co-control::placeholder { color: var(--faint); }
+    html[data-theme="dark"] .co-footer { background: var(--hover, #1C2721); }
+    html[data-theme="dark"] .co-modal-backdrop { background: rgba(0, 0, 0, 0.55); }
+    html[data-theme="dark"] .co-modal { background: var(--card); }
+    html[data-theme="dark"] .co-modal-head {
+        background: var(--accent-soft, rgba(30, 149, 96, 0.14));
+        border-bottom-color: var(--accent-line, rgba(30, 149, 96, 0.35));
+        color: var(--accent-text, #8CD6AF);
+    }
+    html[data-theme="dark"] .co-modal-total { background: var(--hover, #1C2721); }
 </style>

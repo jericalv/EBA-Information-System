@@ -42,7 +42,7 @@
         gap: 16px;
     }
     .dstat-card {
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         border-radius: 14px;
         padding: 20px;
@@ -112,9 +112,10 @@
         white-space: nowrap;
         flex-shrink: 0;
     }
-    .dstat-chip.up { background: #E5F3EA; color: var(--pine); }
+    .dstat-chip.up { background: var(--pine-soft); color: var(--pine); }
     .dstat-chip.down { background: #FBEAEA; color: #B3261E; }
-    .dstat-chip.neutral { background: #F0F2F0; color: var(--muted); }
+    .dstat-chip.neutral { background: var(--hover); color: var(--muted); }
+    html[data-theme="dark"] .dstat-chip.down { background: rgba(227, 106, 106, 0.12); color: #F0A0A0; }
 
     /* ---------- Chart panels ---------- */
     .dashboard-charts-row {
@@ -169,6 +170,9 @@
     .chart-menu-btn:focus-visible {
         outline: 2px solid rgba(10, 92, 47, 0.45);
         outline-offset: 2px;
+    }
+    html[data-theme="dark"] .chart-menu-btn:focus-visible {
+        outline-color: rgba(123, 211, 160, 0.55);
     }
     .chart-menu {
         position: absolute;
@@ -250,6 +254,7 @@
         border-radius: 999px;
         overflow: hidden;
     }
+    html[data-theme="dark"] .rating-bar-track { background: #23302A; }
     .rating-bar-fill {
         height: 100%;
         width: 0;
@@ -645,10 +650,25 @@
     });
 
     // ---------- Charts ----------
-    const chartFont = getComputedStyle(document.documentElement).getPropertyValue('--font-ui').trim() || 'Manrope, sans-serif';
+    const chartFont = getComputedStyle(document.documentElement).getPropertyValue('--font-ui').trim() || 'Inter, sans-serif';
+
+    function chartThemeTokens() {
+        var css = getComputedStyle(document.documentElement);
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return {
+            fore: css.getPropertyValue('--muted').trim() || '#66756C',
+            ink: css.getPropertyValue('--ink').trim() || '#1A2B21',
+            grid: dark ? '#232D26' : '#EDF2EE',
+            stroke: dark ? '#151C18' : '#ffffff',
+            trendColors: dark ? ['#3B5C4A', '#7BD3A0', '#F0B152'] : ['#9CC5AC', '#0A5C2F', '#D97706'],
+            donutColors: dark ? ['#7BD3A0', '#4E8266', '#F0B152'] : ['#0A5C2F', '#6FAF8D', '#D97706']
+        };
+    }
+    var chartTheme = chartThemeTokens();
+
     const chartBase = {
         fontFamily: chartFont,
-        foreColor: '#66756C',
+        foreColor: chartTheme.fore,
         toolbar: { show: false },
         animations: { enabled: !prefersReducedMotion }
     };
@@ -674,7 +694,7 @@
             plotOptions: {
                 bar: { columnWidth: '42%', borderRadius: 4, borderRadiusApplication: 'end' }
             },
-            colors: ['#9CC5AC', '#0A5C2F', '#D97706'],
+            colors: chartTheme.trendColors,
             series: [
                 {
                     name: 'Product Reviews',
@@ -697,7 +717,7 @@
             labels: reviewTrendData.map(m => m.month),
             markers: {
                 size: [0, 0, 3.5],
-                strokeColors: '#fff',
+                strokeColors: chartTheme.stroke,
                 strokeWidth: 2,
                 hover: { size: 5 }
             },
@@ -747,7 +767,7 @@
                 ]
             },
             grid: {
-                borderColor: '#EDF2EE',
+                borderColor: chartTheme.grid,
                 strokeDashArray: 4,
                 padding: { left: 6, right: 6 }
             }
@@ -781,8 +801,8 @@
                     categoryData.snack || 0
                 ],
                 labels: ['Food', 'Beverage', 'Snack'],
-                colors: ['#0A5C2F', '#6FAF8D', '#D97706'],
-                stroke: { colors: ['#ffffff'], width: 3 },
+                colors: chartTheme.donutColors,
+                stroke: { colors: [chartTheme.stroke], width: 3 },
                 dataLabels: { enabled: false },
                 plotOptions: {
                     pie: {
@@ -791,11 +811,11 @@
                             size: '76%',
                             labels: {
                                 show: true,
-                                name: { fontSize: '12px', color: '#66756C', offsetY: 18 },
+                                name: { fontSize: '12px', color: chartTheme.fore, offsetY: 18 },
                                 value: {
                                     fontSize: '26px',
                                     fontWeight: 600,
-                                    color: '#1A2B21',
+                                    color: chartTheme.ink,
                                     offsetY: -12,
                                     formatter: function (value) { return value; }
                                 },
@@ -803,7 +823,7 @@
                                     show: true,
                                     label: 'Products',
                                     fontSize: '12px',
-                                    color: '#66756C',
+                                    color: chartTheme.fore,
                                     formatter: function (w) {
                                         return w.globals.seriesTotals.reduce(function (a, b) { return a + b; }, 0);
                                     }
@@ -844,6 +864,31 @@
             categoryChart.render();
         }
     }
+
+    // ---------- Re-style charts when the theme toggles ----------
+    window.addEventListener('eba:theme', function () {
+        chartTheme = chartThemeTokens();
+        if (trendChart) {
+            trendChart.updateOptions({
+                chart: { foreColor: chartTheme.fore },
+                colors: chartTheme.trendColors,
+                grid: { borderColor: chartTheme.grid },
+                markers: { size: [0, 0, 3.5], strokeColors: chartTheme.stroke, strokeWidth: 2, hover: { size: 5 } }
+            }, false, false);
+        }
+        if (categoryChart) {
+            categoryChart.updateOptions({
+                chart: { foreColor: chartTheme.fore },
+                colors: chartTheme.donutColors,
+                stroke: { colors: [chartTheme.stroke], width: 3 },
+                plotOptions: { pie: { donut: { labels: {
+                    name: { color: chartTheme.fore },
+                    value: { color: chartTheme.ink },
+                    total: { color: chartTheme.fore }
+                } } } }
+            }, false, false);
+        }
+    });
 
     // ---------- Wire the three-dot menus ----------
     wireChartPanel('panel_ratings', [

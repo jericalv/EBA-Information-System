@@ -4,8 +4,8 @@ namespace App\Console\Commands;
 
 use App\Mail\PaymentDueReminderMail;
 use App\Models\ActivityLog;
-use App\Models\ConcessionairePayment;
 use App\Models\User;
+use App\Services\ConcessionaireFeeService;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
@@ -25,33 +25,39 @@ class SendPaymentDueReminders extends Command
      *
      * @var string
      */
-    protected $description = 'Send payment due reminder emails to concessionaires on the monthly deadline day (1st of the month)';
+    protected $description = 'Send payment reminder emails to concessionaires with an outstanding monthly fee';
 
     /**
      * Execute the console command.
      */
-    public function handle(): int
+    public function handle(ConcessionaireFeeService $feeService): int
     {
         $today = Carbon::today();
 
         $concessionaires = User::query()
             ->where('role', 'concessionaire')
             ->where('is_approved', true)
+            ->where('is_active_concessionaire', true)
             ->whereNotNull('monthly_fee')
             ->get();
 
-        $dueDate = 'the 1st of ' . $today->format('F Y');
+        $plans = $feeService->plans($concessionaires);
+        $dueDate = $today->format('F Y');
         $sentCount = 0;
         $skippedCount = 0;
 
-        foreach ($concessionaires as $concessionaire) {
-            $hasPaymentThisMonth = ConcessionairePayment::query()
-                ->where('concessionaire_id', $concessionaire->id)
-                ->whereMonth('payment_date', $today->month)
-                ->whereYear('payment_date', $today->year)
-                ->exists();
+        $remindable = [
+            ConcessionaireFeeService::STATUS_DUE,
+            ConcessionaireFeeService::STATUS_DUE_SOON,
+            ConcessionaireFeeService::STATUS_OVERDUE,
+        ];
 
-            if ($hasPaymentThisMonth) {
+        foreach ($concessionaires as $concessionaire) {
+            $plan = $plans[$concessionaire->id];
+
+            // Skip anyone with nothing outstanding: already covered (including
+            // advance payments), contract not started yet, or contract ended.
+            if (! in_array($plan['status'], $remindable, true)) {
                 $skippedCount++;
 
                 continue;
@@ -85,7 +91,7 @@ class SendPaymentDueReminders extends Command
             }
         }
 
-        $this->info("Payment due reminders complete. Sent: {$sentCount}, Skipped (already paid): {$skippedCount}.");
+        $this->info("Payment due reminders complete. Sent: {$sentCount}, Skipped (nothing outstanding): {$skippedCount}.");
 
         return self::SUCCESS;
     }

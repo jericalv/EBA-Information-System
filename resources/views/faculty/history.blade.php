@@ -6,9 +6,9 @@
 @section('extra-css')
 <style>
     .table { width: 100%; border-collapse: collapse; min-width: 900px; }
-    .table th, .table td { padding: 14px 18px; border-bottom: 1px solid #eef2f7; text-align: left; vertical-align: top; }
-    .table th { background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
-    .detail { font-size: 12px; color: #64748b; white-space: pre-wrap; }
+    .table th, .table td { padding: 14px 18px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .table th { background: var(--hover); color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .detail { font-size: 12px; color: var(--muted); white-space: pre-wrap; }
 </style>
 @endsection
 
@@ -76,12 +76,12 @@
                             <td>{!! $detailsText !!}</td>
                             <td>
                                 <div>{{ $log->created_at->format('M d, Y') }}</div>
-                                <div style="font-size:13px;color:#64748b;">{{ $log->created_at->format('g:i A') }}</div>
+                                <div style="font-size:13px;color:var(--muted);">{{ $log->created_at->format('g:i A') }}</div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" style="text-align:center;color:#64748b;padding:24px;">No activity logs found for your account.</td>
+                            <td colspan="4" style="text-align:center;color:var(--muted);padding:24px;">No activity logs found for your account.</td>
                         </tr>
                     @endforelse
                 </tbody>

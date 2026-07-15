@@ -5,20 +5,21 @@
 
 @section('extra-css')
 <style>
+    main { max-width: 1560px !important; }
     .table { width: 100%; border-collapse: collapse; min-width: 900px; table-layout: fixed; }
-    .table td .cell-muted { font-size: 13px; color: #64748b; }
+    .table td .cell-muted { font-size: 13px; color: var(--muted); }
     .type-badge {
         display: inline-flex;
         padding: 4px 10px;
         border-radius: 6px;
         font-size: 12px;
         font-weight: 600;
-        background: #EEF0F3;
-        color: #1F2937;
+        background: var(--hover-2);
+        color: var(--ink);
     }
-    .table th, .table td { padding: 12px 12px; border-bottom: 1px solid #eef2f7; text-align: left; vertical-align: top; overflow-wrap: break-word; word-break: break-word; }
+    .table th, .table td { padding: 12px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; overflow-wrap: break-word; word-break: break-word; }
     .business-badge, .type-badge { max-width: 100%; white-space: normal; overflow-wrap: break-word; word-break: break-word; }
-    .table th { background: #f8fafc; color: #64748b; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    .table th { background: var(--hover); color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
 
     .business-badge {
         display: inline-flex;
@@ -35,7 +36,13 @@
     .badge-approved { background: #E9F6EE; color: #15803D; }
     .badge-rejected { background: rgba(239,68,68,0.1); color: #dc2626; }
     .badge-registered { background: rgba(59,130,246,0.1); color: #2563eb; }
-    .badge-expired { background: #e5e7eb; color: #4b5563; }
+    .badge-expired { background: #e5e7eb; color: var(--muted); }
+    html[data-theme="dark"] .badge-pending { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+    html[data-theme="dark"] .badge-approved { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
+    html[data-theme="dark"] .badge-rejected { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+    html[data-theme="dark"] .badge-registered { background: rgba(96, 165, 250, 0.14); color: #9CC4F8; }
+    html[data-theme="dark"] .badge-expired { background: rgba(255, 255, 255, 0.07); color: var(--muted); }
+    html[data-theme="dark"] .business-badge { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
 
     /* Wizard step badge (table) */
     .wizard-badge {
@@ -48,8 +55,9 @@
         font-weight: 700;
         margin-top: 6px;
         border: 1px solid transparent;
+        white-space: nowrap;
     }
-    .wizard-badge.gray { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
+    .wizard-badge.gray { background: var(--hover-2); color: var(--ink); border-color: var(--line); }
     .wizard-badge.step-1 { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
     .wizard-badge.step-2 { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
     .wizard-badge.step-3 { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
@@ -57,7 +65,48 @@
     .wizard-badge.amber { background: #fffbeb; color: #b45309; border-color: #fde68a; }
     .wizard-badge.violet { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
     .wizard-badge.blue { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-    .wizard-badge.green { background: #EEF0F3; color: #1F2937; border-color: #D6DCE3; }
+    .wizard-badge.green { background: var(--hover-2); color: var(--ink); border-color: #D6DCE3; }
+    html[data-theme="dark"] .wizard-badge.step-1,
+    html[data-theme="dark"] .wizard-badge.blue { background: rgba(96, 165, 250, 0.14); color: #9CC4F8; border-color: rgba(96, 165, 250, 0.35); }
+    html[data-theme="dark"] .wizard-badge.step-2 { background: rgba(234, 124, 58, 0.15); color: #F0B08A; border-color: rgba(234, 124, 58, 0.35); }
+    html[data-theme="dark"] .wizard-badge.step-3,
+    html[data-theme="dark"] .wizard-badge.violet { background: rgba(167, 139, 250, 0.15); color: #C6B4FA; border-color: rgba(167, 139, 250, 0.35); }
+    html[data-theme="dark"] .wizard-badge.step-4 { background: rgba(45, 193, 166, 0.15); color: #85DCC9; border-color: rgba(45, 193, 166, 0.35); }
+    html[data-theme="dark"] .wizard-badge.amber { background: rgba(227, 164, 72, 0.14); color: #E9C288; border-color: rgba(227, 164, 72, 0.35); }
+    html[data-theme="dark"] .wizard-badge.green { border-color: var(--line-strong); }
+
+    /* ===== Row action kebab menu ===== */
+    .row-menu-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    }
+    .row-menu-btn svg { width: 17px; height: 17px; }
+    .row-menu-btn:hover,
+    .row-menu-btn.is-open {
+        background: var(--pine-soft);
+        color: var(--pine);
+        border-color: var(--line-strong);
+    }
+    .row-menu-btn:focus-visible { outline: 2px solid rgba(31, 41, 55, 0.40); outline-offset: 2px; }
+    .actions-dropdown-container { position: relative; display: inline-block; text-align: left; }
+    .actions-dropdown-menu {
+        position: absolute;
+        right: 0;
+        top: calc(100% + 4px);
+        width: 180px;
+        z-index: 60;
+        display: none;
+    }
+    .actions-dropdown-menu.active { display: block; }
     .wizard-dot {
         width: 8px;
         height: 8px;
@@ -79,6 +128,20 @@
         --wiz-green-dark: #15803D;
         --wiz-green-soft: #E9F6EE;
     }
+    html[data-theme="dark"] {
+        --wiz-green: #1E9560;
+        --wiz-green-dark: #8CD6AF;
+        --wiz-green-soft: rgba(30, 149, 96, 0.12);
+    }
+    html[data-theme="dark"] .wizard-inline-error { background: rgba(227, 106, 106, 0.12); border-color: rgba(227, 106, 106, 0.35); color: #F0A0A0; }
+    html[data-theme="dark"] .wizard-inline-success,
+    html[data-theme="dark"] .wizard-doc-readonly,
+    html[data-theme="dark"] .wizard-docs-done-banner { color: #8CD6AF; border-color: rgba(30, 149, 96, 0.35); }
+    html[data-theme="dark"] .rv-callout.amber { background: rgba(227, 164, 72, 0.12); color: #E9C288; border-color: rgba(227, 164, 72, 0.35); }
+    html[data-theme="dark"] .rv-callout.red { background: rgba(227, 106, 106, 0.12); color: #F0A0A0; border-color: rgba(227, 106, 106, 0.35); }
+    html[data-theme="dark"] .rv-callout.violet { background: rgba(167, 139, 250, 0.12); color: #C6B4FA; border-color: rgba(167, 139, 250, 0.35); }
+    html[data-theme="dark"] .rv-callout.blue { background: rgba(96, 165, 250, 0.12); color: #9CC4F8; border-color: rgba(96, 165, 250, 0.35); }
+    html[data-theme="dark"] .rv-callout.green { background: rgba(30, 149, 96, 0.12); color: #8CD6AF; border-color: rgba(30, 149, 96, 0.35); }
     .modal-backdrop {
         position: fixed;
         inset: 0;
@@ -92,7 +155,7 @@
     }
     .modal-backdrop.active { display: flex; }
     .modal {
-        background: #fff;
+        background: var(--card);
         border-radius: 14px;
         border: 1px solid var(--line);
         padding: 24px;
@@ -116,14 +179,14 @@
     #viewModal .view-modal-topbar {
         margin-bottom: 0;
         padding: 14px 20px;
-        background: #fff;
+        background: var(--card);
         border-bottom: 1px solid var(--line);
         border-radius: 14px 14px 0 0;
     }
     #viewModal #viewContent {
         overflow-y: auto;
         padding: 20px;
-        background: #FAFBFC;
+        background: var(--hover);
     }
     .view-modal-topbar {
         display: flex;
@@ -143,7 +206,7 @@
     .view-modal-topbar-right { display: inline-flex; align-items: center; gap: 10px; }
     .view-modal-close {
         border: 1px solid var(--line-strong);
-        background: #fff;
+        background: var(--card);
         color: var(--muted);
         width: 30px;
         height: 30px;
@@ -167,7 +230,7 @@
     .rv-section {
         border: 1px solid var(--line);
         border-radius: 12px;
-        background: #fff;
+        background: var(--card);
         margin-top: 14px;
         overflow: hidden;
         box-shadow: var(--shadow-card);
@@ -207,13 +270,13 @@
     }
     .rv-proposal {
         margin-top: 2px;
-        background: #FAFBFC;
+        background: var(--hover);
         border: 1px solid var(--line);
         border-radius: 8px;
         padding: 10px 12px;
         font-size: 13px;
         font-weight: 500;
-        color: #374151;
+        color: var(--ink);
         white-space: pre-wrap;
         max-height: 140px;
         overflow-y: auto;
@@ -226,14 +289,14 @@
         align-items: center;
         padding: 12px 16px;
         border-top: 1px solid var(--line);
-        background: #FAFBFC;
+        background: var(--hover);
     }
     .rv-attachments .rv-field-label { margin: 0 4px 0 0; }
     .rv-attachment-empty {
         display: inline-flex;
         align-items: center;
         padding: 4px 10px;
-        background: #fff;
+        background: var(--card);
         color: var(--faint);
         border: 1px dashed var(--line-strong);
         border-radius: 6px;
@@ -242,9 +305,9 @@
     }
     .view-modal-notice {
         font-size: 13px;
-        color: #4b5563;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
+        color: var(--muted);
+        background: var(--hover);
+        border: 1px solid var(--line);
         border-radius: 8px;
         padding: 10px;
     }
@@ -252,20 +315,20 @@
         margin-top: 8px;
         padding: 10px 12px;
         border-left: 3px solid #94a3b8;
-        background: #fff;
-        border: 1px solid #e5e7eb;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 8px;
         font-size: 13px;
-        color: #374151;
+        color: var(--ink);
         white-space: pre-wrap;
     }
     .proposal-text {
-        background: #f8fafc;
+        background: var(--hover);
         border: 1px solid #e2e8f0;
         border-radius: 8px;
         padding: 12px;
         font-size: 14px;
-        color: #374151;
+        color: var(--ink);
         max-height: 150px;
         overflow-y: auto;
         margin-top: 8px;
@@ -283,19 +346,19 @@
         padding: 4px 10px;
         border-radius: 6px;
         border: 1px solid var(--line-strong);
-        background: #F2F4F6;
+        background: var(--hover);
         color: var(--ink);
         font-size: 12px;
         font-weight: 700;
         text-decoration: none;
     }
-    .file-link.file-link-pill:hover { background: #E9EDF1; border-color: #AEB6C0; text-decoration: none; }
+    .file-link.file-link-pill:hover { background: var(--hover-2); border-color: #AEB6C0; text-decoration: none; }
 
     /* Completion wizard */
     .rv-wizard {
         border: 1px solid var(--line);
         border-radius: 12px;
-        background: #fff;
+        background: var(--card);
         padding: 18px 18px 14px;
         box-shadow: var(--shadow-card);
     }
@@ -311,7 +374,7 @@
         font-family: var(--font-mono);
         font-size: 12px;
         font-weight: 600;
-        background: #fff;
+        background: var(--card);
         border: 1.5px solid var(--line-strong);
         color: var(--faint);
         transition: all 0.2s ease;
@@ -366,7 +429,7 @@
         background: currentColor;
         flex-shrink: 0;
     }
-    .rv-callout.gray { background: #F3F4F6; color: #4B5563; border-color: #E5E7EB; }
+    .rv-callout.gray { background: var(--hover-2); color: var(--muted); border-color: var(--line); }
     .rv-callout.amber { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
     .rv-callout.red { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
     .rv-callout.violet { background: #F5F3FF; color: #6D28D9; border-color: #DDD6FE; }
@@ -377,7 +440,7 @@
         margin-top: 14px;
         border: 1px solid var(--line);
         border-radius: 12px;
-        background: #fff;
+        background: var(--card);
         padding: 16px;
         box-shadow: var(--shadow-card);
     }
@@ -454,10 +517,11 @@
         resize: vertical;
         font-size: 13px;
         font-family: inherit;
-        color: #111827;
-        background: #fff;
+        color: var(--ink);
+        background: var(--field);
         box-sizing: border-box;
     }
+    html[data-theme="dark"] .reject-modal-textarea { border-color: rgba(227, 106, 106, 0.45); }
     .reject-modal-textarea:focus {
         outline: none;
         border-color: #EF4444;
@@ -500,15 +564,15 @@
             <table class="table" style="width:100%;">
                 <thead>
                     <tr>
-                        <th style="width:17%;">Applicant</th>
-                        <th style="width:13%;">Business</th>
+                        <th style="width:16%;">Applicant</th>
+                        <th style="width:12%;">Business</th>
                         <th style="width:9%;">Type of Business</th>
-                        <th style="width:12%;">Proposed Location</th>
-                        <th style="width:11%;">Contact</th>
-                        <th style="width:13%;">Status</th>
-                        <th style="width:9%;">Submitted</th>
-                        <th style="width:8%;">Last Updated</th>
-                        <th style="width:8%;">Action</th>
+                        <th style="width:11%;">Proposed Location</th>
+                        <th style="width:10%;">Contact</th>
+                        <th style="width:17%;">Status</th>
+                        <th style="width:10%;">Submitted</th>
+                        <th style="width:10%;">Last Updated</th>
+                        <th style="width:5%;">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -569,7 +633,7 @@
                         <tr class="partnership-row" data-search="{{ strtolower(trim(($application->full_name ?? '') . ' ' . ($application->email ?? '') . ' ' . ($application->business_name ?? ''))) }}">
                             <td>
                                 <strong>{{ $application->full_name }}</strong>
-                                <div style="font-size:13px;color:#64748b;">{{ $application->email }}</div>
+                                <div style="font-size:13px;color:var(--muted);">{{ $application->email }}</div>
                             </td>
                             <td><span class="business-badge">{{ $application->business_name }}</span></td>
                             <td>
@@ -600,17 +664,24 @@
                             </td>
                             <td>
                                 <div>{{ $application->created_at->format('M d, Y') }}</div>
-                                <div style="font-size:13px;color:#64748b;">{{ $application->created_at->format('g:i A') }}</div>
+                                <div style="font-size:13px;color:var(--muted);">{{ $application->created_at->format('g:i A') }}</div>
                             </td>
                             <td>
                                 <div>{{ $application->updated_at->format('M d, Y') }}</div>
-                                <div style="font-size:13px;color:#64748b;">{{ $application->updated_at->format('g:i A') }}</div>
+                                <div style="font-size:13px;color:var(--muted);">{{ $application->updated_at->format('g:i A') }}</div>
                             </td>
                             <td>
+                                <div class="actions-dropdown-container">
+                                    <button type="button" class="row-menu-btn" aria-label="More actions" aria-haspopup="menu" onclick="toggleActionsMenu(this)">
+                                        <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
+                                        </svg>
+                                    </button>
+                                    <div class="actions-dropdown-menu pop" role="menu">
                                 <button
                                     type="button"
-                                    class="btn btn-green"
-                                    style="padding:8px 14px;font-size:13px;"
+                                    class="pop-item"
+                                    role="menuitem"
                                     onclick="openViewModalFromButton(this)"
                                     data-app-id="{{ $application->id }}"
                                     data-app-status="{{ $application->status }}"
@@ -648,17 +719,20 @@
                                     data-business-permit-path="{{ $application->business_permit_path ? Storage::url($application->business_permit_path) : '' }}"
                                     data-business-permit-paths="{{ json_encode(collect($application->documentPaths('business_permit'))->map(fn($p) => Storage::url($p))->all()) }}"
                                 >
-                                    Review
+                                    <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    View
                                 </button>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" style="text-align:center;color:#64748b;padding:24px;">No partnership applications found.</td>
+                            <td colspan="9" style="text-align:center;color:var(--muted);padding:24px;">No partnership applications found.</td>
                         </tr>
                     @endforelse
                     <tr id="partnership-no-match" style="display:none;">
-                        <td colspan="9" style="text-align:center;color:#64748b;padding:24px;">No matching partnership applications found.</td>
+                        <td colspan="9" style="text-align:center;color:var(--muted);padding:24px;">No matching partnership applications found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -784,7 +858,37 @@
         }
     }
 
+    function toggleActionsMenu(button) {
+        const container = button.closest('.actions-dropdown-container');
+        const menu = container?.querySelector('.actions-dropdown-menu');
+        if (!menu) return;
+
+        document.querySelectorAll('.actions-dropdown-menu.active').forEach((openMenu) => {
+            if (openMenu !== menu) {
+                openMenu.classList.remove('active');
+                openMenu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
+            }
+        });
+
+        const isOpen = menu.classList.toggle('active');
+        button.classList.toggle('is-open', isOpen);
+    }
+
+    function closeAllActionMenus() {
+        document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
+            menu.classList.remove('active');
+            menu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
+        });
+    }
+
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.actions-dropdown-container')) {
+            closeAllActionMenus();
+        }
+    });
+
     function openViewModalFromButton(buttonEl) {
+        closeAllActionMenus();
         const id = Number(buttonEl?.dataset?.appId || 0);
         if (!id) return;
         openViewModal(id, buttonEl);

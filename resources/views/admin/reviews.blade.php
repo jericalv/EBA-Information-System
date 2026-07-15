@@ -11,8 +11,8 @@
         margin-bottom: 24px;
     }
     .reviews-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 14px;
         padding: 20px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -45,7 +45,7 @@
     }
     .reviews-card-label {
         font-size: 13px;
-        color: #64748b;
+        color: var(--muted);
         font-weight: 600;
         letter-spacing: 0.01em;
     }
@@ -67,13 +67,13 @@
     .reviews-card-value {
         font-size: 32px;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--ink);
         line-height: 1.2;
         margin-bottom: 10px;
     }
     .reviews-card-note {
         font-size: 11px;
-        color: #94a3b8;
+        color: var(--faint);
         font-weight: 500;
     }
     @media (max-width: 1400px) {
@@ -98,13 +98,19 @@
     .badge-warning { background: #ffedd5; color: #9a3412; }
     .badge-type-product { background: #dbeafe; color: #1d4ed8; }
     .badge-type-store { background: #ede9fe; color: #6d28d9; }
+    html[data-theme="dark"] .badge-approved { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
+    html[data-theme="dark"] .badge-pending { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+    html[data-theme="dark"] .badge-rejected { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+    html[data-theme="dark"] .badge-warning { background: rgba(234, 124, 58, 0.15); color: #F0B08A; }
+    html[data-theme="dark"] .badge-type-product { background: rgba(96, 165, 250, 0.14); color: #9CC4F8; }
+    html[data-theme="dark"] .badge-type-store { background: rgba(167, 139, 250, 0.15); color: #C6B4FA; }
 
     .rating-value {
         font-weight: 700;
-        color: #0f172a;
+        color: var(--ink);
     }
     .rating-muted {
-        color: #64748b;
+        color: var(--muted);
         font-size: 13px;
     }
     .overall-score {
@@ -112,7 +118,7 @@
         align-items: center;
         gap: 6px;
         font-weight: 700;
-        color: #0f172a;
+        color: var(--ink);
     }
     .stars {
         letter-spacing: 1px;
@@ -121,12 +127,12 @@
     }
     .comment-cell {
         max-width: 340px;
-        color: #334155;
+        color: var(--ink);
     }
     .table-meta {
         display: block;
         margin-top: 4px;
-        color: #64748b;
+        color: var(--muted);
         font-size: 12px;
     }
     .actions-cell {
@@ -137,7 +143,7 @@
     }
     .section-header {
         font-size: 13px;
-        color: #64748b;
+        color: var(--muted);
         margin-top: 4px;
     }
     .filters-bar {
@@ -155,17 +161,17 @@
     }
     .filters-field label {
         font-size: 12px;
-        color: #334155;
+        color: var(--ink);
         font-weight: 700;
     }
     .filters-input,
     .filters-select {
         width: 100%;
         padding: 9px 12px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--line);
         border-radius: 8px;
-        background: #f8fafc;
-        color: #1e293b;
+        background: var(--hover);
+        color: var(--ink);
         font: inherit;
         font-size: 14px;
     }
@@ -182,7 +188,7 @@
     <div class="card" style="margin-bottom:20px;">
         <div class="card-header" style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
             <div>
-                <strong style="font-size:16px;color:#111827;">Per-Concessionaire Ratings</strong>
+                <strong style="font-size:16px;color: var(--ink);">Per-Concessionaire Ratings</strong>
                 <div class="section-header">Sorted by overall score ascending (worst performing first).</div>
             </div>
             <span class="badge badge-pending">Approved Concessionaires: {{ $concessionaireRatings->count() }}</span>
@@ -264,11 +270,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No approved concessionaires found.</td>
+                            <td colspan="7" style="text-align:center;padding:32px;color: var(--faint);">No approved concessionaires found.</td>
                         </tr>
                     @endforelse
                     <tr id="concessionaireRatingsEmpty" style="display:none;">
-                        <td colspan="7" style="text-align:center;padding:24px;color:#94a3b8;">No concessionaires match your filters.</td>
+                        <td colspan="7" style="text-align:center;padding:24px;color: var(--faint);">No concessionaires match your filters.</td>
                     </tr>
                 </tbody>
             </table>
@@ -278,7 +284,7 @@
     <div class="card">
         <div class="card-header" style="display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
             <div>
-                <strong style="font-size:16px;color:#111827;">Recent Reviews Feed</strong>
+                <strong style="font-size:16px;color: var(--ink);">Recent Reviews Feed</strong>
                 <div class="section-header">Most recent product and store reviews across the system.</div>
             </div>
             <span class="badge badge-secondary" id="recentReviewsCountBadge">Showing {{ $recentReviews->count() }} of {{ $recentReviews->total() }}</span>
@@ -378,7 +384,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No reviews found.</td>
+                            <td colspan="7" style="text-align:center;padding:32px;color: var(--faint);">No reviews found.</td>
                         </tr>
                     @endforelse
                 </tbody>

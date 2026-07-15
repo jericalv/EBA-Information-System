@@ -93,6 +93,21 @@
         border-color: #F2D8D8;
         color: var(--danger);
     }
+    html[data-theme="dark"] .status-active {
+        background: rgba(123, 211, 160, 0.10);
+        border-color: rgba(123, 211, 160, 0.30);
+        color: #A9E4C2;
+    }
+    html[data-theme="dark"] .status-pending {
+        background: rgba(227, 164, 72, 0.10);
+        border-color: rgba(227, 164, 72, 0.32);
+        color: #EEC084;
+    }
+    html[data-theme="dark"] .status-expired {
+        background: rgba(227, 106, 106, 0.12);
+        border-color: rgba(227, 106, 106, 0.35);
+        color: #F0A0A0;
+    }
     .moa-actions {
         display: flex;
         gap: 10px;
@@ -127,6 +142,14 @@
         padding: 14px 18px;
         border-radius: 8px;
         margin-top: 20px;
+    }
+    html[data-theme="dark"] .notice-box {
+        background: rgba(227, 164, 72, 0.10);
+        border-color: rgba(227, 164, 72, 0.32);
+    }
+    html[data-theme="dark"] .notice-box h4,
+    html[data-theme="dark"] .notice-box p {
+        color: #EEC084;
     }
     .notice-box h4 {
         font-weight: 700;

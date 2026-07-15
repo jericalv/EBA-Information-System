@@ -29,7 +29,7 @@
         gap: 16px;
     }
     .dstat-card {
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         border-radius: 14px;
         padding: 20px;
@@ -151,7 +151,7 @@
     /* Reserve chart height before ApexCharts draws so the grid track never
        animates from 0 to full height on load (the collapse-then-expand flash). */
     #chart_cashier_monthly { min-height: 320px; }
-    #chart_cashier_types { min-height: 300px; }
+    #chart_cashier_status { min-height: 300px; }
     /* Belt-and-suspenders: no collapse transitions until charts have mounted. */
     .dashboard-page.charts-loading .chart-panel-head,
     .dashboard-page.charts-loading .chart-body,
@@ -170,7 +170,7 @@
     // hard refresh never flashes the expanded state before the main script runs.
     (function () {
         try {
-            var panelIds = ['panel_collections', 'panel_types'];
+            var panelIds = ['panel_collections', 'panel_status'];
             var css = '';
             panelIds.forEach(function (id) {
                 if (localStorage.getItem('cashierDash:collapsed:' + id) === '1') {
@@ -248,9 +248,9 @@
             </article>
 
             <article class="dstat-card">
-                <span class="dstat-label">Overdue this month</span>
+                <span class="dstat-label">Overdue</span>
                 <span class="dstat-value {{ $overdue > 0 ? 'is-danger' : '' }}" data-count-to="{{ $overdue }}">0</span>
-                <span class="dstat-foot">Past due and still unpaid</span>
+                <span class="dstat-foot">With unpaid past months</span>
             </article>
         </section>
 
@@ -273,20 +273,20 @@
                 </div>
             </div>
 
-            <div class="panel chart-panel" id="panel_types">
+            <div class="panel chart-panel" id="panel_status">
                 <div class="chart-panel-head">
                     <div>
-                        <h2 class="panel-title">Payment methods</h2>
-                        <p class="panel-sub">How recorded payments were made.</p>
+                        <h2 class="panel-title">Collection status</h2>
+                        <p class="panel-sub">Where active concessionaires stand this month.</p>
                     </div>
                     <div class="chart-menu-wrap">
-                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Payment methods options">&#8943;</button>
+                        <button type="button" class="chart-menu-btn" data-menu-btn aria-haspopup="true" aria-expanded="false" aria-label="Collection status options">&#8943;</button>
                         <div class="chart-menu pop" data-menu hidden></div>
                     </div>
                 </div>
                 <div class="chart-body">
                     <div class="chart-body-inner">
-                        <div id="chart_cashier_types"></div>
+                        <div id="chart_cashier_status"></div>
                     </div>
                 </div>
             </div>
@@ -428,13 +428,36 @@
 
     // ================= Charts =================
     const cashierMonthly = @json($cashierMonthlyPayments);
-    const cashierTypes = @json($cashierPaymentTypes);
-    const typesTotal = (cashierTypes.cash || 0) + (cashierTypes.check || 0) + (cashierTypes.bank_transfer || 0);
+    const cashierStatus = @json($cashierCollectionStatus);
+    const statusSeries = [
+        cashierStatus.paid || 0,
+        cashierStatus.due || 0,
+        cashierStatus.overdue || 0,
+        cashierStatus.no_contract || 0
+    ];
+    const statusLabels = ['Paid', 'Due this month', 'Overdue', 'No fee / inactive'];
+    const statusTotal = statusSeries.reduce(function (a, b) { return a + b; }, 0);
 
     var pesoFormatter = new Intl.NumberFormat('en-PH', { style: 'currency', currency: 'PHP', minimumFractionDigits: 0, maximumFractionDigits: 0 });
     function formatPeso(value) { return pesoFormatter.format(Math.round(value || 0)); }
 
     var chartFont = getComputedStyle(document.documentElement).getPropertyValue('--font-ui').trim() || 'Manrope, sans-serif';
+
+    // Colors the charts by the active theme; re-read on every eba:theme event.
+    function chartThemeTokens() {
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return {
+            fore: dark ? '#98A89E' : '#66756C',
+            grid: dark ? '#232D26' : '#EDF2EE',
+            ink: dark ? '#E6EDE8' : '#1A2B21',
+            primary: dark ? '#7BD3A0' : '#0A5C2F',
+            stroke: dark ? '#151C18' : '#ffffff',
+            statusColors: dark
+                ? ['#7BD3A0', '#F0B152', '#E36A6A', '#66756C']
+                : ['#0A5C2F', '#D97706', '#B91C1C', '#93A198']
+        };
+    }
+    var chartTheme = chartThemeTokens();
 
     // Re-enable collapse transitions only once the charts have drawn, so the
     // initial render never plays a collapse/expand animation.
@@ -455,14 +478,14 @@
 
     var chartBase = {
         fontFamily: chartFont,
-        foreColor: '#66756C',
+        foreColor: chartTheme.fore,
         toolbar: { show: false },
         animations: { enabled: !prefersReducedMotion },
         events: { mounted: chartMountedTick }
     };
 
     var monthlyChart = null;
-    var typesChart = null;
+    var statusChart = null;
 
     if (document.querySelector('#chart_cashier_monthly') && typeof ApexCharts !== 'undefined') {
         var monthlyOptions = {
@@ -470,7 +493,7 @@
             series: [
                 { name: 'Collected', data: cashierMonthly.map(function (m) { return m.total; }) }
             ],
-            colors: ['#0A5C2F'],
+            colors: [chartTheme.primary],
             plotOptions: { bar: { columnWidth: '48%', borderRadius: 4, borderRadiusApplication: 'end' } },
             dataLabels: { enabled: false },
             xaxis: {
@@ -489,50 +512,74 @@
                 theme: 'dark', style: { fontSize: '12px' },
                 y: { formatter: function (v) { return '₱' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2 }); } }
             },
-            grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+            grid: { borderColor: chartTheme.grid, strokeDashArray: 4, padding: { left: 6, right: 6 } }
         };
         monthlyChart = new ApexCharts(document.querySelector('#chart_cashier_monthly'), monthlyOptions);
         chartsExpected++;
         setTimeout(function () { monthlyChart.render(); }, 50);
     }
 
-    var typesTarget = document.querySelector('#chart_cashier_types');
-    if (typesTarget && typeof ApexCharts !== 'undefined') {
-        if (typesTotal === 0) {
-            typesTarget.innerHTML = '<p class="chart-empty">No payments recorded yet.</p>';
+    function statusDonutLabels(theme) {
+        return {
+            show: true,
+            name: { fontSize: '12px', color: theme.fore, offsetY: 18 },
+            value: { fontSize: '26px', fontWeight: 600, color: theme.ink, offsetY: -12, formatter: function (v) { return v; } },
+            total: {
+                show: true, label: 'Concessionaires', fontSize: '12px', color: theme.fore,
+                formatter: function (w) { return w.globals.seriesTotals.reduce(function (a, b) { return a + b; }, 0); }
+            }
+        };
+    }
+
+    var statusTarget = document.querySelector('#chart_cashier_status');
+    if (statusTarget && typeof ApexCharts !== 'undefined') {
+        if (statusTotal === 0) {
+            statusTarget.innerHTML = '<p class="chart-empty">No active concessionaires yet.</p>';
         } else {
-            typesChart = new ApexCharts(typesTarget, {
+            statusChart = new ApexCharts(statusTarget, {
                 chart: Object.assign({}, chartBase, { height: 300, type: 'donut', width: '100%' }),
-                series: [cashierTypes.cash || 0, cashierTypes.check || 0, cashierTypes.bank_transfer || 0],
-                labels: ['Cash', 'Check', 'Bank Transfer'],
-                colors: ['#0A5C2F', '#6FAF8D', '#D97706'],
-                stroke: { colors: ['#ffffff'], width: 3 },
+                series: statusSeries,
+                labels: statusLabels,
+                colors: chartTheme.statusColors,
+                stroke: { colors: [chartTheme.stroke], width: 3 },
                 dataLabels: { enabled: false },
                 plotOptions: {
                     pie: {
                         expandOnClick: false,
                         donut: {
                             size: '76%',
-                            labels: {
-                                show: true,
-                                name: { fontSize: '12px', color: '#66756C', offsetY: 18 },
-                                value: { fontSize: '26px', fontWeight: 600, color: '#1A2B21', offsetY: -12, formatter: function (v) { return v; } },
-                                total: {
-                                    show: true, label: 'Payments', fontSize: '12px', color: '#66756C',
-                                    formatter: function (w) { return w.globals.seriesTotals.reduce(function (a, b) { return a + b; }, 0); }
-                                }
-                            }
+                            labels: statusDonutLabels(chartTheme)
                         }
                     }
                 },
-                tooltip: { theme: 'dark', style: { fontSize: '12px' }, y: { formatter: function (v) { return v + ' ' + (v === 1 ? 'payment' : 'payments'); } } },
+                tooltip: { theme: 'dark', style: { fontSize: '12px' }, y: { formatter: function (v) { return v + ' ' + (v === 1 ? 'concessionaire' : 'concessionaires'); } } },
                 legend: { show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '12px', fontWeight: 600, markers: { size: 5, shape: 'circle' }, itemMargin: { horizontal: 10 } },
                 responsive: [{ breakpoint: 600, options: { chart: { height: 260 } } }]
             });
             chartsExpected++;
-            setTimeout(function () { typesChart.render(); }, 50);
+            setTimeout(function () { statusChart.render(); }, 50);
         }
     }
+
+    // Restyle mounted charts when the navbar toggle flips the theme.
+    window.addEventListener('eba:theme', function () {
+        chartTheme = chartThemeTokens();
+        if (monthlyChart) {
+            monthlyChart.updateOptions({
+                chart: { foreColor: chartTheme.fore },
+                colors: [chartTheme.primary],
+                grid: { borderColor: chartTheme.grid }
+            }, false, true);
+        }
+        if (statusChart) {
+            statusChart.updateOptions({
+                chart: { foreColor: chartTheme.fore },
+                colors: chartTheme.statusColors,
+                stroke: { colors: [chartTheme.stroke], width: 3 },
+                plotOptions: { pie: { expandOnClick: false, donut: { size: '76%', labels: statusDonutLabels(chartTheme) } } }
+            }, false, true);
+        }
+    });
 
     // ---------- Report registry (shared by per-panel menus and "Download reports") ----------
     var reportRegistry = [
@@ -547,17 +594,15 @@
             }
         },
         {
-            panel: 'panel_types',
-            chart: function () { return typesChart; },
-            pngName: 'payment-methods.png',
-            csvName: 'payment-methods.csv',
-            csvHeaders: ['Method', 'Payments'],
+            panel: 'panel_status',
+            chart: function () { return statusChart; },
+            pngName: 'collection-status.png',
+            csvName: 'collection-status.csv',
+            csvHeaders: ['Status', 'Concessionaires'],
             csvRows: function () {
-                return [
-                    ['Cash', cashierTypes.cash || 0],
-                    ['Check', cashierTypes.check || 0],
-                    ['Bank Transfer', cashierTypes.bank_transfer || 0]
-                ];
+                return statusLabels.map(function (label, index) {
+                    return [label, statusSeries[index]];
+                });
             }
         }
     ];

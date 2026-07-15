@@ -9,6 +9,7 @@ use App\Models\ActivityLog;
 use App\Models\ConcessionairePayment;
 use App\Models\PartnershipApplication;
 use App\Models\User;
+use App\Services\ConcessionaireFeeService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Mailable;
@@ -31,50 +32,32 @@ class CashierController extends Controller
             ->where('is_active_concessionaire', true)
             ->count();
 
-        $paidThisMonth = ConcessionairePayment::whereYear('period_month', now()->year)
-            ->whereMonth('period_month', now()->month)
-            ->pluck('concessionaire_id')
-            ->toArray();
-
         $concessionaires = User::query()
             ->where('role', 'concessionaire')
             ->where('is_approved', true)
             ->where('is_active_concessionaire', true)
             ->get();
 
-        $today = now()->day;
-        $overdueCount = 0;
-        $readyToRecordCount = 0;
+        $feeService = app(ConcessionaireFeeService::class);
+        $plans = $feeService->plans($concessionaires);
+        $counts = $feeService->statusCounts($plans);
 
-        if ($concessionaires->isNotEmpty()) {
-            $concessionaires->each(function (User $concessionaire) use (
-                $paidThisMonth,
-                $today,
-                &$overdueCount,
-                &$readyToRecordCount
-            ) {
-                $hasPaymentThisMonth = in_array($concessionaire->id, $paidThisMonth, true);
-                $monthlyFee = (float) ($concessionaire->monthly_fee ?? 0);
+        $overdueCount = $counts[ConcessionaireFeeService::STATUS_OVERDUE];
+        $dueCount = $counts[ConcessionaireFeeService::STATUS_DUE]
+            + $counts[ConcessionaireFeeService::STATUS_DUE_SOON];
+        $readyToRecordCount = $dueCount + $overdueCount;
 
-                if ($hasPaymentThisMonth) {
-                    $status = 'paid';
-                } elseif ($monthlyFee <= 0) {
-                    $status = 'no_contract';
-                } elseif ($today >= 25) {
-                    $status = 'due_soon';
-                } else {
-                    $status = 'overdue';
-                }
-
-                if ($status === 'overdue') {
-                    $overdueCount++;
-                }
-
-                if (in_array($status, ['due_soon', 'overdue'], true)) {
-                    $readyToRecordCount++;
-                }
-            });
-        }
+        // Collection status of active concessionaires for the current month.
+        // The campus is cash-only, so a payment-method breakdown says nothing —
+        // this shows who has settled the month instead.
+        $cashierCollectionStatus = [
+            'paid' => $counts[ConcessionaireFeeService::STATUS_PAID],
+            'due' => $dueCount,
+            'overdue' => $overdueCount,
+            'no_contract' => $counts[ConcessionaireFeeService::STATUS_NO_FEE]
+                + $counts[ConcessionaireFeeService::STATUS_NOT_STARTED]
+                + $counts[ConcessionaireFeeService::STATUS_ENDED],
+        ];
 
         $cashierMonthlyPayments = collect(range(5, 0))->map(function ($i) {
             $month = now()->subMonths($i);
@@ -86,12 +69,6 @@ class CashierController extends Controller
                     ->sum('amount'),
             ];
         })->values()->toArray();
-
-        $cashierPaymentTypes = [
-            'cash' => ConcessionairePayment::where('payment_type', 'cash')->count(),
-            'check' => ConcessionairePayment::where('payment_type', 'check')->count(),
-            'bank_transfer' => ConcessionairePayment::where('payment_type', 'bank_transfer')->count(),
-        ];
 
         // ---- Current-month collection totals for the stat cards ----
         $collectedThisMonth = (float) (collect($cashierMonthlyPayments)->last()['total'] ?? 0);
@@ -107,157 +84,26 @@ class CashierController extends Controller
             'collectedThisMonth',
             'paymentsThisMonthCount',
             'cashierMonthlyPayments',
-            'cashierPaymentTypes'
+            'cashierCollectionStatus'
         ));
     }
 
-    public function paymentsIndex(Request $request)
+    public function paymentsIndex(Request $request, ConcessionaireFeeService $feeService)
     {
-        $currentMonthStart = now()->startOfMonth();
-        $currentMonthEnd = now()->endOfMonth();
-
         $concessionaires = User::query()
             ->where('role', 'concessionaire')
             ->where('is_approved', true)
             ->where('is_active_concessionaire', true)
-            ->withCount([
-                'concessionairePayments as current_month_payment_count' => function ($query) use ($currentMonthStart, $currentMonthEnd) {
-                    $query->whereBetween('payment_date', [$currentMonthStart, $currentMonthEnd]);
-                },
-            ])
             ->withSum('concessionairePayments as total_paid', 'amount')
             ->withMax('concessionairePayments as last_payment_date', 'payment_date')
             ->orderBy('business_name')
             ->orderBy('name')
             ->get();
 
-        $now = now();
-        $today = $now->day;
-        $currentMonthKey = $now->format('Y-m');
-
-        $concessionaireStatuses = [];
-        $paymentPlans = [];
-
-        if ($concessionaires->isNotEmpty()) {
-            $latestApplications = PartnershipApplication::query()
-                ->select([
-                    'partnership_applications.id',
-                    'partnership_applications.user_id',
-                    'partnership_applications.contract_period_start',
-                    'partnership_applications.contract_period_end',
-                    'partnership_applications.status',
-                    'partnership_applications.business_name',
-                ])
-                ->joinSub(
-                    PartnershipApplication::query()
-                        ->selectRaw('MAX(partnership_applications.id) as latest_id, partnership_applications.user_id')
-                        ->whereIn('partnership_applications.user_id', $concessionaires->pluck('id'))
-                        ->groupBy('partnership_applications.user_id'),
-                    'latest_pa',
-                    function ($join) {
-                        $join->on('latest_pa.latest_id', '=', 'partnership_applications.id')
-                            ->on('latest_pa.user_id', '=', 'partnership_applications.user_id');
-                    }
-                )
-                ->get()
-                ->keyBy('user_id');
-
-            // Every covered month per concessionaire, so we can flag arrears/advances.
-            $paidMonthsByConcessionaire = ConcessionairePayment::query()
-                ->whereIn('concessionaire_id', $concessionaires->pluck('id'))
-                ->get(['concessionaire_id', 'period_month', 'payment_date'])
-                ->groupBy('concessionaire_id')
-                ->map(function ($payments) {
-                    return $payments
-                        ->map(function ($payment) {
-                            $covered = $payment->period_month ?? $payment->payment_date;
-
-                            return $covered ? Carbon::parse($covered)->format('Y-m') : null;
-                        })
-                        ->filter()
-                        ->flip();
-                });
-
-            foreach ($concessionaires as $concessionaire) {
-                $latestApplication = $latestApplications->get($concessionaire->id);
-                $concessionaire->setRelation('latestPartnershipApplication', $latestApplication);
-
-                $monthlyFee = (float) ($concessionaire->monthly_fee ?? 0);
-                $paidKeys = $paidMonthsByConcessionaire->get($concessionaire->id) ?? collect();
-                $hasPaymentThisMonth = $paidKeys->has($currentMonthKey);
-
-                if ($hasPaymentThisMonth) {
-                    $status = 'paid';
-                } elseif ($monthlyFee <= 0) {
-                    $status = 'no_contract';
-                } elseif ($today >= 25) {
-                    $status = 'due_soon';
-                } else {
-                    $status = 'overdue';
-                }
-
-                $concessionaireStatuses[$concessionaire->id] = $status;
-
-                // The calendar classifies every month itself, so we only need to
-                // hand it the contract window, which months are already paid, and
-                // which unpaid months to pre-select (arrears + the current month).
-                $contractStart = $latestApplication?->contract_period_start;
-                $contractEnd = $latestApplication?->contract_period_end;
-                $owedCount = 0;
-                $preselect = [];
-
-                if ($monthlyFee > 0) {
-                    // Arrears: unpaid in-contract months from contract start to last month.
-                    if ($contractStart) {
-                        $cursor = $contractStart->copy()->startOfMonth();
-                        $floor = $now->copy()->subMonths(24)->startOfMonth();
-                        if ($cursor->lt($floor)) {
-                            $cursor = $floor;
-                        }
-                        $lastMonth = $now->copy()->subMonthNoOverflow()->startOfMonth();
-
-                        while ($cursor->lte($lastMonth)) {
-                            $key = $cursor->format('Y-m');
-                            $withinContract = ! $contractEnd || $cursor->lte($contractEnd);
-                            if ($withinContract && ! $paidKeys->has($key)) {
-                                $preselect[] = $key;
-                                $owedCount++;
-                            }
-                            $cursor = $cursor->addMonthNoOverflow();
-                        }
-                    }
-
-                    // Current month (if unpaid and still within the contract).
-                    $currentCursor = $now->copy()->startOfMonth();
-                    if (! $hasPaymentThisMonth && (! $contractEnd || $currentCursor->lte($contractEnd))) {
-                        $preselect[] = $currentMonthKey;
-                    }
-                }
-
-                // A concessionaire can still be selectable when arrears exist but
-                // the current month is already paid, so key the button off the fee.
-                $hasSelectableMonths = $monthlyFee > 0
-                    && ($contractStart !== null || ! $hasPaymentThisMonth);
-
-                $paymentPlans[$concessionaire->id] = [
-                    'monthly_fee' => $monthlyFee,
-                    'business' => $concessionaire->business_name ?: $concessionaire->name,
-                    'name' => $concessionaire->name,
-                    'owed_count' => $owedCount,
-                    'current_unpaid' => ! $hasPaymentThisMonth && $monthlyFee > 0,
-                    'has_selectable' => $hasSelectableMonths,
-                    'current_month' => $currentMonthKey,
-                    'contract_start' => $contractStart?->format('Y-m'),
-                    'contract_end' => $contractEnd?->format('Y-m'),
-                    'paid_months' => $paidKeys->keys()->values()->all(),
-                    'preselect' => $preselect,
-                ];
-            }
-        }
+        $paymentPlans = $feeService->plans($concessionaires);
 
         return view('cashier.payments', compact(
             'concessionaires',
-            'concessionaireStatuses',
             'paymentPlans'
         ));
     }
@@ -311,40 +157,78 @@ class CashierController extends Controller
         return $pdf->download($filename);
     }
 
-    public function downloadHistoryPdf(Request $request)
+    /**
+     * Month the export should be limited to (?month=YYYY-MM), or null for all.
+     */
+    private function exportMonth(Request $request): ?Carbon
     {
-        $payments = ConcessionairePayment::query()
+        $month = $request->query('month');
+
+        if (is_string($month) && preg_match('/^\d{4}-(0[1-9]|1[0-2])$/', $month)) {
+            return Carbon::createFromFormat('Y-m', $month)->startOfMonth();
+        }
+
+        return null;
+    }
+
+    /**
+     * All payments for the history exports, optionally limited to the month
+     * the payment was made in.
+     */
+    private function historyPayments(?Carbon $month)
+    {
+        return ConcessionairePayment::query()
             ->with(['concessionaire:id,name,business_name', 'recordedBy:id,name'])
+            ->when($month, function ($query) use ($month) {
+                $query->whereBetween('payment_date', [
+                    $month->copy()->startOfDay(),
+                    $month->copy()->endOfMonth()->endOfDay(),
+                ]);
+            })
             ->orderByDesc('created_at')
             ->get();
+    }
+
+    public function downloadHistoryPdf(Request $request)
+    {
+        $month = $this->exportMonth($request);
+        $payments = $this->historyPayments($month);
 
         $generatedAt = now();
 
         $pdf = Pdf::loadView('cashier.history-pdf', [
             'payments' => $payments,
             'generatedAt' => $generatedAt,
+            'periodLabel' => $month?->format('F Y'),
         ])->setPaper('a4', 'landscape');
 
-        $filename = sprintf('cashier-payment-history-%s.pdf', $generatedAt->format('Ymd-His'));
+        $filename = sprintf(
+            'cashier-payment-history-%s%s.pdf',
+            $month ? $month->format('Y-m') . '-' : '',
+            $generatedAt->format('Ymd-His')
+        );
 
         return $pdf->download($filename);
     }
 
     public function viewHistoryPdf(Request $request)
     {
-        $payments = ConcessionairePayment::query()
-            ->with(['concessionaire:id,name,business_name', 'recordedBy:id,name'])
-            ->orderByDesc('created_at')
-            ->get();
+        $month = $this->exportMonth($request);
+        $payments = $this->historyPayments($month);
 
         $generatedAt = now();
 
         $pdf = Pdf::loadView('cashier.history-pdf', [
             'payments' => $payments,
             'generatedAt' => $generatedAt,
+            'periodLabel' => $month?->format('F Y'),
         ])->setPaper('a4', 'landscape');
 
-        $filename = sprintf('cashier-payment-history-%s.pdf', $generatedAt->format('Ymd-His'));
+        $filename = sprintf(
+            'cashier-payment-history-%s%s.pdf',
+            $month ? $month->format('Y-m') . '-' : '',
+            $generatedAt->format('Ymd-His')
+        );
 
         return response($pdf->output(), 200, [
             'Content-Type' => 'application/pdf',
@@ -398,6 +282,117 @@ class CashierController extends Controller
         return response($pdf->output(), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'inline; filename="' . $filename . '"',
+        ]);
+    }
+
+    /**
+     * Wrap a value so spreadsheet apps keep it as literal text; otherwise
+     * Excel converts date-like cells to date numbers that render as #####
+     * when the column is too narrow.
+     */
+    private function csvText(string $value): string
+    {
+        return '="' . $value . '"';
+    }
+
+    public function downloadHistoryCsv(Request $request)
+    {
+        $month = $this->exportMonth($request);
+        $payments = $this->historyPayments($month);
+
+        $filename = sprintf(
+            'payment-history-%s%s.csv',
+            $month ? $month->format('Y-m') . '-' : '',
+            now()->format('Ymd-His')
+        );
+
+        return response()->streamDownload(function () use ($payments) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Concessionaire',
+                'Business Name',
+                'Amount Paid (PHP)',
+                'Payment Date',
+                'Period Covered',
+                'Payment Status',
+                'Payment Type',
+                'OR Number',
+                'Recorded By',
+                'Recorded At',
+            ]);
+
+            foreach ($payments as $payment) {
+                fputcsv($handle, [
+                    $payment->concessionaire?->name ?: 'N/A',
+                    $payment->concessionaire?->business_name ?: 'N/A',
+                    number_format((float) $payment->amount, 2, '.', ''),
+                    $payment->payment_date ? $this->csvText($payment->payment_date->format('Y-m-d')) : 'N/A',
+                    $payment->period_month ? $this->csvText($payment->period_month->format('M Y')) : 'N/A',
+                    $payment->paymentTiming() ?? 'N/A',
+                    ucfirst(str_replace('_', ' ', (string) $payment->payment_type)),
+                    $payment->or_number ?: 'N/A',
+                    $payment->recordedBy?->name ?: 'N/A',
+                    $payment->created_at ? $this->csvText($payment->created_at->setTimezone('Asia/Manila')->format('Y-m-d h:i A')) : 'N/A',
+                ]);
+            }
+
+            fputcsv($handle, ['']);
+            fputcsv($handle, ['Total Payments', $payments->count()]);
+            fputcsv($handle, ['Total Amount Paid (PHP)', number_format((float) $payments->sum('amount'), 2, '.', '')]);
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
+    public function downloadConcessionaireHistoryCsv(Request $request, User $concessionaire)
+    {
+        $payments = ConcessionairePayment::query()
+            ->where('concessionaire_id', $concessionaire->id)
+            ->with(['recordedBy:id,name'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        $businessOrName = $concessionaire->business_name ?: $concessionaire->name;
+        $safeName = preg_replace('/[^A-Za-z0-9]+/', '-', $businessOrName) ?: 'concessionaire';
+        $filename = sprintf('payment-history-%s-%s.csv', trim($safeName, '-'), now()->format('Ymd-His'));
+
+        return response()->streamDownload(function () use ($payments) {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, [
+                'Amount Paid (PHP)',
+                'Payment Date',
+                'Period Covered',
+                'Payment Status',
+                'Payment Type',
+                'OR Number',
+                'Recorded By',
+                'Recorded At',
+            ]);
+
+            foreach ($payments as $payment) {
+                fputcsv($handle, [
+                    number_format((float) $payment->amount, 2, '.', ''),
+                    $payment->payment_date ? $this->csvText($payment->payment_date->format('Y-m-d')) : 'N/A',
+                    $payment->period_month ? $this->csvText($payment->period_month->format('M Y')) : 'N/A',
+                    $payment->paymentTiming() ?? 'N/A',
+                    ucfirst(str_replace('_', ' ', (string) $payment->payment_type)),
+                    $payment->or_number ?: 'N/A',
+                    $payment->recordedBy?->name ?: 'N/A',
+                    $payment->created_at ? $this->csvText($payment->created_at->setTimezone('Asia/Manila')->format('Y-m-d h:i A')) : 'N/A',
+                ]);
+            }
+
+            fputcsv($handle, ['']);
+            fputcsv($handle, ['Total Payments', $payments->count()]);
+            fputcsv($handle, ['Total Amount Paid (PHP)', number_format((float) $payments->sum('amount'), 2, '.', '')]);
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 

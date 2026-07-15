@@ -23,9 +23,23 @@ Recorded By: {{ $payments->first()?->recordedBy?->name ?: 'Cashier' }}
 Notes: {{ $payments->first()->notes }}
 @endif
 
+@if ($payments->count() > 1)
+Download your official invoices below:
+
+@foreach ($payments as $payment)
+- [Invoice for {{ \Illuminate\Support\Carbon::parse($payment->period_month)->format('F Y') }} (PDF)]({{ $invoiceUrls[$payment->id] }})
+@endforeach
+@endif
+
 If you believe there is any discrepancy, please contact the admin office.
 
-@component('mail::button', ['url' => route('concessionaire.payments'), 'color' => 'success'])
+@if ($payments->count() === 1)
+@component('mail::button', ['url' => $invoiceUrls[$payments->first()->id], 'color' => 'success'])
+Download Invoice (PDF)
+@endcomponent
+@endif
+
+@component('mail::button', ['url' => route('concessionaire.payments')])
 View Payment History
 @endcomponent
 

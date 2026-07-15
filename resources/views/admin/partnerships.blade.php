@@ -25,7 +25,12 @@
     .badge-approved { background: #E9F6EE; color: #15803D; }
     .badge-rejected { background: rgba(239,68,68,0.1); color: #dc2626; }
     .badge-registered { background: rgba(59,130,246,0.1); color: #2563eb; }
-    .badge-expired { background: #e5e7eb; color: #4b5563; }
+    .badge-expired { background: #e5e7eb; color: var(--muted); }
+    html[data-theme="dark"] .badge-pending { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+    html[data-theme="dark"] .badge-approved { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
+    html[data-theme="dark"] .badge-rejected { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
+    html[data-theme="dark"] .badge-registered { background: rgba(96, 165, 250, 0.14); color: #9CC4F8; }
+    html[data-theme="dark"] .badge-expired { background: rgba(255, 255, 255, 0.07); color: var(--muted); }
 
     /* Wizard step badge (table) */
     .wizard-badge {
@@ -39,7 +44,7 @@
         margin-top: 6px;
         border: 1px solid transparent;
     }
-    .wizard-badge.gray { background: #f3f4f6; color: #374151; border-color: #e5e7eb; }
+    .wizard-badge.gray { background: var(--hover-2); color: var(--ink); border-color: var(--line-strong); }
     .wizard-badge.step-1 { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
     .wizard-badge.step-2 { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
     .wizard-badge.step-3 { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
@@ -47,7 +52,14 @@
     .wizard-badge.amber { background: #fffbeb; color: #b45309; border-color: #fde68a; }
     .wizard-badge.violet { background: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
     .wizard-badge.blue { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
-    .wizard-badge.green { background: #EEF0F3; color: #1F2937; border-color: #D6DCE3; }
+    .wizard-badge.green { background: var(--hover-2); color: var(--ink); border-color: var(--line-strong); }
+    html[data-theme="dark"] .wizard-badge.step-1,
+    html[data-theme="dark"] .wizard-badge.blue { background: rgba(96, 165, 250, 0.14); color: #9CC4F8; border-color: rgba(96, 165, 250, 0.35); }
+    html[data-theme="dark"] .wizard-badge.step-2 { background: rgba(234, 124, 58, 0.15); color: #F0B08A; border-color: rgba(234, 124, 58, 0.35); }
+    html[data-theme="dark"] .wizard-badge.step-3,
+    html[data-theme="dark"] .wizard-badge.violet { background: rgba(167, 139, 250, 0.15); color: #C6B4FA; border-color: rgba(167, 139, 250, 0.35); }
+    html[data-theme="dark"] .wizard-badge.step-4 { background: rgba(45, 193, 166, 0.15); color: #85DCC9; border-color: rgba(45, 193, 166, 0.35); }
+    html[data-theme="dark"] .wizard-badge.amber { background: rgba(227, 164, 72, 0.14); color: #E9C288; border-color: rgba(227, 164, 72, 0.35); }
     .wizard-dot {
         width: 8px;
         height: 8px;
@@ -101,7 +113,7 @@
     #partnerships-data-table .user-email {
         font-size: 11px;
         margin-top: 1px;
-        color: #64748b;
+        color: var(--muted);
     }
     #partnerships-data-table .business-badge {
         font-size: 11.5px;
@@ -109,11 +121,11 @@
     }
     #partnerships-data-table .contact-number {
         font-size: 12.5px;
-        color: #1e293b;
+        color: var(--ink);
         white-space: nowrap;
     }
     #partnerships-data-table .contact-empty {
-        color: #94a3b8;
+        color: var(--faint);
         font-size: 12.5px;
     }
     #partnerships-data-table .submitted-date {
@@ -123,7 +135,7 @@
     }
     #partnerships-data-table .submitted-time {
         font-size: 11px;
-        color: #94a3b8;
+        color: var(--faint);
         margin-top: 1px;
     }
     #partnerships-data-table .badge {
@@ -182,6 +194,15 @@
         --wiz-green-dark: #15803D;
         --wiz-green-soft: #E9F6EE;
     }
+    html[data-theme="dark"] {
+        --wiz-green: #1E9560;
+        --wiz-green-dark: #8CD6AF;
+        --wiz-green-soft: rgba(30, 149, 96, 0.12);
+    }
+    html[data-theme="dark"] .wizard-inline-error { background: rgba(227, 106, 106, 0.12); border-color: rgba(227, 106, 106, 0.35); color: #F0A0A0; }
+    html[data-theme="dark"] .wizard-inline-success,
+    html[data-theme="dark"] .wizard-doc-readonly,
+    html[data-theme="dark"] .wizard-docs-done-banner { color: #8CD6AF; border-color: rgba(30, 149, 96, 0.35); }
     .modal-backdrop {
         position: fixed;
         inset: 0;
@@ -195,7 +216,7 @@
     }
     .modal-backdrop.active { display: flex; }
     .modal {
-        background: #fff;
+        background: var(--card);
         border-radius: 14px;
         border: 1px solid var(--line);
         padding: 24px;
@@ -219,14 +240,14 @@
     #viewModal .view-modal-topbar {
         margin-bottom: 0;
         padding: 14px 20px;
-        background: #fff;
+        background: var(--card);
         border-bottom: 1px solid var(--line);
         border-radius: 14px 14px 0 0;
     }
     #viewModal #viewContent {
         overflow-y: auto;
         padding: 20px;
-        background: #FAFBFC;
+        background: var(--hover);
     }
     .view-modal-topbar {
         display: flex;
@@ -246,7 +267,7 @@
     .view-modal-topbar-right { display: inline-flex; align-items: center; gap: 10px; }
     .view-modal-close {
         border: 1px solid var(--line-strong);
-        background: #fff;
+        background: var(--card);
         color: var(--muted);
         width: 30px;
         height: 30px;
@@ -270,7 +291,7 @@
     .rv-section {
         border: 1px solid var(--line);
         border-radius: 12px;
-        background: #fff;
+        background: var(--card);
         margin-top: 14px;
         overflow: hidden;
         box-shadow: var(--shadow-card);
@@ -310,13 +331,13 @@
     }
     .rv-proposal {
         margin-top: 2px;
-        background: #FAFBFC;
+        background: var(--hover);
         border: 1px solid var(--line);
         border-radius: 8px;
         padding: 10px 12px;
         font-size: 13px;
         font-weight: 500;
-        color: #374151;
+        color: var(--ink);
         white-space: pre-wrap;
         max-height: 140px;
         overflow-y: auto;
@@ -329,14 +350,14 @@
         align-items: center;
         padding: 12px 16px;
         border-top: 1px solid var(--line);
-        background: #FAFBFC;
+        background: var(--hover);
     }
     .rv-attachments .rv-field-label { margin: 0 4px 0 0; }
     .rv-attachment-empty {
         display: inline-flex;
         align-items: center;
         padding: 4px 10px;
-        background: #fff;
+        background: var(--card);
         color: var(--faint);
         border: 1px dashed var(--line-strong);
         border-radius: 6px;
@@ -345,9 +366,9 @@
     }
     .view-modal-notice {
         font-size: 13px;
-        color: #4b5563;
-        background: #f9fafb;
-        border: 1px solid #e5e7eb;
+        color: var(--muted);
+        background: var(--hover);
+        border: 1px solid var(--line);
         border-radius: 8px;
         padding: 10px;
     }
@@ -355,20 +376,20 @@
         margin-top: 8px;
         padding: 10px 12px;
         border-left: 3px solid #94a3b8;
-        background: #fff;
-        border: 1px solid #e5e7eb;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 8px;
         font-size: 13px;
-        color: #374151;
+        color: var(--ink);
         white-space: pre-wrap;
     }
     .proposal-text {
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
+        background: var(--hover);
+        border: 1px solid var(--line);
         border-radius: 8px;
         padding: 12px;
         font-size: 14px;
-        color: #374151;
+        color: var(--ink);
         max-height: 150px;
         overflow-y: auto;
         margin-top: 8px;
@@ -386,7 +407,7 @@
         padding: 4px 10px;
         border-radius: 6px;
         border: 1px solid var(--line-strong);
-        background: #F2F4F6;
+        background: var(--hover-2);
         color: var(--ink);
         font-size: 12px;
         font-weight: 700;
@@ -398,7 +419,7 @@
     .rv-wizard {
         border: 1px solid var(--line);
         border-radius: 12px;
-        background: #fff;
+        background: var(--card);
         padding: 18px 18px 14px;
         box-shadow: var(--shadow-card);
     }
@@ -414,7 +435,7 @@
         font-family: var(--font-mono);
         font-size: 12px;
         font-weight: 600;
-        background: #fff;
+        background: var(--card);
         border: 1.5px solid var(--line-strong);
         color: var(--faint);
         transition: all 0.2s ease;
@@ -469,18 +490,23 @@
         background: currentColor;
         flex-shrink: 0;
     }
-    .rv-callout.gray { background: #F3F4F6; color: #4B5563; border-color: #E5E7EB; }
+    .rv-callout.gray { background: var(--hover-2); color: var(--muted); border-color: var(--line-strong); }
     .rv-callout.amber { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
     .rv-callout.red { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
     .rv-callout.violet { background: #F5F3FF; color: #6D28D9; border-color: #DDD6FE; }
     .rv-callout.blue { background: #EFF6FF; color: #1D4ED8; border-color: #BFDBFE; }
     .rv-callout.green { background: var(--wiz-green-soft); color: #166534; border-color: #BBE5C8; }
+    html[data-theme="dark"] .rv-callout.amber { background: rgba(227, 164, 72, 0.12); color: #E9C288; border-color: rgba(227, 164, 72, 0.35); }
+    html[data-theme="dark"] .rv-callout.red { background: rgba(227, 106, 106, 0.12); color: #F0A0A0; border-color: rgba(227, 106, 106, 0.35); }
+    html[data-theme="dark"] .rv-callout.violet { background: rgba(167, 139, 250, 0.12); color: #C6B4FA; border-color: rgba(167, 139, 250, 0.35); }
+    html[data-theme="dark"] .rv-callout.blue { background: rgba(96, 165, 250, 0.12); color: #9CC4F8; border-color: rgba(96, 165, 250, 0.35); }
+    html[data-theme="dark"] .rv-callout.green { background: rgba(30, 149, 96, 0.12); color: #8CD6AF; border-color: rgba(30, 149, 96, 0.35); }
 
     .wizard-action-panel {
         margin-top: 14px;
         border: 1px solid var(--line);
         border-radius: 12px;
-        background: #fff;
+        background: var(--card);
         padding: 16px;
         box-shadow: var(--shadow-card);
     }
@@ -557,8 +583,8 @@
         resize: vertical;
         font-size: 13px;
         font-family: inherit;
-        color: #111827;
-        background: #fff;
+        color: var(--ink);
+        background: var(--card);
         box-sizing: border-box;
     }
     .reject-modal-textarea:focus {
@@ -760,13 +786,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" style="text-align:center;padding:48px;color:#94a3b8;">
+                            <td colspan="6" style="text-align:center;padding:48px;color: var(--faint);">
                                 No partnership applications found.
                             </td>
                         </tr>
                     @endforelse
                     <tr id="partnerships-no-results-row" style="display:none;">
-                        <td colspan="6" style="text-align:center;padding:48px;color:#94a3b8;">
+                        <td colspan="6" style="text-align:center;padding:48px;color: var(--faint);">
                             No results found.
                         </td>
                     </tr>

@@ -37,6 +37,6 @@ class PaymentDueReminderMail extends Mailable
 
     private function dueDate(): string
     {
-        return 'the 1st of ' . now()->format('F Y');
+        return now()->format('F Y');
     }
 }

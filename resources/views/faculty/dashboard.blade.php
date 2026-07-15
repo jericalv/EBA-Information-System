@@ -47,7 +47,7 @@
         gap: 16px;
     }
     .dstat-card {
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         border-radius: 14px;
         padding: 20px;
@@ -556,6 +556,23 @@
 
     var chartFont = getComputedStyle(document.documentElement).getPropertyValue('--font-ui').trim() || 'Manrope, sans-serif';
 
+    function chartThemeTokens() {
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return {
+            mode: dark ? 'dark' : 'light',
+            fore: dark ? '#9CA5B1' : '#687180',
+            grid: dark ? '#262C35' : '#EEF0F3',
+            stroke: dark ? '#171B21' : '#fff',
+            primary: dark ? '#A9B4C4' : '#1F2937',
+            secondary: dark ? '#5C6674' : '#94A3B8',
+            statusColors: dark
+                ? ['#E9C288', '#8792A0', '#A9B4C4', '#F0A0A0', '#5C6674']
+                : ['#D97706', '#64748B', '#1F2937', '#B3261E', '#94A3B8'],
+            dataLabel: dark ? '#10151B' : '#fff'
+        };
+    }
+    var chartTheme = chartThemeTokens();
+
     // Re-enable collapse transitions only once the charts have drawn, so the
     // initial render never plays a collapse/expand animation.
     var dashboardPageEl = document.querySelector('.dashboard-page');
@@ -579,7 +596,8 @@
 
     var chartBase = {
         fontFamily: chartFont,
-        foreColor: '#687180',
+        foreColor: chartTheme.fore,
+        background: 'transparent',
         toolbar: { show: false },
         animations: { enabled: !prefersReducedMotion },
         events: { mounted: chartMountedTick }
@@ -593,6 +611,7 @@
 
     if (document.querySelector('#chart_monthly_applications') && typeof ApexCharts !== 'undefined') {
         var monthlyOptions = {
+            theme: { mode: chartTheme.mode },
             chart: Object.assign({}, chartBase, {
                 height: 320,
                 type: 'area',
@@ -601,7 +620,7 @@
             series: [
                 { name: 'Applications', data: appMonthData }
             ],
-            colors: ['#1F2937'],
+            colors: [chartTheme.primary],
             stroke: { curve: 'smooth', width: 2.5, lineCap: 'round' },
             fill: {
                 type: 'gradient',
@@ -615,7 +634,7 @@
             dataLabels: { enabled: false },
             markers: {
                 size: 3.5,
-                strokeColors: '#fff',
+                strokeColors: chartTheme.stroke,
                 strokeWidth: 2,
                 hover: { size: 5 }
             },
@@ -643,7 +662,7 @@
                 }
             },
             grid: {
-                borderColor: '#EEF0F3',
+                borderColor: chartTheme.grid,
                 strokeDashArray: 4,
                 padding: { left: 6, right: 6 }
             }
@@ -659,6 +678,7 @@
 
     if (document.querySelector('#chart_status_distribution') && typeof ApexCharts !== 'undefined') {
         var statusOptions = {
+            theme: { mode: chartTheme.mode },
             chart: Object.assign({}, chartBase, {
                 height: 320,
                 type: 'bar',
@@ -667,7 +687,7 @@
             series: [
                 { name: 'Applications', data: statusData }
             ],
-            colors: ['#D97706', '#64748B', '#1F2937', '#B3261E', '#94A3B8'],
+            colors: chartTheme.statusColors,
             plotOptions: {
                 bar: {
                     columnWidth: '44%',
@@ -706,7 +726,7 @@
                 }
             },
             grid: {
-                borderColor: '#EEF0F3',
+                borderColor: chartTheme.grid,
                 strokeDashArray: 4,
                 padding: { left: 6, right: 6 }
             }
@@ -722,6 +742,7 @@
     // ---------- Revenue (area) ----------
     if (document.querySelector('#chart_revenue') && typeof ApexCharts !== 'undefined') {
         var revenueOptions = {
+            theme: { mode: chartTheme.mode },
             chart: Object.assign({}, chartBase, {
                 height: 320,
                 type: 'area',
@@ -730,7 +751,7 @@
             series: [
                 { name: 'Revenue', data: revenueData }
             ],
-            colors: ['#1F2937'],
+            colors: [chartTheme.primary],
             stroke: { curve: 'smooth', width: 2.5, lineCap: 'round' },
             fill: {
                 type: 'gradient',
@@ -744,7 +765,7 @@
             dataLabels: { enabled: false },
             markers: {
                 size: 3.5,
-                strokeColors: '#fff',
+                strokeColors: chartTheme.stroke,
                 strokeWidth: 2,
                 hover: { size: 5 }
             },
@@ -770,7 +791,7 @@
                 }
             },
             grid: {
-                borderColor: '#EEF0F3',
+                borderColor: chartTheme.grid,
                 strokeDashArray: 4,
                 padding: { left: 6, right: 6 }
             }
@@ -786,6 +807,7 @@
     // ---------- Units sold: uniforms vs books (stacked bar) ----------
     if (document.querySelector('#chart_units_by_type') && typeof ApexCharts !== 'undefined') {
         var unitsOptions = {
+            theme: { mode: chartTheme.mode },
             chart: Object.assign({}, chartBase, {
                 height: 320,
                 type: 'bar',
@@ -796,7 +818,7 @@
                 { name: 'Uniforms', data: unitsUniformsData },
                 { name: 'Books', data: unitsBooksData }
             ],
-            colors: ['#1F2937', '#94A3B8'],
+            colors: [chartTheme.primary, chartTheme.secondary],
             plotOptions: {
                 bar: {
                     columnWidth: '46%',
@@ -837,7 +859,7 @@
                 }
             },
             grid: {
-                borderColor: '#EEF0F3',
+                borderColor: chartTheme.grid,
                 strokeDashArray: 4,
                 padding: { left: 6, right: 6 }
             }
@@ -854,6 +876,7 @@
     if (document.querySelector('#chart_top_items') && typeof ApexCharts !== 'undefined') {
         var topItemsHeight = Math.max(260, topItemLabels.length * 46 + 40);
         var topItemsOptions = {
+            theme: { mode: chartTheme.mode },
             chart: Object.assign({}, chartBase, {
                 height: topItemsHeight,
                 type: 'bar',
@@ -862,7 +885,7 @@
             series: [
                 { name: 'Units sold', data: topItemData }
             ],
-            colors: ['#1F2937'],
+            colors: [chartTheme.primary],
             plotOptions: {
                 bar: {
                     horizontal: true,
@@ -873,7 +896,7 @@
             },
             dataLabels: {
                 enabled: true,
-                style: { fontSize: '11px', fontWeight: 600, colors: ['#fff'] },
+                style: { fontSize: '11px', fontWeight: 600, colors: [chartTheme.dataLabel] },
                 offsetX: -2,
                 formatter: function (value) { return Math.round(value); }
             },
@@ -900,7 +923,7 @@
                 }
             },
             grid: {
-                borderColor: '#EEF0F3',
+                borderColor: chartTheme.grid,
                 strokeDashArray: 4,
                 padding: { left: 6, right: 6 }
             }
@@ -912,6 +935,63 @@
             topItemsChart.render();
         }, 50);
     }
+
+    // ---------- Re-style charts when the theme toggle fires ----------
+    // Deferred past the next paint so the CSS theme flip renders instantly;
+    // the (synchronous, animation-free) chart restyle follows a frame later.
+    window.addEventListener('eba:theme', function () {
+        requestAnimationFrame(function () {
+            setTimeout(function () {
+                chartTheme = chartThemeTokens();
+                var themeUpdate = { mode: chartTheme.mode };
+                var gridUpdate = { borderColor: chartTheme.grid, strokeDashArray: 4, padding: { left: 6, right: 6 } };
+
+                if (monthlyChart) {
+                    monthlyChart.updateOptions({
+                        theme: themeUpdate,
+                        chart: { foreColor: chartTheme.fore },
+                        colors: [chartTheme.primary],
+                        markers: { strokeColors: chartTheme.stroke },
+                        grid: gridUpdate
+                    }, false, false);
+                }
+                if (statusChart) {
+                    statusChart.updateOptions({
+                        theme: themeUpdate,
+                        chart: { foreColor: chartTheme.fore },
+                        colors: chartTheme.statusColors,
+                        grid: gridUpdate
+                    }, false, false);
+                }
+                if (revenueChart) {
+                    revenueChart.updateOptions({
+                        theme: themeUpdate,
+                        chart: { foreColor: chartTheme.fore },
+                        colors: [chartTheme.primary],
+                        markers: { strokeColors: chartTheme.stroke },
+                        grid: gridUpdate
+                    }, false, false);
+                }
+                if (unitsChart) {
+                    unitsChart.updateOptions({
+                        theme: themeUpdate,
+                        chart: { foreColor: chartTheme.fore },
+                        colors: [chartTheme.primary, chartTheme.secondary],
+                        grid: gridUpdate
+                    }, false, false);
+                }
+                if (topItemsChart) {
+                    topItemsChart.updateOptions({
+                        theme: themeUpdate,
+                        chart: { foreColor: chartTheme.fore },
+                        colors: [chartTheme.primary],
+                        dataLabels: { style: { colors: [chartTheme.dataLabel] } },
+                        grid: gridUpdate
+                    }, false, false);
+                }
+            }, 0);
+        });
+    });
 
     // ---------- Report registry (shared by per-panel menus and "Download all") ----------
     var reportRegistry = [

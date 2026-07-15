@@ -13,7 +13,7 @@
     <div class="card" style="max-width:760px;">
         <div class="card-header">
             <strong>{{ $concessionaire->name }}</strong>
-            <div style="font-size:13px;color:#64748b;">{{ $concessionaire->email }}</div>
+            <div style="font-size:13px;color:var(--muted);">{{ $concessionaire->email }}</div>
         </div>
         <div class="card-body" style="padding:20px;">
             <form method="POST" action="{{ route('staff.concessionaires.update', $concessionaire->id) }}">
@@ -21,17 +21,17 @@
                 @method('PATCH')
 
                 <div style="display:grid;gap:8px;margin-bottom:12px;">
-                    <label style="font-size:13px;font-weight:700;color:#334155;">Business Name</label>
+                    <label style="font-size:13px;font-weight:700;color:var(--ink);">Business Name</label>
                     <input type="text" name="business_name" value="{{ old('business_name', $concessionaire->business_name) }}" maxlength="255" required style="width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:6px;">
                 </div>
 
                 <div style="display:grid;gap:8px;margin-bottom:12px;">
-                    <label style="font-size:13px;font-weight:700;color:#334155;">Description</label>
+                    <label style="font-size:13px;font-weight:700;color:var(--ink);">Description</label>
                     <textarea name="description" maxlength="2000" style="width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:6px;min-height:110px;">{{ old('description', $concessionaire->description) }}</textarea>
                 </div>
 
                 <div style="display:grid;gap:8px;margin-bottom:16px;">
-                    <label style="font-size:13px;font-weight:700;color:#334155;">Location</label>
+                    <label style="font-size:13px;font-weight:700;color:var(--ink);">Location</label>
                     <input type="text" name="location" value="{{ old('location', $concessionaire->location) }}" maxlength="255" style="width:100%;padding:10px 12px;border:1px solid var(--line-strong);border-radius:6px;">
                 </div>
 

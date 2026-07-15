@@ -24,7 +24,7 @@
         gap: 16px;
     }
     .dstat-card {
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         border-radius: 14px;
         padding: 20px;
@@ -472,6 +472,29 @@
         return rows.map(function (row) { return row.map(csvEscape).join(','); }).join('\r\n');
     }
 
+    // Force spreadsheet apps to keep date-like cells ("Jul 2026") as literal
+    // text; otherwise Excel converts them to dates that render as ##### when
+    // the column is too narrow.
+    function excelText(value) {
+        return '="' + String(value === null || value === undefined ? '' : value) + '"';
+    }
+
+    // "Total" row summing every numeric column (label goes in the first column,
+    // non-numeric columns are left blank).
+    function totalsRow(headers, rows) {
+        return headers.map(function (_, col) {
+            if (col === 0) return 'Total';
+            var sum = 0, hasNumber = false;
+            rows.forEach(function (row) {
+                var value = row[col];
+                if (value === '' || value === null || value === undefined) return;
+                var num = Number(value);
+                if (isFinite(num)) { sum += num; hasNumber = true; }
+            });
+            return hasNumber ? Math.round(sum * 100) / 100 : '';
+        });
+    }
+
     function downloadCSVString(filename, csvString) {
         var blob = new Blob(['﻿' + csvString], { type: 'text/csv;charset=utf-8;' });
         var link = document.createElement('a');
@@ -577,6 +600,18 @@
 
     var chartFont = getComputedStyle(document.documentElement).getPropertyValue('--font-ui').trim() || 'Manrope, sans-serif';
 
+    // Theme-dependent chart tokens (axis text, gridlines, marker/donut strokes).
+    function chartThemeTokens() {
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        return {
+            fore: dark ? '#9DAFA4' : '#66756C',
+            grid: dark ? '#26312A' : '#EDF2EE',
+            stroke: dark ? '#171F1A' : '#ffffff',
+            ink: dark ? '#E8EEEA' : '#1A2B21'
+        };
+    }
+    var chartTheme = chartThemeTokens();
+
     // Re-enable collapse transitions only once the charts have drawn, so the
     // initial render never plays a collapse/expand animation.
     var dashboardPageEl = document.querySelector('.dashboard-page');
@@ -596,7 +631,7 @@
 
     var chartBase = {
         fontFamily: chartFont,
-        foreColor: '#66756C',
+        foreColor: chartTheme.fore,
         toolbar: { show: false },
         animations: { enabled: !prefersReducedMotion },
         events: { mounted: chartMountedTick }
@@ -633,7 +668,7 @@
                 theme: 'dark', style: { fontSize: '12px' },
                 y: { formatter: function (v) { return '₱' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2 }); } }
             },
-            grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+            grid: { borderColor: chartTheme.grid, strokeDashArray: 4, padding: { left: 6, right: 6 } }
         });
         chartsExpected++;
         setTimeout(function () { monthlyChart.render(); }, 50);
@@ -649,7 +684,7 @@
                 series: [appStatus.pending || 0, appStatus.approved || 0, appStatus.rejected || 0],
                 labels: ['Pending', 'Approved', 'Rejected'],
                 colors: ['#D97706', '#0A5C2F', '#B91C1C'],
-                stroke: { colors: ['#ffffff'], width: 3 },
+                stroke: { colors: [chartTheme.stroke], width: 3 },
                 dataLabels: { enabled: false },
                 plotOptions: {
                     pie: {
@@ -658,10 +693,10 @@
                             size: '76%',
                             labels: {
                                 show: true,
-                                name: { fontSize: '12px', color: '#66756C', offsetY: 18 },
-                                value: { fontSize: '26px', fontWeight: 600, color: '#1A2B21', offsetY: -12, formatter: function (v) { return v; } },
+                                name: { fontSize: '12px', color: chartTheme.fore, offsetY: 18 },
+                                value: { fontSize: '26px', fontWeight: 600, color: chartTheme.ink, offsetY: -12, formatter: function (v) { return v; } },
                                 total: {
-                                    show: true, label: 'Applications', fontSize: '12px', color: '#66756C',
+                                    show: true, label: 'Applications', fontSize: '12px', color: chartTheme.fore,
                                     formatter: function (w) { return w.globals.seriesTotals.reduce(function (a, b) { return a + b; }, 0); }
                                 }
                             }
@@ -688,7 +723,7 @@
                 type: 'gradient',
                 gradient: { shadeIntensity: 1, opacityFrom: 0.28, opacityTo: 0.03, stops: [0, 90, 100] }
             },
-            markers: { size: 3, colors: ['#0A5C2F'], strokeColors: '#fff', strokeWidth: 2, hover: { size: 5 } },
+            markers: { size: 3, colors: ['#0A5C2F'], strokeColors: chartTheme.stroke, strokeWidth: 2, hover: { size: 5 } },
             xaxis: {
                 categories: appTrend.map(function (m) { return m.month; }),
                 labels: { style: { fontSize: '11px', fontWeight: 600 } },
@@ -702,7 +737,7 @@
             },
             legend: { show: false },
             tooltip: { theme: 'dark', style: { fontSize: '12px' } },
-            grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+            grid: { borderColor: chartTheme.grid, strokeDashArray: 4, padding: { left: 6, right: 6 } }
         });
         chartsExpected++;
         setTimeout(function () { trendChart.render(); }, 50);
@@ -728,7 +763,7 @@
                 yaxis: { labels: { style: { fontSize: '11.5px', fontWeight: 600 }, maxWidth: 180 } },
                 legend: { show: false },
                 tooltip: { theme: 'dark', style: { fontSize: '12px' }, y: { formatter: function (v) { return v + ' ' + (v === 1 ? 'review' : 'reviews'); } } },
-                grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+                grid: { borderColor: chartTheme.grid, strokeDashArray: 4, padding: { left: 6, right: 6 } }
             });
             chartsExpected++;
             setTimeout(function () { topChart.render(); }, 50);
@@ -766,7 +801,7 @@
                 theme: 'dark', style: { fontSize: '12px' },
                 y: { formatter: function (v) { return '₱' + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2 }); } }
             },
-            grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+            grid: { borderColor: chartTheme.grid, strokeDashArray: 4, padding: { left: 6, right: 6 } }
         });
         chartsExpected++;
         setTimeout(function () { salesChart.render(); }, 50);
@@ -782,7 +817,7 @@
             colors: salesColors,
             stroke: { curve: 'smooth', width: 2.5 },
             dataLabels: { enabled: false },
-            markers: { size: 3, strokeColors: '#fff', strokeWidth: 2, hover: { size: 5 } },
+            markers: { size: 3, strokeColors: chartTheme.stroke, strokeWidth: 2, hover: { size: 5 } },
             xaxis: {
                 categories: salesMonthLabels,
                 labels: { style: { fontSize: '11px', fontWeight: 600 } },
@@ -796,7 +831,7 @@
             },
             legend: { show: true, position: 'bottom', horizontalAlign: 'center', fontSize: '12px', fontWeight: 600, markers: { size: 5, shape: 'circle' }, itemMargin: { horizontal: 10 } },
             tooltip: { theme: 'dark', style: { fontSize: '12px' }, y: { formatter: function (v) { return v + ' ' + (v === 1 ? 'unit' : 'units'); } } },
-            grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+            grid: { borderColor: chartTheme.grid, strokeDashArray: 4, padding: { left: 6, right: 6 } }
         });
         chartsExpected++;
         setTimeout(function () { unitsChart.render(); }, 50);
@@ -830,12 +865,31 @@
                         }
                     }
                 },
-                grid: { borderColor: '#EDF2EE', strokeDashArray: 4, padding: { left: 6, right: 6 } }
+                grid: { borderColor: chartTheme.grid, strokeDashArray: 4, padding: { left: 6, right: 6 } }
             });
             chartsExpected++;
             setTimeout(function () { itemsChart.render(); }, 50);
         }
     }
+
+    // ---------- Re-style charts when the theme toggles ----------
+    window.addEventListener('eba:theme', function () {
+        chartTheme = chartThemeTokens();
+        [monthlyChart, trendChart, topChart, salesChart, unitsChart, itemsChart].forEach(function (chart) {
+            if (chart) chart.updateOptions({ chart: { foreColor: chartTheme.fore }, grid: { borderColor: chartTheme.grid } }, false, false);
+        });
+        if (trendChart) trendChart.updateOptions({ markers: { size: 3, strokeColors: chartTheme.stroke, strokeWidth: 2, hover: { size: 5 } } }, false, false);
+        if (unitsChart) unitsChart.updateOptions({ markers: { size: 3, strokeColors: chartTheme.stroke, strokeWidth: 2, hover: { size: 5 } } }, false, false);
+        if (statusChart) statusChart.updateOptions({
+            chart: { foreColor: chartTheme.fore },
+            stroke: { colors: [chartTheme.stroke], width: 3 },
+            plotOptions: { pie: { donut: { labels: {
+                name: { color: chartTheme.fore },
+                value: { color: chartTheme.ink },
+                total: { color: chartTheme.fore }
+            } } } }
+        }, false, false);
+    });
 
     // ---------- Report registry (shared by per-panel menus and "Download reports") ----------
     var reportRegistry = [
@@ -846,7 +900,7 @@
             csvName: 'monthly-payments.csv',
             csvHeaders: ['Month', 'Revenue'],
             csvRows: function () {
-                return monthlyPayments.map(function (m) { return [m.month, m.total]; });
+                return monthlyPayments.map(function (m) { return [excelText(m.month), m.total]; });
             }
         },
         {
@@ -870,7 +924,7 @@
             csvName: 'applications-over-time.csv',
             csvHeaders: ['Month', 'Applications'],
             csvRows: function () {
-                return appTrend.map(function (m) { return [m.month, m.count]; });
+                return appTrend.map(function (m) { return [excelText(m.month), m.count]; });
             }
         },
         {
@@ -890,7 +944,7 @@
             csvName: 'uniform-book-revenue.csv',
             csvHeaders: ['Month', 'Uniform revenue', 'Book revenue'],
             csvRows: function () {
-                return salesByMonth.map(function (m) { return [m.month, m.uniform_revenue, m.book_revenue]; });
+                return salesByMonth.map(function (m) { return [excelText(m.month), m.uniform_revenue, m.book_revenue]; });
             }
         },
         {
@@ -900,7 +954,7 @@
             csvName: 'units-sold.csv',
             csvHeaders: ['Month', 'Uniform units', 'Book units'],
             csvRows: function () {
-                return salesByMonth.map(function (m) { return [m.month, m.uniform_units, m.book_units]; });
+                return salesByMonth.map(function (m) { return [excelText(m.month), m.uniform_units, m.book_units]; });
             }
         },
         {
@@ -915,11 +969,17 @@
         }
     ];
 
+    // Data rows plus a trailing "Total" row for every column that can be summed.
+    function reportRowsWithTotal(report) {
+        var rows = report.csvRows();
+        return rows.concat([totalsRow(report.csvHeaders, rows)]);
+    }
+
     reportRegistry.forEach(function (report) {
         var hasChart = !!report.chart();
         wireChartPanel(report.panel, [
             { label: 'Download PNG', available: hasChart, run: function () { downloadPNG(report.chart, report.pngName); } },
-            { label: 'Download CSV', run: function () { downloadCSV(report.csvName, report.csvHeaders, report.csvRows()); } }
+            { label: 'Download CSV', run: function () { downloadCSV(report.csvName, report.csvHeaders, reportRowsWithTotal(report)); } }
         ]);
     });
 
@@ -943,7 +1003,7 @@
     // block of columns, separated by an empty spacer column.
     function downloadAllCSV() {
         var blocks = reportRegistry.map(function (report) {
-            return [[reportTitle(report)], report.csvHeaders].concat(report.csvRows());
+            return [[reportTitle(report)], report.csvHeaders].concat(reportRowsWithTotal(report));
         });
 
         var widths = blocks.map(function (block) {
@@ -963,6 +1023,12 @@
             });
             rows.push(row);
         }
+
+        // Header so the export records exactly when it was generated.
+        var generated = new Date();
+        rows.unshift([]);
+        rows.unshift(['Generated', excelText(generated.toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }))]);
+        rows.unshift(['Admin Dashboard Reports', dashboardDateLabel()]);
 
         downloadCSVString('admin-dashboard-reports.csv', rowsToCSV(rows));
     }

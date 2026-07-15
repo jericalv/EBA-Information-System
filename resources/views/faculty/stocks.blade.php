@@ -12,8 +12,8 @@
         margin-bottom: 20px;
     }
     .stocks-card {
-        background: #fff;
-        border: 1px solid #e2e8f0;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 14px;
         padding: 20px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -25,7 +25,7 @@
     .stocks-card-blue { border-top-color: #3b82f6; }
     .stocks-card-indigo { border-top-color: #6366f1; }
     .stocks-card-green { border-top-color: #1F2937; }
-    .stocks-card-gray { border-top-color: #64748b; }
+    .stocks-card-gray { border-top-color: var(--muted); }
     .stocks-card-header {
         display: flex;
         align-items: center;
@@ -52,13 +52,13 @@
     .stocks-card-icon-gray { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
     .stocks-card-label {
         font-size: 13px;
-        color: #64748b;
+        color: var(--muted);
         font-weight: 600;
     }
     .stocks-card-value {
         font-size: 30px;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--ink);
         line-height: 1.2;
     }
     .stocks-card-status {
@@ -81,8 +81,8 @@
         color: #92400e;
     }
     .stocks-card-status-neutral {
-        background: #f1f5f9;
-        color: #475569;
+        background: var(--hover-2);
+        color: var(--muted);
     }
 
     .stocks-grid {
@@ -97,8 +97,8 @@
     }
 
     .stocks-form-card {
-        background: #fff;
-        border: 1px solid #e2e8f0;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 14px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04);
         padding: 24px;
@@ -106,7 +106,7 @@
     .stocks-form-card h3 {
         font-size: 16px;
         font-weight: 700;
-        color: #111827;
+        color: var(--ink);
         margin-bottom: 16px;
     }
     .stocks-field {
@@ -116,7 +116,7 @@
         display: block;
         font-size: 13px;
         font-weight: 700;
-        color: #334155;
+        color: var(--ink);
         margin-bottom: 6px;
     }
     .stocks-field input[type="text"],
@@ -128,7 +128,7 @@
         font-family: inherit;
         font-size: 14px;
         color: var(--ink);
-        background: #fff;
+        background: var(--field);
     }
     .stocks-field input[type="text"],
     .stocks-field input[type="number"] {
@@ -142,12 +142,12 @@
         outline: none;
         border-color: var(--pine);
         box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
-        background: #fff;
+        background: var(--field);
     }
     .stocks-help {
         margin-top: 5px;
         font-size: 12px;
-        color: #64748b;
+        color: var(--muted);
         line-height: 1.4;
     }
     .stocks-visible-row {
@@ -156,7 +156,7 @@
         gap: 8px;
         font-size: 13px;
         margin: 16px 0 20px;
-        color: #334155;
+        color: var(--ink);
         font-weight: 500;
     }
     .stocks-visible-row input[type="checkbox"] {
@@ -170,11 +170,11 @@
         height: 48px;
         border-radius: 10px;
         overflow: hidden;
-        background: #f8fafc;
+        background: var(--hover);
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--line);
     }
     .stocks-thumb img {
         width: 100%;
@@ -184,7 +184,7 @@
     .stocks-thumb svg {
         width: 22px;
         height: 22px;
-        color: #94a3b8;
+        color: var(--faint);
     }
 
     .search-box {
@@ -198,7 +198,7 @@
         left: 12px;
         width: 16px;
         height: 16px;
-        color: #94a3b8;
+        color: var(--faint);
         pointer-events: none;
     }
     .search-box input {
@@ -209,7 +209,7 @@
         border-radius: 6px;
         font-size: 14px;
         color: var(--ink);
-        background: #fff;
+        background: var(--field);
     }
     .search-box input:focus {
         outline: none;
@@ -226,13 +226,13 @@
     .stocks-table-card th,
     .stocks-table-card td {
         padding: 14px 16px;
-        border-bottom: 1px solid #eef2f7;
+        border-bottom: 1px solid var(--line);
         text-align: left;
         vertical-align: middle;
     }
     .stocks-table-card th {
-        background: #f8fafc;
-        color: #64748b;
+        background: var(--hover);
+        color: var(--muted);
         font-size: 12px;
         text-transform: uppercase;
         letter-spacing: 0.04em;
@@ -258,37 +258,32 @@
         display: inline-block;
         text-align: left;
     }
-    .btn-actions-trigger {
-        background: #fff;
-        color: var(--ink);
-        border: 1px solid var(--line-strong);
-        padding: 0 12px;
-        border-radius: 6px;
-        font-size: 13px;
-        font-weight: 700;
-        cursor: pointer;
+    .row-menu-btn {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
-        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+        justify-content: center;
+        width: 32px;
         height: 32px;
-        line-height: 1;
-        box-sizing: border-box;
+        border-radius: 6px;
+        border: 1px solid transparent;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
     }
-    .btn-actions-trigger:hover {
-        background: #F2F4F6;
-        border-color: #AEB6C0;
-        color: var(--ink);
+    .row-menu-btn svg { width: 17px; height: 17px; }
+    .row-menu-btn:hover,
+    .row-menu-btn.is-open {
+        background: var(--pine-soft);
+        color: var(--pine);
+        border-color: var(--line-strong);
     }
-    .btn-actions-trigger svg {
-        width: 12px;
-        height: 12px;
-    }
+    .row-menu-btn:focus-visible { outline: 2px solid rgba(31, 41, 55, 0.40); outline-offset: 2px; }
     .actions-dropdown-menu {
         position: absolute;
         right: 0;
         top: calc(100% + 4px);
-        background: #fff;
+        background: var(--card);
         border: 1px solid var(--line);
         border-radius: 10px;
         box-shadow: var(--shadow-pop);
@@ -304,7 +299,7 @@
         width: 100%;
         padding: 8px 12px;
         font-size: 13px;
-        color: #334155;
+        color: var(--ink);
         text-align: left;
         background: none;
         border: none;
@@ -364,6 +359,42 @@
     .stock-status-badge-archived .stock-status-badge-dot {
         background: #f43f5e;
     }
+    html[data-theme="dark"] .stock-status-badge-active {
+        background: rgba(30, 149, 96, 0.16);
+        color: #8CD6AF;
+        border-color: rgba(30, 149, 96, 0.35);
+    }
+    html[data-theme="dark"] .stock-status-badge-active .stock-status-badge-dot { background: #8CD6AF; }
+    html[data-theme="dark"] .stock-status-badge-archived {
+        background: rgba(244, 63, 94, 0.14);
+        color: #F5A3B1;
+        border-color: rgba(244, 63, 94, 0.35);
+    }
+    html[data-theme="dark"] .stock-status-badge-archived .stock-status-badge-dot { background: #F5A3B1; }
+
+    /* Stock level indicators */
+    .stock-level {
+        font-weight: 700;
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .stock-level::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: currentColor;
+        display: inline-block;
+        flex-shrink: 0;
+    }
+    .stock-level-none { color: #dc2626; }
+    .stock-level-low { color: #d97706; }
+    .stock-level-ok { color: #15803d; }
+    html[data-theme="dark"] .stock-level-none { color: #F0A0A0; }
+    html[data-theme="dark"] .stock-level-low { color: #E9C288; }
+    html[data-theme="dark"] .stock-level-ok { color: #8CD6AF; }
 
     #editStockModal,
     #addStockModal,
@@ -389,7 +420,7 @@
     .edit-modal-content,
     .delete-modal-content,
     .feedback-modal-content {
-        background: #fff;
+        background: var(--card);
         border-radius: 16px;
         box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         width: 100%;
@@ -409,7 +440,7 @@
     .delete-modal-header,
     .feedback-modal-header {
         padding: 20px 24px;
-        border-bottom: 1px solid #f1f5f9;
+        border-bottom: 1px solid var(--line);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -432,7 +463,7 @@
         display: block;
         font-size: 13px;
         font-weight: 700;
-        color: #334155;
+        color: var(--ink);
         margin-bottom: 6px;
     }
     .add-modal-field input[type="text"],
@@ -445,7 +476,7 @@
         font-family: inherit;
         font-size: 14px;
         color: var(--ink);
-        background: #fff;
+        background: var(--field);
     }
     .add-modal-field input[type="text"],
     .add-modal-field input[type="number"],
@@ -470,27 +501,27 @@
         outline: none;
         border-color: var(--pine);
         box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
-        background: #fff;
+        background: var(--field);
     }
     .add-modal-help {
         margin-top: 5px;
         font-size: 12px;
-        color: #64748b;
+        color: var(--muted);
         line-height: 1.4;
     }
 
     .image-dropzone {
-        border: 2px dashed #cbd5e1;
+        border: 2px dashed var(--line-strong);
         border-radius: 12px;
-        background: #fcfcfd;
+        background: var(--hover);
         padding: 26px 20px;
         text-align: center;
         cursor: pointer;
         transition: border-color 0.15s ease, background-color 0.15s ease;
     }
     .image-dropzone:hover {
-        border-color: #1F2937;
-        background: #f8fafc;
+        border-color: var(--pine);
+        background: var(--hover);
     }
     .image-dropzone-preview {
         width: 88px;
@@ -498,8 +529,8 @@
         border-radius: 10px;
         overflow: hidden;
         margin: 0 auto 14px;
-        border: 1px solid #e2e8f0;
-        background: #fff;
+        border: 1px solid var(--line);
+        background: var(--card);
     }
     .image-dropzone-preview img {
         width: 100%;
@@ -509,20 +540,20 @@
     .image-dropzone-title {
         font-size: 14px;
         font-weight: 700;
-        color: #1F2937;
+        color: var(--ink);
         text-decoration: underline;
         text-underline-offset: 2px;
     }
     .image-dropzone-hint {
         margin-top: 6px;
         font-size: 12px;
-        color: #94a3b8;
+        color: var(--faint);
     }
     .image-dropzone-status {
         margin-top: 10px;
         font-size: 13px;
         font-weight: 700;
-        color: #475569;
+        color: var(--muted);
     }
     .image-dropzone-remove {
         margin-top: 8px;
@@ -542,7 +573,7 @@
         gap: 8px;
         font-size: 13px;
         margin: 16px 0 4px;
-        color: #334155;
+        color: var(--ink);
         font-weight: 500;
     }
     .add-visible-row input[type="checkbox"] {
@@ -566,21 +597,22 @@
         height: 38px;
         padding: 0 10px;
         font-size: 13px;
-        background: #fff;
+        background: var(--field);
+        color: var(--ink);
     }
     .add-size-item input:focus {
         outline: none;
         border-color: var(--pine);
         box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
-        background: #fff;
+        background: var(--field);
     }
     .add-modal-footer {
         padding: 16px 24px;
-        border-top: 1px solid #f1f5f9;
+        border-top: 1px solid var(--line);
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        background: #f8fafc;
+        background: var(--hover);
     }
     .add-modal-actions {
         display: inline-flex;
@@ -604,7 +636,7 @@
     .delete-modal-close,
     .feedback-modal-close {
         border: 0;
-        background: #f1f5f9;
+        background: var(--hover-2);
         border-radius: 6px;
         width: 32px;
         height: 32px;
@@ -612,13 +644,13 @@
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        color: #64748b;
+        color: var(--muted);
     }
     .edit-modal-close:hover,
     .delete-modal-close:hover,
     .feedback-modal-close:hover {
-        background: #e2e8f0;
-        color: #334155;
+        background: var(--hover-2);
+        color: var(--ink);
     }
     .edit-modal-body,
     .delete-modal-body,
@@ -632,7 +664,7 @@
         display: block;
         font-size: 13px;
         font-weight: 700;
-        color: #334155;
+        color: var(--ink);
         margin-bottom: 8px;
     }
     .edit-modal-field input {
@@ -642,7 +674,7 @@
         font-family: inherit;
         font-size: 14px;
         color: var(--ink);
-        background: #fff;
+        background: var(--field);
         height: 44px;
         padding: 0 14px;
     }
@@ -650,21 +682,21 @@
         outline: none;
         border-color: var(--pine);
         box-shadow: 0 0 0 3px rgba(31,41,55,0.10);
-        background: #fff;
+        background: var(--field);
     }
     .edit-modal-footer,
     .delete-modal-footer,
     .feedback-modal-footer {
         padding: 16px 24px;
-        border-top: 1px solid #f1f5f9;
+        border-top: 1px solid var(--line);
         display: flex;
         justify-content: flex-end;
         gap: 10px;
-        background: #f8fafc;
+        background: var(--hover);
     }
     .feedback-modal-message {
         margin: 0;
-        color: #334155;
+        color: var(--ink);
         font-size: 14px;
         line-height: 1.45;
     }
@@ -677,6 +709,22 @@
         font-weight: 500;
         font-size: 13px;
         box-sizing: border-box;
+    }
+
+    /* Dark-only overrides */
+    html[data-theme="dark"] .actions-dropdown-item.btn-delete-item { color: #F0A0A0; }
+    html[data-theme="dark"] .actions-dropdown-item.btn-delete-item:hover { background: rgba(227, 106, 106, 0.12); color: #F0A0A0; }
+    html[data-theme="dark"] .delete-modal-warning { background: rgba(227, 106, 106, 0.12); border-color: rgba(227, 106, 106, 0.35); color: #F0A0A0; }
+    html[data-theme="dark"] .delete-modal-header h3 { color: #F0A0A0; }
+    html[data-theme="dark"] .image-dropzone-remove { color: #F0A0A0; }
+    html[data-theme="dark"] .stocks-card-status-amber { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+    html[data-theme="dark"] .stocks-field input:focus,
+    html[data-theme="dark"] .search-box input:focus,
+    html[data-theme="dark"] .add-modal-field input:focus,
+    html[data-theme="dark"] .add-modal-field select:focus,
+    html[data-theme="dark"] .add-size-item input:focus,
+    html[data-theme="dark"] .edit-modal-field input:focus {
+        box-shadow: 0 0 0 3px rgba(169, 180, 196, 0.18);
     }
 
     .table-search-inline {
@@ -733,8 +781,8 @@
     <section class="card stocks-table-card">
         <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
     <div>
-        <strong style="font-size:16px;color:#111827;">Stock Items</strong>
-        <div style="font-size:13px;color:#64748b;margin-top:4px;">Manage your inventory items</div>
+        <strong style="font-size:16px;color:var(--ink);">Stock Items</strong>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px;">Manage your inventory items</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;">
         <button type="button" class="btn btn-green" @click="isAddModalOpen = true; type = ''; quantity = 0; prices = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; quantities = { XS: 0, S: 0, M: 0, L: 0, XL: 0, '2XL': 0, '3XL': 0, '4XL': 0, '5XL': 0 }; imagePreview = ''; imageName = ''; if ($refs.addForm) $refs.addForm.reset(); refreshBodyScrollLock()">
@@ -744,7 +792,7 @@
             Add Item
         </button>
         <div style="position:relative;display:inline-flex;align-items:center;">
-            <svg style="position:absolute;left:10px;width:15px;height:15px;color:#94a3b8;pointer-events:none;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <svg style="position:absolute;left:10px;width:15px;height:15px;color:var(--faint);pointer-events:none;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
             </svg>
             <input
@@ -752,9 +800,9 @@
                 type="text"
                 placeholder="Search items..."
                 oninput="filterRows()"
-                style="height:38px;padding:0 14px 0 34px;border:1px solid var(--line-strong);border-radius:6px;font-size:13px;color:var(--ink);background:#fff;width:220px;font-family:inherit;"
-                onfocus="this.style.borderColor='#1F2937';this.style.boxShadow='0 0 0 3px rgba(31,41,55,0.10)'"
-                onblur="this.style.borderColor='#e2e8f0';this.style.boxShadow='none'"
+                style="height:38px;padding:0 14px 0 34px;border:1px solid var(--line-strong);border-radius:6px;font-size:13px;color:var(--ink);background:var(--field);width:220px;font-family:inherit;"
+                onfocus="this.style.borderColor='var(--pine)';this.style.boxShadow='0 0 0 3px rgba(31,41,55,0.10)'"
+                onblur="this.style.borderColor='var(--line-strong)';this.style.boxShadow='none'"
             >
         </div>
     </div>
@@ -788,33 +836,24 @@
                                     @endif
                                 </span>
                             </td>
-                            <td style="font-weight:700;color:#0f172a;">{{ $stock->item_name }}</td>
+                            <td style="font-weight:700;color:var(--ink);">{{ $stock->item_name }}</td>
                             <td>
                                 @if($stock->item_type)
-                                    <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;background:#f1f5f9;color:#334155;font-size:12px;font-weight:700;text-transform:capitalize;">{{ $stock->item_type }}</span>
+                                    <span style="display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;background:var(--hover-2);color:var(--ink);font-size:12px;font-weight:700;text-transform:capitalize;">{{ $stock->item_type }}</span>
                                 @else
-                                    <span style="color:#94a3b8;font-size:13px;">—</span>
+                                    <span style="color:var(--faint);font-size:13px;">—</span>
                                 @endif
                             </td>
-                            <td style="font-weight:700;color:#0f172a;">{{ number_format($stock->quantity) }}</td>
+                            <td style="font-weight:700;color:var(--ink);">{{ number_format($stock->quantity) }}</td>
                             <td>
-                                 @if($stock->quantity === 0)
-                                    <span style="color:#dc2626;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
-                                        <span style="width:7px;height:7px;border-radius:50%;background:#dc2626;display:inline-block;flex-shrink:0;"></span>
-                                        No Stock
-                                    </span>
+                                @if($stock->quantity === 0)
+                                    <span class="stock-level stock-level-none">No Stock</span>
                                 @elseif($stock->quantity <= 10)
-                                    <span style="color:#d97706;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
-                                        <span style="width:7px;height:7px;border-radius:50%;background:#d97706;display:inline-block;flex-shrink:0;"></span>
-                                    Low Stock
-                                    </span>
-                                 @else
-                                    <span style="color:#15803d;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:5px;">
-                                         <span style="width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;flex-shrink:0;"></span>
-                                    Healthy
-                                    </span>
+                                    <span class="stock-level stock-level-low">Low Stock</span>
+                                @else
+                                    <span class="stock-level stock-level-ok">Healthy</span>
                                 @endif
-                                </td>
+                            </td>
                             <td>
                                 @if($stock->is_visible)
                                     <span class="stock-status-badge stock-status-badge-active">
@@ -830,10 +869,9 @@
                             </td>
                             <td style="text-align:right;">
                                 <div class="actions-dropdown-container">
-                                    <button type="button" class="btn-actions-trigger" onclick="toggleActionsMenu(this)">
-                                        Actions
-                                        <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                    <button type="button" class="row-menu-btn" aria-label="More actions" aria-haspopup="menu" onclick="toggleActionsMenu(this)">
+                                        <svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/>
                                         </svg>
                                     </button>
 
@@ -887,11 +925,11 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No stock items found.</td>
+                            <td colspan="7" style="text-align:center;padding:32px;color:var(--faint);">No stock items found.</td>
                         </tr>
                     @endforelse
                     <tr id="stocks-no-results-row" style="display:none;">
-                        <td colspan="7" style="text-align:center;padding:32px;color:#94a3b8;">No results found.</td>
+                        <td colspan="7" style="text-align:center;padding:32px;color:var(--faint);">No results found.</td>
                     </tr>
                 </tbody>
             </table>
@@ -931,13 +969,13 @@
                         <label>Prices and Sizes</label>
                         <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
                             <span></span>
-                            <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
-                            <span style="font-size:12px;font-weight:700;color:#334155;">Stocks by Size</span>
+                            <span style="font-size:12px;font-weight:700;color:var(--ink);">Prices by Size</span>
+                            <span style="font-size:12px;font-weight:700;color:var(--ink);">Stocks by Size</span>
                         </div>
                         <div style="display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;">
                             @foreach(['XS','S','M','L','XL','2XL','3XL','4XL','5XL'] as $size)
                             <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end;">
-                                <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:0;">{{ $size }}</label>
+                                <label style="display:block;font-size:12px;font-weight:700;color:var(--ink);margin-bottom:0;">{{ $size }}</label>
                                 <input type="number" id="size_{{ strtolower($size) }}" name="price_{{ strtolower($size) }}" min="0" step="0.01" value="0" x-model.number="prices['{{ $size }}']">
                                 <input type="number" id="qty_{{ strtolower($size) }}" name="qty_{{ strtolower($size) }}" min="0" value="0" x-model.number="quantities['{{ $size }}']">
                             </div>
@@ -962,7 +1000,7 @@
                             x-model.number="quantity"
                             x-effect="if (type === 'uniforms') quantity = totalQuantity"
                             :readonly="type === 'uniforms'"
-                            :style="type === 'uniforms' ? 'background:#f1f5f9;color:#64748b;cursor:not-allowed;' : ''"
+                            :style="type === 'uniforms' ? 'background:var(--hover-2);color:var(--muted);cursor:not-allowed;' : ''"
                             required
                         >
                         <p class="add-modal-help" x-show="type === 'uniforms'" x-cloak>Automatically totals the stocks entered per size above.</p>
@@ -1068,13 +1106,13 @@
                     <label>Prices and Sizes</label>
                     <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:center;margin-bottom:6px;">
                         <span></span>
-                        <span style="font-size:12px;font-weight:700;color:#334155;">Prices by Size</span>
-                        <span style="font-size:12px;font-weight:700;color:#334155;">Stocks by Size</span>
+                        <span style="font-size:12px;font-weight:700;color:var(--ink);">Prices by Size</span>
+                        <span style="font-size:12px;font-weight:700;color:var(--ink);">Stocks by Size</span>
                     </div>
                     <div style="display:grid;grid-template-columns:repeat(1,minmax(0,1fr));gap:10px;">
                         @foreach(['XS','S','M','L','XL','2XL','3XL','4XL','5XL'] as $size)
                         <div style="display:grid;grid-template-columns:80px minmax(0,1fr) minmax(0,1fr);gap:10px;align-items:end;">
-                            <label style="display:block;font-size:12px;font-weight:700;color:#334155;margin-bottom:0;">{{ $size }}</label>
+                            <label style="display:block;font-size:12px;font-weight:700;color:var(--ink);margin-bottom:0;">{{ $size }}</label>
                             <input type="number" id="edit_price_{{ strtolower($size) }}" name="price_{{ strtolower($size) }}" min="0" step="0.01" x-model.number="prices['{{ $size }}']" :disabled="itemType !== 'uniforms'">
                             <input type="number" id="edit_qty_{{ strtolower($size) }}" name="qty_{{ strtolower($size) }}" min="0" x-model.number="quantities['{{ $size }}']" :disabled="itemType !== 'uniforms'">
                         </div>
@@ -1098,7 +1136,7 @@
                         x-model.number="quantity"
                         x-effect="if (itemType === 'uniforms') quantity = totalQuantity"
                         :readonly="itemType === 'uniforms'"
-                        :style="itemType === 'uniforms' ? 'background:#f1f5f9;color:#64748b;cursor:not-allowed;' : ''"
+                        :style="itemType === 'uniforms' ? 'background:var(--hover-2);color:var(--muted);cursor:not-allowed;' : ''"
                         oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                         required
                     >
@@ -1223,10 +1261,12 @@
         document.querySelectorAll('.actions-dropdown-menu.active').forEach((openMenu) => {
             if (openMenu !== menu) {
                 openMenu.classList.remove('active');
+                openMenu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
             }
         });
 
-        menu.classList.toggle('active');
+        const isOpen = menu.classList.toggle('active');
+        button.classList.toggle('is-open', isOpen);
     }
 
     function openEditModalFromButton(button) {
@@ -1351,6 +1391,7 @@
     function closeAllMenus() {
         document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
             menu.classList.remove('active');
+            menu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
         });
     }
 
