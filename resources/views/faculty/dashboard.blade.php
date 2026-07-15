@@ -432,6 +432,28 @@
         }).join('\r\n');
     }
 
+    // Force spreadsheet apps to keep date-like cells ("Jul 2026") as literal
+    // text; otherwise Excel converts them to dates that render as "Jul-26".
+    function excelText(value) {
+        return '="' + String(value === null || value === undefined ? '' : value) + '"';
+    }
+
+    // "Total" row summing every numeric column (label goes in the first column,
+    // non-numeric columns are left blank).
+    function totalsRow(headers, rows) {
+        return headers.map(function (_, col) {
+            if (col === 0) return 'Total';
+            var sum = 0, hasNumber = false;
+            rows.forEach(function (row) {
+                var value = row[col];
+                if (value === '' || value === null || value === undefined) return;
+                var num = Number(value);
+                if (isFinite(num)) { sum += num; hasNumber = true; }
+            });
+            return hasNumber ? Math.round(sum * 100) / 100 : '';
+        });
+    }
+
     function downloadCSVString(filename, csvString) {
         var blob = new Blob(['﻿' + csvString], { type: 'text/csv;charset=utf-8;' });
         var link = document.createElement('a');
@@ -1003,7 +1025,7 @@
             csvHeaders: ['Month', 'Applications'],
             csvRows: function () {
                 return appMonthLabels.map(function (label, index) {
-                    return [label, appMonthData[index] || 0];
+                    return [excelText(label), appMonthData[index] || 0];
                 });
             }
         },
@@ -1027,7 +1049,7 @@
             csvHeaders: ['Month', 'Revenue'],
             csvRows: function () {
                 return salesMonthLabels.map(function (label, index) {
-                    return [label, revenueData[index] || 0];
+                    return [excelText(label), revenueData[index] || 0];
                 });
             }
         },
@@ -1039,7 +1061,7 @@
             csvHeaders: ['Month', 'Uniforms', 'Books'],
             csvRows: function () {
                 return salesMonthLabels.map(function (label, index) {
-                    return [label, unitsUniformsData[index] || 0, unitsBooksData[index] || 0];
+                    return [excelText(label), unitsUniformsData[index] || 0, unitsBooksData[index] || 0];
                 });
             }
         },
@@ -1057,6 +1079,12 @@
         }
     ];
 
+    // Data rows plus a trailing "Total" row for every column that can be summed.
+    function reportRowsWithTotal(report) {
+        var rows = report.csvRows();
+        return rows.concat([totalsRow(report.csvHeaders, rows)]);
+    }
+
     // ---------- Wire the three-dot menus ----------
     reportRegistry.forEach(function (report) {
         wireChartPanel(report.panel, [
@@ -1066,7 +1094,7 @@
             },
             {
                 label: 'Download CSV',
-                run: function () { downloadCSV(report.csvName, report.csvHeaders, report.csvRows()); }
+                run: function () { downloadCSV(report.csvName, report.csvHeaders, reportRowsWithTotal(report)); }
             }
         ]);
     });
@@ -1089,13 +1117,38 @@
         return el ? el.textContent.trim() : '';
     }
 
-    // One CSV with each report as a titled section, separated by a blank line.
+    // One CSV with the reports laid out side by side: each report is a titled
+    // block of columns, separated by an empty spacer column.
     function downloadAllCSV() {
         var blocks = reportRegistry.map(function (report) {
-            var section = [[reportTitle(report)], report.csvHeaders].concat(report.csvRows());
-            return rowsToCSV(section);
+            return [[reportTitle(report)], report.csvHeaders].concat(reportRowsWithTotal(report));
         });
-        downloadCSVString('faculty-dashboard-reports.csv', blocks.join('\r\n\r\n'));
+
+        var widths = blocks.map(function (block) {
+            return block.reduce(function (max, row) { return Math.max(max, row.length); }, 1);
+        });
+        var height = blocks.reduce(function (max, block) { return Math.max(max, block.length); }, 0);
+
+        var rows = [];
+        for (var r = 0; r < height; r++) {
+            var row = [];
+            blocks.forEach(function (block, i) {
+                var cells = block[r] || [];
+                for (var c = 0; c < widths[i]; c++) {
+                    row.push(cells[c] === undefined ? '' : cells[c]);
+                }
+                if (i < blocks.length - 1) row.push('');
+            });
+            rows.push(row);
+        }
+
+        // Header so the export records exactly when it was generated.
+        var generated = new Date();
+        rows.unshift([]);
+        rows.unshift(['Generated', excelText(generated.toLocaleString('en-PH', { dateStyle: 'medium', timeStyle: 'short' }))]);
+        rows.unshift(['Faculty Dashboard Reports', dashboardDateLabel()]);
+
+        downloadCSVString('faculty-dashboard-reports.csv', rowsToCSV(rows));
     }
 
     // One PNG that stacks every chart vertically with a header and per-chart titles.

@@ -40,6 +40,14 @@
             --line-strong: #CBD1D8;
             --amber: #B45309;
             --danger: #B91C1C;
+            /* Green success/primary accent — the ONLY green on faculty, reserved
+               for positive actions + confirmations so they read apart from the
+               graphite chrome. Neutral chrome stays graphite (--pine). */
+            --success: #0A5C2F;
+            --success-strong: #094B27;
+            --success-soft: #F0F7F2;
+            --success-line: #CDE3D4;
+            --success-text: #14532D;
             --field: #FFFFFF;
             --hover: #F2F4F6;
             --hover-2: #E9EDF1;
@@ -67,12 +75,19 @@
             --line-strong: #39424E;
             --amber: #E3A448;
             --danger: #E36A6A;
+            /* Green stays green in dark (mint) — success/primary accent only. */
+            --success: #7BD3A0;
+            --success-strong: #6BC492;
+            --success-soft: rgba(30, 149, 96, 0.16);
+            --success-line: rgba(30, 149, 96, 0.40);
+            --success-text: #8CD6AF;
             --field: #1A1F26;
             --hover: #1C222A;
             --hover-2: #222933;
-            --accent-soft: rgba(169, 180, 196, 0.12);
-            --accent-line: rgba(169, 180, 196, 0.30);
-            --accent-text: #C5CDD9;
+            /* Checkout component accent (co-modal head, cash badge) → green. */
+            --accent-soft: rgba(30, 149, 96, 0.16);
+            --accent-line: rgba(30, 149, 96, 0.40);
+            --accent-text: #8CD6AF;
             --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.40);
             --shadow-pop: 0 12px 32px rgba(0, 0, 0, 0.55);
         }
@@ -142,7 +157,7 @@
             font-weight: 500;
             line-height: 1.5;
         }
-        .alert-success { background: var(--hover); border-color: var(--line-strong); color: var(--ink); }
+        .alert-success { background: var(--success-soft); border-color: var(--success-line); color: var(--success-text); }
         .alert-error { background: #FDF3F3; border-color: #F2D8D8; color: var(--danger); }
 
         /* ---------- Legacy shared components (used across faculty pages) ---------- */
@@ -238,11 +253,11 @@
             outline-offset: 2px;
         }
         .btn-green {
-            background: var(--pine);
+            background: var(--success);
             color: #fff;
         }
         .btn-green:hover {
-            background: var(--pine-strong);
+            background: var(--success-strong);
         }
         .btn-outline {
             background: var(--field);
@@ -666,8 +681,8 @@
         .pop-item.pop-item-danger:hover { background: #FDF3F3; }
 
         /* ---------- Dark-only overrides ---------- */
-        /* --pine flips to a light graphite in dark, so anything sitting on it
-           needs dark text instead of white. */
+        /* --success is light mint and --pine flips to light graphite in dark, so
+           anything sitting on either needs dark text instead of white. */
         html[data-theme="dark"] .btn-green { color: #10151B; }
         html[data-theme="dark"] .pg-btn.is-current { color: #10151B; }
         html[data-theme="dark"] .nb-avatar-fallback { color: #10151B; }

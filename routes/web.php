@@ -175,10 +175,13 @@ Route::middleware(['auth', 'faculty'])->prefix('staff')->name('staff.')->group(f
     Route::post('/uniform-checkout', [FacultyController::class, 'storeUniformCheckout'])->name('uniform-checkout.store');
 
     Route::get('/stocks', [FacultyController::class, 'stocksIndex'])->name('stocks.index');
+    Route::get('/stocks/create', [FacultyController::class, 'createStock'])->name('stocks.create');
+    Route::get('/stocks/{stock}/edit', [FacultyController::class, 'editStock'])->name('stocks.edit');
     Route::post('/stocks', [FacultyController::class, 'storeStock'])->name('stocks.store');
+    Route::patch('/stocks/{stock}/adjust', [FacultyController::class, 'adjustStock'])->name('stocks.adjust');
     Route::patch('/stocks/{stock}', [FacultyController::class, 'updateStock'])->name('stocks.update');
-    Route::delete('/stocks/{stock}', [FacultyController::class, 'destroyStock'])->name('stocks.destroy');
-    Route::patch('/stocks/{stock}/visibility', [FacultyController::class, 'toggleStockVisibility'])->name('stocks.visibility');
+    Route::delete('/stocks/{id}', [FacultyController::class, 'archiveStock'])->name('stocks.archive');
+    Route::delete('/stocks/{stock}/destroy', [FacultyController::class, 'destroyStock'])->name('stocks.destroy');
 
     Route::get('/partnerships', [FacultyController::class, 'partnershipsIndex'])->name('partnerships.index');
     Route::get('/partnerships/{application}/document/{type}', [FacultyController::class, 'viewPartnershipDocument'])->name('partnerships.document');
