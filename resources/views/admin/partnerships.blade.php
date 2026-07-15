@@ -510,6 +510,7 @@
         padding: 16px;
         box-shadow: var(--shadow-card);
     }
+    .wizard-action-panel.is-busy { pointer-events: none; opacity: 0.65; }
     .wizard-action-title { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
     .wizard-action-subtitle { margin: -4px 0 10px; font-size: 12px; color: var(--muted); }
     .wizard-inline-error {
@@ -840,26 +841,63 @@
         finalApprove: (id) => `{{ route('admin.partnerships.wizard.final-approve', ['application' => '__ID__']) }}`.replace('__ID__', id),
     };
 
+    // The table lives inside .card (overflow:hidden) / .card-body (overflow-x:auto),
+    // which would clip an absolutely-positioned dropdown and force a scrollbar.
+    // Position the menu with `fixed` coordinates so it escapes those containers.
+    function positionActionsMenu(button, menu) {
+        const rect = button.getBoundingClientRect();
+        const menuWidth = menu.offsetWidth || 180;
+        const menuHeight = menu.offsetHeight || 0;
+        const margin = 4;
+
+        let left = rect.right - menuWidth;
+        if (left < 8) left = 8;
+
+        let top = rect.bottom + margin;
+        // Flip above the button if it would overflow the viewport bottom.
+        if (top + menuHeight > window.innerHeight - 8) {
+            const above = rect.top - menuHeight - margin;
+            if (above >= 8) top = above;
+        }
+
+        menu.style.position = 'fixed';
+        menu.style.top = top + 'px';
+        menu.style.left = left + 'px';
+        menu.style.right = 'auto';
+    }
+
+    function closeActionsMenus() {
+        document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
+            menu.classList.remove('active');
+            menu.style.position = '';
+            menu.style.top = '';
+            menu.style.left = '';
+            menu.style.right = '';
+            menu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
+        });
+    }
+
     function toggleActionsMenu(button) {
         const menu = button.closest('.actions-dropdown-container')?.querySelector('.actions-dropdown-menu');
         if (!menu) return;
         const willOpen = !menu.classList.contains('active');
-        document.querySelectorAll('.actions-dropdown-menu.active').forEach((openMenu) => {
-            openMenu.classList.remove('active');
-            openMenu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
-        });
-        menu.classList.toggle('active', willOpen);
-        button.classList.toggle('is-open', willOpen);
+        closeActionsMenus();
+        if (willOpen) {
+            menu.classList.add('active');
+            button.classList.add('is-open');
+            positionActionsMenu(button, menu);
+        }
     }
 
     document.addEventListener('click', function (e) {
         if (!e.target.closest('.actions-dropdown-container')) {
-            document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
-                menu.classList.remove('active');
-                menu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
-            });
+            closeActionsMenus();
         }
     });
+
+    // A fixed menu detaches from the button on scroll/resize — close it instead.
+    window.addEventListener('scroll', closeActionsMenus, true);
+    window.addEventListener('resize', closeActionsMenus);
 
     function filterRows() {
         const input = document.getElementById('partnerships-search-input');
@@ -977,10 +1015,7 @@
     function openViewModalFromButton(buttonEl) {
         const id = Number(buttonEl?.dataset?.appId || 0);
         if (!id) return;
-        document.querySelectorAll('.actions-dropdown-menu.active').forEach((menu) => {
-            menu.classList.remove('active');
-            menu.closest('.actions-dropdown-container')?.querySelector('.row-menu-btn')?.classList.remove('is-open');
-        });
+        closeActionsMenus();
         openViewModal(id, buttonEl);
     }
 
@@ -1259,18 +1294,31 @@
 
             const finalApproveBtn = document.getElementById('wizardFinalApproveBtn');
 
+            const wizardActionPanel = document.getElementById('wizardActionPanel');
+            let wizardActionInFlight = false;
+
             const performAction = async (url, method, payload, successMessage, reloadDelay = 1500) => {
+                // Guard against double-clicks: a second request would hit the server
+                // after the status has already advanced and return "Invalid state."
+                if (wizardActionInFlight) return;
+                wizardActionInFlight = true;
+                if (wizardActionPanel) wizardActionPanel.classList.add('is-busy');
                 showWizardPanelMessage(null, '');
                 try {
                     const { response, data } = await wizardFetchJson(url, method, payload);
                     if (!response.ok || !data.success) {
                         showWizardPanelMessage('error', data.message || 'Action failed.');
+                        wizardActionInFlight = false;
+                        if (wizardActionPanel) wizardActionPanel.classList.remove('is-busy');
                         return;
                     }
                     showWizardPanelMessage('success', successMessage);
+                    // Keep the lock engaged — the page is about to reload.
                     setTimeout(() => window.location.reload(), reloadDelay);
                 } catch (error) {
                     showWizardPanelMessage('error', 'Action failed. Please try again.');
+                    wizardActionInFlight = false;
+                    if (wizardActionPanel) wizardActionPanel.classList.remove('is-busy');
                 }
             };
 

@@ -829,6 +829,17 @@
             transition: background-color 0.15s ease;
         }
         a.notif-item:hover { background: var(--pine-soft); }
+        .notif-item.is-unread { background: var(--pine-soft); }
+        .notif-item-dot {
+            width: 7px;
+            height: 7px;
+            margin-left: auto;
+            margin-top: 5px;
+            border-radius: 50%;
+            background: var(--pine);
+            flex-shrink: 0;
+            align-self: flex-start;
+        }
         .notif-item-icon {
             width: 30px;
             height: 30px;
@@ -1316,9 +1327,9 @@
 
                     <div class="notif-panel" data-notif-panel="partnerships" role="tabpanel">
                         <div class="notif-list">
-                            @if($unreadApplicationCount > 0)
+                            @if($unreadApplicationSteps->isNotEmpty())
                                 @foreach($unreadApplicationSteps as $event)
-                                    <a href="{{ route('admin.partnerships', ['search' => $event['concessionaire_name']]) }}" class="notif-item">
+                                    <a href="{{ route('admin.partnerships', ['search' => $event['search_term']]) }}" class="notif-item {{ ($event['is_unread'] ?? false) ? 'is-unread' : '' }}">
                                         <div class="notif-item-icon">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
@@ -1329,6 +1340,9 @@
                                             <p class="notif-item-meta">{{ $event['concessionaire_name'] }}</p>
                                             <p class="notif-item-time">{{ $event['submitted_at']->diffForHumans() }}</p>
                                         </div>
+                                        @if($event['is_unread'] ?? false)
+                                            <span class="notif-item-dot" aria-label="New"></span>
+                                        @endif
                                     </a>
                                 @endforeach
                             @else
