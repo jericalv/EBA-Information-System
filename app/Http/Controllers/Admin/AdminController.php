@@ -17,6 +17,7 @@ use App\Models\PartnershipApplication;
 use App\Models\ProductReview;
 use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
+use App\Models\StockMovement;
 use App\Models\UniformStock;
 use App\Models\User;
 use App\Services\ConcessionaireFeeService;
@@ -153,13 +154,86 @@ class AdminController extends Controller
         return back();
     }
 
+    /**
+     * Concessionaires whose fee plan is overdue (unpaid past in-contract
+     * months), for the navbar notifications panel.
+     */
+    public function getOverdueFeeAlerts(): Collection
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->role !== 'admin') {
+            return collect();
+        }
+
+        if (! Schema::hasColumn('users', 'monthly_fee')) {
+            return collect();
+        }
+
+        $concessionaires = User::query()
+            ->where('role', 'concessionaire')
+            ->where('is_approved', true)
+            ->where('is_active_concessionaire', true)
+            ->where('monthly_fee', '>', 0)
+            ->get();
+
+        $plans = app(ConcessionaireFeeService::class)->plans($concessionaires);
+
+        return collect($plans)
+            ->filter(fn ($plan) => $plan['status'] === ConcessionaireFeeService::STATUS_OVERDUE)
+            ->map(function ($plan) {
+                $oldest = $plan['owed_months'][0] ?? null;
+
+                return [
+                    'business' => $plan['business'],
+                    'name' => $plan['name'],
+                    'owed_count' => $plan['owed_count'],
+                    'monthly_fee' => $plan['monthly_fee'],
+                    'oldest_month_label' => $oldest
+                        ? Carbon::createFromFormat('Y-m', $oldest)->format('M Y')
+                        : null,
+                ];
+            })
+            ->sortByDesc('owed_count')
+            ->values();
+    }
+
+    /**
+     * Active stock items at or below the low-stock threshold, lowest first,
+     * for the navbar notifications panel.
+     */
+    public function getLowStockAlerts(): Collection
+    {
+        $user = Auth::user();
+
+        if (! $user || $user->role !== 'admin') {
+            return collect();
+        }
+
+        // Per-size aware: an item with plenty of total stock still alerts
+        // when one of its carried sizes is at or below its own threshold.
+        return UniformStock::query()
+            ->where('is_visible', true)
+            ->orderBy('quantity')
+            ->orderBy('item_name')
+            ->get()
+            ->filter(fn (UniformStock $stock): bool => $stock->stockHealth()['status'] !== 'healthy')
+            ->values();
+    }
+
     protected function adminView(string $view, array $data = [])
     {
         $unreadApplicationSteps = $this->getUnreadApplicationSteps();
+        $overdueFeeAlerts = $this->getOverdueFeeAlerts();
+        $lowStockAlerts = $this->getLowStockAlerts();
 
         return view($view, array_merge($data, [
             'unreadApplicationSteps' => $unreadApplicationSteps->take(10),
             'unreadApplicationCount' => $unreadApplicationSteps->count(),
+            'overdueFeeAlerts' => $overdueFeeAlerts->take(10),
+            'overdueFeeAlertCount' => $overdueFeeAlerts->count(),
+            'lowStockAlerts' => $lowStockAlerts->take(10),
+            'lowStockAlertCount' => $lowStockAlerts->count(),
         ]));
     }
 
@@ -1728,7 +1802,104 @@ class AdminController extends Controller
             ->orderBy('item_name')
             ->get();
 
-        return $this->adminView('admin.stocks', compact('stocks'));
+        $active = $stocks->where('is_visible', true);
+        $healths = $active->mapWithKeys(fn (UniformStock $stock) => [$stock->id => $stock->stockHealth()['status']]);
+
+        $stats = [
+            'total' => $active->count(),
+            'low' => $healths->filter(fn (string $status): bool => $status === 'low')->count(),
+            'out' => $healths->filter(fn (string $status): bool => $status === 'out')->count(),
+            'value' => $active->sum(fn (UniformStock $stock): float => $stock->inventoryValue()),
+            'archived' => $stocks->where('is_visible', false)->count(),
+        ];
+
+        $recentMovements = StockMovement::query()
+            ->with(['stock:id,item_name', 'user:id,name'])
+            ->latest()
+            ->limit(12)
+            ->get();
+
+        return $this->adminView('admin.stocks', compact('stocks', 'stats', 'recentMovements'));
+    }
+
+    /**
+     * Show the dedicated add-item page.
+     */
+    public function createStock()
+    {
+        return $this->adminView('admin.stock-form', ['stock' => null, 'movements' => collect()]);
+    }
+
+    /**
+     * Show the dedicated edit-item page.
+     */
+    public function editStock(UniformStock $stock)
+    {
+        $movements = $stock->movements()->with('user:id,name')->latest()->limit(10)->get();
+
+        return $this->adminView('admin.stock-form', compact('stock', 'movements'));
+    }
+
+    /**
+     * Validate the shared add/edit stock form.
+     *
+     * @return array<string, mixed>
+     */
+    private function validateStockForm(Request $request, ?UniformStock $stock = null): array
+    {
+        return $request->validate([
+            'item_name' => [
+                'required', 'string', 'max:100',
+                Rule::unique('uniform_stocks', 'item_name')->ignore($stock?->id),
+            ],
+            'item_type' => ['required', Rule::in(['books', 'uniforms'])],
+            'quantity' => 'nullable|integer|min:0|max:100000',
+            'book_price' => 'nullable|numeric|min:0|max:999999.99',
+            'sizes_available' => 'required_if:item_type,uniforms|array',
+            'sizes_available.*' => [Rule::in(UniformStock::SIZE_KEYS)],
+            'price_mode' => ['nullable', Rule::in(['single', 'per_size'])],
+            'uniform_price' => 'nullable|numeric|min:0|max:999999.99',
+            'low_stock_threshold' => 'required|integer|min:0|max:10000',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_image' => 'nullable|boolean',
+            'is_visible' => 'nullable|boolean',
+        ], [
+            'sizes_available.required_if' => 'Select at least one size this uniform comes in.',
+        ]);
+    }
+
+    /**
+     * Build the per-size price and quantity maps from the form.
+     * Only sizes the admin marked as available are stored.
+     *
+     * @return array{0: array<string, float>, 1: array<string, int>, 2: int}
+     */
+    private function buildUniformData(Request $request): array
+    {
+        $selected = array_values(array_intersect(
+            UniformStock::SIZE_KEYS,
+            (array) $request->input('sizes_available', [])
+        ));
+        $singlePriceMode = $request->input('price_mode', 'per_size') === 'single';
+        $singlePrice = max(0, (float) $request->input('uniform_price', 0));
+
+        $prices = [];
+        $sizes = [];
+        $quantity = 0;
+
+        foreach ($selected as $sizeKey) {
+            $inputKey = strtolower($sizeKey);
+            $price = $singlePriceMode
+                ? $singlePrice
+                : max(0, (float) $request->input('price_' . $inputKey, 0));
+            $sizeQuantity = max(0, (int) $request->input('qty_' . $inputKey, 0));
+
+            $prices[$sizeKey] = $price;
+            $sizes[$sizeKey] = $sizeQuantity;
+            $quantity += $sizeQuantity;
+        }
+
+        return [$prices, $sizes, $quantity];
     }
 
     /**
@@ -1736,38 +1907,17 @@ class AdminController extends Controller
      */
     public function storeStock(Request $request)
     {
-        $validated = $request->validate([
-            'item_name' => 'required|string|max:100|unique:uniform_stocks,item_name',
-            'quantity' => 'required|integer|min:0|max:3000',
-            'item_type' => ['nullable', Rule::in(['books', 'uniforms'])],
-            'prices' => 'nullable|array',
-            'prices.*' => 'nullable|numeric|min:0|max:999999.99',
-            'book_price' => 'nullable|numeric|min:0|max:999999.99',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'is_visible' => 'nullable|boolean',
-        ]);
+        $validated = $this->validateStockForm($request);
 
-        $itemType = $validated['item_type'] ?? null;
+        $itemType = $validated['item_type'];
         $prices = null;
         $sizes = null;
         $unitPrice = null;
-        $quantity = (int) $validated['quantity'];
+        $quantity = max(0, (int) ($validated['quantity'] ?? 0));
 
         if ($itemType === 'uniforms') {
-            $sizeKeys = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
-            $prices = [];
-            $sizes = [];
-            $quantity = 0;
-
-            foreach ($sizeKeys as $sizeKey) {
-                $inputKey = strtolower($sizeKey);
-                $priceValue = $request->input('price_' . $inputKey, $request->input('prices.' . $sizeKey, 0));
-                $sizeQuantity = max(0, (int) $request->input('qty_' . $inputKey, 0));
-                $prices[$sizeKey] = max(0, (float) $priceValue);
-                $sizes[$sizeKey] = $sizeQuantity;
-                $quantity += $sizeQuantity;
-            }
-        } elseif ($itemType === 'books') {
+            [$prices, $sizes, $quantity] = $this->buildUniformData($request);
+        } else {
             $unitPrice = max(0, (float) ($validated['book_price'] ?? 0));
         }
 
@@ -1785,8 +1935,30 @@ class AdminController extends Controller
             'prices' => $prices,
             'unit_price' => $unitPrice,
             'quantity' => $quantity,
+            'low_stock_threshold' => (int) $validated['low_stock_threshold'],
             'is_visible' => (bool) ($validated['is_visible'] ?? false),
         ]);
+
+        if ($itemType === 'uniforms') {
+            foreach ($sizes as $sizeKey => $sizeQuantity) {
+                if ($sizeQuantity > 0) {
+                    $stock->movements()->create([
+                        'user_id' => Auth::id(),
+                        'type' => 'initial',
+                        'size' => $sizeKey,
+                        'quantity_change' => $sizeQuantity,
+                        'quantity_after' => $sizeQuantity,
+                    ]);
+                }
+            }
+        } elseif ($quantity > 0) {
+            $stock->movements()->create([
+                'user_id' => Auth::id(),
+                'type' => 'initial',
+                'quantity_change' => $quantity,
+                'quantity_after' => $quantity,
+            ]);
+        }
 
         ActivityLog::log(
             'stock_item_created',
@@ -1802,26 +1974,19 @@ class AdminController extends Controller
             ]
         );
 
-        return back()->with('success', 'Stock item added successfully.');
+        return redirect()->route('admin.stocks')->with('success', "Added {$stock->item_name} to stock.");
     }
 
     /**
-     * Update stock quantity.
+     * Update a stock item from the edit page.
      */
     public function updateStock(Request $request, UniformStock $stock)
     {
-        $validated = $request->validate([
-            'item_name' => 'required|string|max:100|unique:uniform_stocks,item_name,' . $stock->id,
-            'quantity' => 'required|integer|min:0|max:3000',
-            'item_type' => ['nullable', Rule::in(['books', 'uniforms'])],
-            'book_price' => 'nullable|numeric|min:0|max:999999.99',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'remove_image' => 'nullable|boolean',
-        ]);
+        $validated = $this->validateStockForm($request, $stock);
 
         $oldItemName = (string) $stock->item_name;
         $oldQuantity = (int) $stock->quantity;
-        $newQuantity = (int) $validated['quantity'];
+        $oldSizes = is_array($stock->sizes) ? $stock->sizes : [];
         $oldImage = $stock->image;
 
         if ($request->hasFile('image')) {
@@ -1838,36 +2003,54 @@ class AdminController extends Controller
             $stock->image = null;
         }
 
-        $itemType = strtolower((string) ($validated['item_type'] ?? $stock->item_type ?? ''));
+        $itemType = $validated['item_type'];
         $prices = null;
         $sizes = null;
         $unitPrice = null;
+        $newQuantity = max(0, (int) ($validated['quantity'] ?? 0));
 
         if ($itemType === 'uniforms') {
-            $sizeKeys = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
-            $prices = [];
-            $sizes = [];
-            $newQuantity = 0;
-
-            foreach ($sizeKeys as $sizeKey) {
-                $inputKey = strtolower($sizeKey);
-                $priceValue = $request->input('price_' . $inputKey, $request->input('prices.' . $sizeKey, 0));
-                $sizeQuantity = max(0, (int) $request->input('qty_' . $inputKey, 0));
-                $prices[$sizeKey] = max(0, (float) $priceValue);
-                $sizes[$sizeKey] = $sizeQuantity;
-                $newQuantity += $sizeQuantity;
-            }
-        } elseif ($itemType === 'books') {
+            [$prices, $sizes, $newQuantity] = $this->buildUniformData($request);
+        } else {
             $unitPrice = max(0, (float) ($validated['book_price'] ?? 0));
         }
 
         $stock->item_name = $validated['item_name'];
         $stock->quantity = $newQuantity;
-        $stock->item_type = $itemType ?: $stock->item_type;
+        $stock->item_type = $itemType;
         $stock->sizes = $sizes;
         $stock->prices = $prices;
         $stock->unit_price = $unitPrice;
+        $stock->low_stock_threshold = (int) $validated['low_stock_threshold'];
+        $stock->is_visible = $request->boolean('is_visible');
         $stock->save();
+
+        // Record every quantity change this edit caused in the movement ledger.
+        if ($itemType === 'uniforms') {
+            $allSizes = array_unique(array_merge(array_keys($oldSizes), array_keys($sizes ?? [])));
+
+            foreach ($allSizes as $sizeKey) {
+                $before = (int) ($oldSizes[$sizeKey] ?? 0);
+                $after = (int) (($sizes ?? [])[$sizeKey] ?? 0);
+
+                if ($before !== $after) {
+                    $stock->movements()->create([
+                        'user_id' => Auth::id(),
+                        'type' => 'edit',
+                        'size' => $sizeKey,
+                        'quantity_change' => $after - $before,
+                        'quantity_after' => $after,
+                    ]);
+                }
+            }
+        } elseif ($oldQuantity !== $newQuantity) {
+            $stock->movements()->create([
+                'user_id' => Auth::id(),
+                'type' => 'edit',
+                'quantity_change' => $newQuantity - $oldQuantity,
+                'quantity_after' => $newQuantity,
+            ]);
+        }
 
         ActivityLog::log(
             'stock_quantity_updated',
@@ -1886,7 +2069,87 @@ class AdminController extends Controller
             ]
         );
 
-        return back()->with('success', "Stock item updated for {$stock->item_name}.");
+        return redirect()->route('admin.stocks')->with('success', "Stock item updated for {$stock->item_name}.");
+    }
+
+    /**
+     * Quick stock adjustment (restock or correction) without the full edit form.
+     */
+    public function adjustStock(Request $request, UniformStock $stock)
+    {
+        $validated = $request->validate([
+            'action' => ['required', Rule::in(['restock', 'deduct'])],
+            'size' => ['nullable', Rule::in(UniformStock::SIZE_KEYS)],
+            'amount' => 'required|integer|min:1|max:100000',
+            'note' => 'nullable|string|max:255',
+        ]);
+
+        $isUniform = $stock->isUniform();
+        $sizeKey = strtoupper((string) ($validated['size'] ?? ''));
+        $delta = $validated['action'] === 'deduct'
+            ? -(int) $validated['amount']
+            : (int) $validated['amount'];
+
+        if ($isUniform) {
+            $sizes = is_array($stock->sizes) ? $stock->sizes : [];
+
+            if ($sizeKey === '' || ! array_key_exists($sizeKey, $sizes)) {
+                return back()->with('error', 'Pick which size to adjust.');
+            }
+
+            $before = (int) ($sizes[$sizeKey] ?? 0);
+            $after = $before + $delta;
+
+            if ($after < 0) {
+                return back()->with('error', "Cannot remove {$validated['amount']} from {$stock->item_name} ({$sizeKey}) — only {$before} in stock.");
+            }
+
+            $sizes[$sizeKey] = $after;
+            $stock->sizes = $sizes;
+            $stock->quantity = array_sum(array_map(static fn ($qty): int => (int) $qty, $sizes));
+            $stock->save();
+        } else {
+            $before = (int) $stock->quantity;
+            $after = $before + $delta;
+
+            if ($after < 0) {
+                return back()->with('error', "Cannot remove {$validated['amount']} from {$stock->item_name} — only {$before} in stock.");
+            }
+
+            $sizeKey = '';
+            $stock->quantity = $after;
+            $stock->save();
+        }
+
+        $stock->movements()->create([
+            'user_id' => Auth::id(),
+            'type' => $validated['action'] === 'deduct' ? 'correction' : 'restock',
+            'size' => $sizeKey !== '' ? $sizeKey : null,
+            'quantity_change' => $delta,
+            'quantity_after' => $after,
+            'note' => $validated['note'] ?? null,
+        ]);
+
+        ActivityLog::log(
+            'stock_adjusted',
+            'uniform_stock',
+            (string) $stock->id,
+            "Adjusted stock for {$stock->item_name}" . ($sizeKey !== '' ? " ({$sizeKey})" : ''),
+            [
+                'stock_id' => $stock->id,
+                'item_name' => $stock->item_name,
+                'size' => $sizeKey !== '' ? $sizeKey : null,
+                'change' => $delta,
+                'quantity_after' => $after,
+                'note' => $validated['note'] ?? null,
+                'admin_id' => Auth::id(),
+            ]
+        );
+
+        $label = $sizeKey !== '' ? "{$stock->item_name} ({$sizeKey})" : $stock->item_name;
+        $verb = $delta > 0 ? 'Added ' . $delta . ' to' : 'Removed ' . abs($delta) . ' from';
+
+        return back()->with('success', "{$verb} {$label}. Now {$after} in stock.");
     }
 
     /**

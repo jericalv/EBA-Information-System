@@ -108,29 +108,36 @@ class CashierController extends Controller
         ));
     }
 
-    public function historyIndex(Request $request)
+    public function historyIndex(Request $request, ConcessionaireFeeService $feeService)
     {
-        $filters = [
-            'concessionaire_id' => $request->query('concessionaire_id'),
-            'date_from' => $request->query('date_from'),
-            'date_to' => $request->query('date_to'),
-            'payment_type' => $request->query('payment_type'),
-        ];
+        $monthStart = $this->exportMonth($request);
+        $month = $monthStart?->format('Y-m');
 
-        $filterConcessionaires = User::query()
+        $query = ConcessionairePayment::query()
+            ->with(['concessionaire', 'recordedBy'])
+            ->when($monthStart, function ($q) use ($monthStart) {
+                $q->whereBetween('payment_date', [
+                    $monthStart->copy()->startOfDay(),
+                    $monthStart->copy()->endOfMonth()->endOfDay(),
+                ]);
+            });
+
+        $totalCollected = (clone $query)->sum('amount');
+        $recentPayments = $query->orderByDesc('created_at')->get();
+
+        // Same overdue figure as the dashboard stat card and admin payment logs.
+        $activeConcessionaires = User::query()
             ->where('role', 'concessionaire')
             ->where('is_approved', true)
-            ->orderByRaw('COALESCE(NULLIF(business_name, ""), name) asc')
-            ->get(['id', 'name', 'business_name']);
-
-        $recentPayments = ConcessionairePayment::query()
-            ->with(['concessionaire', 'recordedBy'])
-            ->orderByDesc('created_at')
-            ->get();
+            ->where('is_active_concessionaire', true)
+            ->get(['id', 'name', 'business_name', 'monthly_fee']);
+        $overdueCount = $feeService->statusCounts($feeService->plans($activeConcessionaires))[ConcessionaireFeeService::STATUS_OVERDUE];
 
         return view('cashier.history', compact(
-            'filterConcessionaires',
-            'recentPayments'
+            'recentPayments',
+            'totalCollected',
+            'overdueCount',
+            'month'
         ));
     }
 

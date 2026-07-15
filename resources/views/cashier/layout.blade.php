@@ -1046,7 +1046,7 @@
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                 </svg>
-                                <span>Payment History</span>
+                                <span>Payment Logs</span>
                             </a>
                         </li>
                     </ul>
@@ -1108,7 +1108,7 @@
                             } elseif (request()->routeIs('cashier.history')) {
                                 $breadcrumbs = [
                                     ['label' => 'Dashboard', 'url' => route('cashier.dashboard')],
-                                    ['label' => 'Payment History', 'active' => true]
+                                    ['label' => 'Payment Logs', 'active' => true]
                                 ];
                             }
                         @endphp
@@ -1309,7 +1309,7 @@
             const pages = [
                 { label: 'Dashboard', hint: 'Page', url: @json(route('cashier.dashboard')), keywords: 'home overview stats collections summary charts' },
                 { label: 'Record Payment', hint: 'Page', url: @json(route('cashier.payments')), keywords: 'concessionaires record pay fee monthly collect receipt' },
-                { label: 'Payment History', hint: 'Page', url: @json(route('cashier.history')), keywords: 'payments log recent receipts transactions download' },
+                { label: 'Payment Logs', hint: 'Page', url: @json(route('cashier.history')), keywords: 'payments history log recent receipts transactions download' },
                 { label: 'Settings', hint: 'Page', url: @json($cashierSettingsRoute), keywords: 'profile account password name email' },
             ];
             const historySearchUrl = @json(route('cashier.history'));
@@ -1341,7 +1341,7 @@
                 if (query !== '') {
                     options.push({
                         url: historySearchUrl + '?q=' + encodeURIComponent(input.value.trim()),
-                        label: 'Search payment history for "' + input.value.trim() + '"',
+                        label: 'Search payment logs for "' + input.value.trim() + '"',
                         hint: 'History',
                         icon: searchIcon,
                     });

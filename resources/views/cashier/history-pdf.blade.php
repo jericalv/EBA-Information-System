@@ -90,7 +90,7 @@
     <div class="sheet">
         <div class="header">
             <div class="title">EBA Information System</div>
-            <div class="subtitle">Cashier Payment History Report{{ !empty($periodLabel) ? ' — ' . $periodLabel : '' }}</div>
+            <div class="subtitle">Cashier Payment Logs Report{{ !empty($periodLabel) ? ' — ' . $periodLabel : '' }}</div>
             <div class="meta">Generated: {{ $generatedAt->format('M d, Y h:i A') }}</div>
         </div>
 
