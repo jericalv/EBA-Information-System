@@ -766,15 +766,54 @@
         .nb-user-chevron { width: 14px; height: 14px; color: var(--muted); }
 
         /* Notifications dropdown */
-        .notif-pop { width: 320px; }
+        .notif-pop { width: 352px; }
         .notif-head {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--line);
+            padding: 12px 16px 10px;
             font-size: 13.5px;
             font-weight: 800;
             letter-spacing: -0.01em;
             color: var(--ink);
         }
+        .notif-tabs {
+            display: flex;
+            gap: 2px;
+            padding: 0 10px;
+            border-bottom: 1px solid var(--line);
+        }
+        .notif-tab {
+            appearance: none;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -1px;
+            padding: 6px 8px 9px;
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            color: var(--muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+        .notif-tab:hover { color: var(--ink); }
+        .notif-tab.is-active { color: var(--pine); border-bottom-color: var(--pine); }
+        .notif-tab-count {
+            font-family: var(--font-mono);
+            font-size: 10px;
+            font-weight: 700;
+            line-height: 1;
+            padding: 3px 5px;
+            border-radius: 5px;
+            background: var(--hover-2);
+            color: var(--muted);
+        }
+        .notif-tab.is-active .notif-tab-count { background: var(--pine-soft); color: var(--pine); }
+        .notif-tab-count.notif-count-red { background: rgba(220, 38, 38, 0.12); color: #dc2626; }
+        .notif-tab-count.notif-count-amber { background: rgba(217, 119, 6, 0.14); color: #d97706; }
+        .notif-panel[hidden] { display: none; }
         .notif-list {
             max-height: 320px;
             overflow-y: auto;
@@ -802,6 +841,9 @@
             flex-shrink: 0;
         }
         .notif-item-icon svg { width: 15px; height: 15px; }
+        .notif-item-icon.is-red { background: rgba(220, 38, 38, 0.1); color: #dc2626; }
+        .notif-item-icon.is-amber { background: rgba(217, 119, 6, 0.12); color: #d97706; }
+        .notif-item-icon.is-dim { background: var(--hover-2); color: var(--muted); }
         .notif-item-title {
             font-size: 13px;
             font-weight: 700;
@@ -913,6 +955,12 @@
     @php
         $unreadApplicationSteps = $unreadApplicationSteps ?? collect();
         $unreadApplicationCount = $unreadApplicationCount ?? 0;
+        $overdueFeeAlerts = $overdueFeeAlerts ?? collect();
+        $overdueFeeAlertCount = $overdueFeeAlertCount ?? 0;
+        $lowStockAlerts = $lowStockAlerts ?? collect();
+        $lowStockAlertCount = $lowStockAlertCount ?? 0;
+        $persistentAlertCount = $overdueFeeAlertCount + $lowStockAlertCount;
+        $notificationTotalCount = $unreadApplicationCount + $persistentAlertCount;
         $adminUser = auth()->user();
         $adminName = $adminUser?->name ?? 'Administrator';
         $adminEmail = $adminUser?->email ?? '';
@@ -1233,49 +1281,162 @@
             </button>
 
             <div class="nb-pop-wrap">
-                <button id="application-notification-button" type="button" class="nb-icon-btn" title="Notifications" data-unread-count="{{ $unreadApplicationCount }}" aria-expanded="false" aria-controls="application-notification-dropdown">
+                <button id="application-notification-button" type="button" class="nb-icon-btn" title="Notifications" data-unread-count="{{ $unreadApplicationCount }}" data-persistent-count="{{ $persistentAlertCount }}" aria-expanded="false" aria-controls="application-notification-dropdown">
                     <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.437L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
                     </svg>
-                    @if($unreadApplicationCount > 0)
-                        <span id="application-notification-badge" class="nb-badge">{{ $unreadApplicationCount }}</span>
+                    @if($notificationTotalCount > 0)
+                        <span id="application-notification-badge" class="nb-badge">{{ $notificationTotalCount }}</span>
                     @endif
                 </button>
 
-                <div id="application-notification-dropdown" class="nb-pop pop notif-pop" role="menu" aria-labelledby="application-notification-button">
+                <div id="application-notification-dropdown" class="nb-pop pop notif-pop" aria-labelledby="application-notification-button">
                     <div class="notif-head">Notifications</div>
-                    <div class="notif-list">
-                        @if($unreadApplicationCount > 0)
-                            @foreach($unreadApplicationSteps as $event)
-                                <a href="{{ route('admin.partnerships', ['search' => $event['concessionaire_name']]) }}" class="notif-item">
-                                    <div class="notif-item-icon">
-                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+
+                    <div class="notif-tabs" role="tablist" aria-label="Notification sections">
+                        <button type="button" class="notif-tab is-active" data-notif-tab="partnerships" role="tab" aria-selected="true">
+                            Partnerships
+                            @if($unreadApplicationCount > 0)
+                                <span class="notif-tab-count">{{ $unreadApplicationCount }}</span>
+                            @endif
+                        </button>
+                        <button type="button" class="notif-tab" data-notif-tab="overdue" role="tab" aria-selected="false">
+                            Overdue
+                            @if($overdueFeeAlertCount > 0)
+                                <span class="notif-tab-count notif-count-red">{{ $overdueFeeAlertCount }}</span>
+                            @endif
+                        </button>
+                        <button type="button" class="notif-tab" data-notif-tab="stocks" role="tab" aria-selected="false">
+                            Low Stock
+                            @if($lowStockAlertCount > 0)
+                                <span class="notif-tab-count notif-count-amber">{{ $lowStockAlertCount }}</span>
+                            @endif
+                        </button>
+                    </div>
+
+                    <div class="notif-panel" data-notif-panel="partnerships" role="tabpanel">
+                        <div class="notif-list">
+                            @if($unreadApplicationCount > 0)
+                                @foreach($unreadApplicationSteps as $event)
+                                    <a href="{{ route('admin.partnerships', ['search' => $event['concessionaire_name']]) }}" class="notif-item">
+                                        <div class="notif-item-icon">
+                                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="notif-item-title">{{ $event['step_label'] }}</p>
+                                            <p class="notif-item-meta">{{ $event['concessionaire_name'] }}</p>
+                                            <p class="notif-item-time">{{ $event['submitted_at']->diffForHumans() }}</p>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            @else
+                                <div class="notif-item">
+                                    <div class="notif-item-icon is-dim">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                         </svg>
                                     </div>
                                     <div>
-                                        <p class="notif-item-title">{{ $event['step_label'] }}</p>
-                                        <p class="notif-item-meta">{{ $event['concessionaire_name'] }}</p>
-                                        <p class="notif-item-time">{{ $event['submitted_at']->diffForHumans() }}</p>
+                                        <p class="notif-item-title">No new submissions</p>
+                                        <p class="notif-item-meta">You're all caught up.</p>
                                     </div>
-                                </a>
-                            @endforeach
-                        @else
-                            <div class="notif-item">
-                                <div class="notif-item-icon" style="background:var(--hover-2);color:var(--muted);">
-                                    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
                                 </div>
-                                <div>
-                                    <p class="notif-item-title">No new submissions</p>
-                                    <p class="notif-item-meta">You're all caught up.</p>
-                                </div>
-                            </div>
-                        @endif
+                            @endif
+                        </div>
+                        <div class="notif-foot">
+                            <a href="{{ route('admin.partnerships') }}" class="notif-foot-link">View Partnerships &rarr;</a>
+                        </div>
                     </div>
-                    <div class="notif-foot">
-                        <a href="{{ route('admin.partnerships') }}" class="notif-foot-link">View Partnerships &rarr;</a>
+
+                    <div class="notif-panel" data-notif-panel="overdue" role="tabpanel" hidden>
+                        <div class="notif-list">
+                            @if($overdueFeeAlertCount > 0)
+                                @foreach($overdueFeeAlerts as $alert)
+                                    <a href="{{ route('admin.concessionaires') }}" class="notif-item">
+                                        <div class="notif-item-icon is-red">
+                                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="notif-item-title">{{ $alert['business'] }}</p>
+                                            <p class="notif-item-meta">{{ $alert['owed_count'] }} {{ Str::plural('month', $alert['owed_count']) }} unpaid &middot; &#8369;{{ number_format($alert['monthly_fee'], 2) }}/mo</p>
+                                            @if($alert['oldest_month_label'])
+                                                <p class="notif-item-time">Since {{ $alert['oldest_month_label'] }}</p>
+                                            @endif
+                                        </div>
+                                    </a>
+                                @endforeach
+                            @else
+                                <div class="notif-item">
+                                    <div class="notif-item-icon is-dim">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="notif-item-title">No overdue accounts</p>
+                                        <p class="notif-item-meta">All monthly fees are on track.</p>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="notif-foot">
+                            <a href="{{ route('admin.concessionaires') }}" class="notif-foot-link">View Concessionaires &rarr;</a>
+                        </div>
+                    </div>
+
+                    <div class="notif-panel" data-notif-panel="stocks" role="tabpanel" hidden>
+                        <div class="notif-list">
+                            @if($lowStockAlertCount > 0)
+                                @foreach($lowStockAlerts as $stock)
+                                    @php $stockHealth = $stock->stockHealth(); @endphp
+                                    <a href="{{ route('admin.stocks') }}" class="notif-item">
+                                        <div class="notif-item-icon {{ $stockHealth['status'] === 'out' ? 'is-red' : 'is-amber' }}">
+                                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5 12 3l8.25 4.5L12 12 3.75 7.5Z"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12 12 16.5 20.25 12"/>
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 16.5 12 21l8.25-4.5"/>
+                                            </svg>
+                                        </div>
+                                        <div>
+                                            <p class="notif-item-title">{{ $stock->item_name }}</p>
+                                            <p class="notif-item-meta">
+                                                @if($stockHealth['status'] === 'out')
+                                                    Out of stock
+                                                @elseif($stockHealth['out_sizes'] !== [] || $stockHealth['low_sizes'] !== [])
+                                                    @if($stockHealth['out_sizes'] !== [])Out: {{ implode(', ', $stockHealth['out_sizes']) }}@endif
+                                                    @if($stockHealth['out_sizes'] !== [] && $stockHealth['low_sizes'] !== []) &middot; @endif
+                                                    @if($stockHealth['low_sizes'] !== [])Low: {{ implode(', ', $stockHealth['low_sizes']) }}@endif
+                                                @else
+                                                    Only {{ number_format($stock->quantity) }} left
+                                                @endif
+                                                @if($stock->item_type)
+                                                    &middot; {{ ucfirst($stock->item_type) }}
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            @else
+                                <div class="notif-item">
+                                    <div class="notif-item-icon is-dim">
+                                        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p class="notif-item-title">Inventory looks healthy</p>
+                                        <p class="notif-item-meta">No items at or below their alert threshold.</p>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                        <div class="notif-foot">
+                            <a href="{{ route('admin.stocks') }}" class="notif-foot-link">View Stocks &rarr;</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1422,6 +1583,29 @@
             });
         })();
 
+        // ---------- Notification section tabs ----------
+        (() => {
+            const dropdown = document.getElementById('application-notification-dropdown');
+            if (!dropdown) return;
+
+            const tabs = dropdown.querySelectorAll('.notif-tab');
+            const panels = dropdown.querySelectorAll('.notif-panel');
+
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const target = tab.dataset.notifTab;
+                    tabs.forEach((t) => {
+                        t.classList.toggle('is-active', t === tab);
+                        t.setAttribute('aria-selected', t === tab ? 'true' : 'false');
+                    });
+                    panels.forEach((panel) => {
+                        panel.hidden = panel.dataset.notifPanel !== target;
+                    });
+                });
+            });
+        })();
+
         // ---------- Mark application notifications as read ----------
         (() => {
             const notificationButton = document.getElementById('application-notification-button');
@@ -1447,7 +1631,15 @@
                     if (!response.ok) return;
                     markedRead = true;
                     notificationButton.dataset.unreadCount = '0';
-                    if (notificationBadge) notificationBadge.remove();
+                    // Overdue fees and low stock are standing alerts, so the
+                    // badge drops to that count instead of disappearing.
+                    const persistentCount = Number(notificationButton.dataset.persistentCount || '0');
+                    if (!notificationBadge) return;
+                    if (persistentCount > 0) {
+                        notificationBadge.textContent = persistentCount;
+                    } else {
+                        notificationBadge.remove();
+                    }
                 }).catch(() => {
                     // Keep UI unchanged if request fails.
                 });

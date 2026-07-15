@@ -87,7 +87,10 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     
     // Uniform Stocks
     Route::get('/stocks', [AdminController::class, 'stocks'])->name('stocks');
+    Route::get('/stocks/create', [AdminController::class, 'createStock'])->name('stocks.create');
+    Route::get('/stocks/{stock}/edit', [AdminController::class, 'editStock'])->name('stocks.edit');
     Route::post('/stocks', [AdminController::class, 'storeStock'])->name('stocks.store');
+    Route::patch('/stocks/{stock}/adjust', [AdminController::class, 'adjustStock'])->name('stocks.adjust');
     Route::patch('/stocks/{stock}', [AdminController::class, 'updateStock'])->name('stocks.update');
     Route::delete('/stocks/{id}', [AdminController::class, 'confirmDelete'])->name('stocks.delete');
     Route::delete('/stocks/{stock}/destroy', [AdminController::class, 'destroyStock'])->name('stocks.destroy');

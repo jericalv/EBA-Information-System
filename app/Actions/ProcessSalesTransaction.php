@@ -4,6 +4,7 @@ namespace App\Actions;
 
 use App\Models\ActivityLog;
 use App\Models\SalesOrder;
+use App\Models\StockMovement;
 use App\Models\UniformStock;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -80,6 +81,18 @@ class ProcessSalesTransaction
                     $stock->quantity = array_sum(array_map(static fn ($qty): int => (int) $qty, $sizes));
                     $stock->save();
                 }
+
+                StockMovement::create([
+                    'uniform_stock_id' => $stock->id,
+                    'user_id' => $cashierId,
+                    'type' => 'sale',
+                    'size' => $isBook ? null : $selectedSize,
+                    'quantity_change' => -$requestedQty,
+                    'quantity_after' => $isBook
+                        ? (int) $stock->quantity
+                        : (int) ($stock->sizes[$selectedSize] ?? 0),
+                    'note' => 'Sales order #' . $salesOrder->id,
+                ]);
 
                 $salesOrder->items()->create([
                     'uniform_stock_id' => $stock->id,

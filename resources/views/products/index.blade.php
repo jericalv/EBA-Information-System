@@ -983,12 +983,6 @@
                                 <h3 class="stock-name">{{ $stock->item_name }}</h3>
                             </div>
                             <div class="stock-foot">
-                                @if(($stock->item_type ?? null) === 'books' && $stock->unit_price > 0)
-                                    <span class="stock-price">&#8369;{{ number_format($stock->unit_price, 2) }}</span>
-                                @endif
-                                @auth
-                                    <span class="stock-qty {{ $isOutOfStock ? 'out-of-stock' : ($isLowStock ? 'low-stock' : '') }}">{{ number_format($stockQty) }}<em>on hand</em></span>
-                                @endauth
                                 <span class="stock-view">
                                     View
                                     <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
