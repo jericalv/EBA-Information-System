@@ -13,6 +13,7 @@ class SalesOrderItem extends Model
     protected $fillable = [
         'sales_order_id',
         'uniform_stock_id',
+        'size',
         'quantity',
         'price_at_sale',
     ];

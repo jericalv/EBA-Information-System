@@ -11,6 +11,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PartnershipApplicationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\UniformReceiptController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['guest'])->group(function () {
@@ -73,6 +74,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::get('/record-payment', [AdminController::class, 'recordPayment'])->name('record-payment');
     Route::post('/record-payment', [AdminController::class, 'storeRecordedPayment'])->name('record-payment.store');
     Route::get('/uniform-checkout', [AdminController::class, 'uniformCheckout'])->name('uniform-checkout');
+    Route::get('/uniform-checkout/receipt/{order}', [UniformReceiptController::class, 'show'])->name('uniform-checkout.receipt');
     Route::get('/reviews', [AdminController::class, 'reviewsIndex'])->name('reviews');
     Route::delete('/reviews/product/{id}', [AdminController::class, 'deleteProductReview'])->name('reviews.delete-product');
     Route::delete('/reviews/store/{id}', [AdminController::class, 'deleteStoreReview'])->name('reviews.delete-store');
@@ -173,6 +175,7 @@ Route::middleware(['auth', 'faculty'])->prefix('staff')->name('staff.')->group(f
 
     Route::get('/uniform-checkout', [FacultyController::class, 'uniformCheckoutIndex'])->name('uniform-checkout');
     Route::post('/uniform-checkout', [FacultyController::class, 'storeUniformCheckout'])->name('uniform-checkout.store');
+    Route::get('/uniform-checkout/receipt/{order}', [UniformReceiptController::class, 'show'])->name('uniform-checkout.receipt');
 
     Route::get('/stocks', [FacultyController::class, 'stocksIndex'])->name('stocks.index');
     Route::get('/stocks/create', [FacultyController::class, 'createStock'])->name('stocks.create');

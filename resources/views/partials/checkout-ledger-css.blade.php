@@ -207,8 +207,21 @@
     .co-modal-actions {
         display: flex;
         justify-content: flex-end;
+        gap: 10px;
         padding: 0 18px 18px;
     }
+    .co-modal-receipt { margin-top: 14px; }
+    .co-modal-receipt label {
+        display: block;
+        margin-bottom: 6px;
+        font-family: var(--font-mono);
+        font-size: 10.5px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+    }
+    .co-modal-receipt input.co-control { width: 100%; }
 
     /* ---------- Dark theme (portals that support it set data-theme="dark") ----------
        Accent falls back to admin green; faculty overrides --accent-* to graphite. */

@@ -37,7 +37,11 @@ new class extends Component {
             ->toArray();
     }
 
-    public function processCheckout(array $cart): bool
+    /**
+     * Returns the new sales order id so the front-end can offer the
+     * booklet receipt print, or null when the sale failed.
+     */
+    public function processCheckout(array $cart): ?int
     {
         $this->successMessage = null;
         $this->errorMessage = null;
@@ -76,7 +80,7 @@ new class extends Component {
         )->validate();
 
         try {
-            app(ProcessSalesTransaction::class)->handle(
+            $order = app(ProcessSalesTransaction::class)->handle(
                 $cart,
                 (int) Auth::id(),
                 $this->paymentType
@@ -86,12 +90,12 @@ new class extends Component {
 
             $this->uniformStocks = $this->loadStocks();
 
-            return true;
+            return $order->id;
         } catch (\Throwable $e) {
             report($e);
             $this->errorMessage = $e->getMessage();
 
-            return false;
+            return null;
         }
     }
 }; ?>
@@ -118,6 +122,9 @@ new class extends Component {
              loading: false,
              showSuccessModal: false,
              lastCompletedTotal: 0,
+             lastOrderId: null,
+             receiptAddress: '',
+             receiptBase: '{{ request()->routeIs('admin.*') ? url('admin/uniform-checkout/receipt') : url('staff/uniform-checkout/receipt') }}',
              maxCartItems: 10,
              init() {
                  this.stockItems = $wire.uniformStocks
@@ -231,6 +238,12 @@ new class extends Component {
              closeSuccessModal() {
                  this.showSuccessModal = false
              },
+             printReceipt() {
+                 if (!this.lastOrderId) return
+                 const address = this.receiptAddress.trim()
+                 const query = address ? '?address=' + encodeURIComponent(address) : ''
+                 window.open(this.receiptBase + '/' + this.lastOrderId + query, '_blank')
+             },
              async submit() {
                  if (!this.canCompleteSale) return
                  this.loading = true
@@ -242,10 +255,12 @@ new class extends Component {
                          quantity: parseInt(item.quantity),
                          price_at_sale: parseFloat(item.unit_price),
                      }))
-                     const isSuccessful = await $wire.processCheckout(cartData)
-                     if (!isSuccessful) return
+                     const orderId = await $wire.processCheckout(cartData)
+                     if (!orderId) return
 
                      this.lastCompletedTotal = completedTotal
+                     this.lastOrderId = orderId
+                     this.receiptAddress = ''
                      this.cart = [{ uniform_stock_id: '', selected_size: '', quantity: 1, unit_price: 0, max_available_stock: 0 }]
                      this.showSuccessModal = true
                  } catch (e) {
@@ -411,8 +426,25 @@ new class extends Component {
                             <span>Recorded total</span>
                             <strong x-text="fmt(lastCompletedTotal)"></strong>
                         </div>
+                        <div class="co-modal-receipt">
+                            <label for="co-receipt-address">Address on receipt (optional)</label>
+                            <input
+                                id="co-receipt-address"
+                                type="text"
+                                maxlength="45"
+                                x-model="receiptAddress"
+                                class="co-control"
+                                placeholder="e.g. Bacoor, Cavite"
+                            >
+                        </div>
                     </div>
                     <div class="co-modal-actions">
+                        <button type="button" class="btn btn-outline" x-on:click="printReceipt()">
+                            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 9V4h12v5M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v6H6z"/>
+                            </svg>
+                            Print Receipt
+                        </button>
                         <button type="button" class="btn btn-green" x-on:click="closeSuccessModal()">Close &amp; Continue</button>
                     </div>
                 </div>

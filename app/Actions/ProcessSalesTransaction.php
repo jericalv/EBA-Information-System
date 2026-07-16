@@ -96,6 +96,7 @@ class ProcessSalesTransaction
 
                 $salesOrder->items()->create([
                     'uniform_stock_id' => $stock->id,
+                    'size' => $isBook ? null : $selectedSize,
                     'quantity' => $requestedQty,
                     'price_at_sale' => $priceAtSale,
                 ]);
