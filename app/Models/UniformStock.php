@@ -41,6 +41,30 @@ class UniformStock extends Model
         return $this->hasMany(StockMovement::class);
     }
 
+    /**
+     * Gallery images, in display order.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(UniformStockImage::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Gallery paths for display, falling back to the legacy single image column.
+     *
+     * @return array<int, string>
+     */
+    public function galleryPaths(): array
+    {
+        $paths = $this->images->pluck('path')->all();
+
+        if (empty($paths) && $this->image) {
+            $paths = [$this->image];
+        }
+
+        return array_slice($paths, 0, 5);
+    }
+
     public function isUniform(): bool
     {
         return $this->item_type === 'uniforms' && is_array($this->sizes) && $this->sizes !== [];

@@ -811,7 +811,7 @@
                                 <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span>Set Fee</span>
+                                <span>Fee Tracking</span>
                             </a>
                         </li>
                     </ul>
@@ -915,6 +915,12 @@
                                 $breadcrumbs = [
                                     ['label' => 'Dashboard', 'active' => true]
                                 ];
+                            } elseif (request()->routeIs('staff.partnerships.show')) {
+                                $breadcrumbs = [
+                                    ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
+                                    ['label' => 'Partnerships', 'url' => route('staff.partnerships.index')],
+                                    ['label' => 'Review', 'active' => true]
+                                ];
                             } elseif (request()->routeIs('staff.partnerships*')) {
                                 $breadcrumbs = [
                                     ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
@@ -923,7 +929,7 @@
                             } elseif (request()->routeIs('staff.concessionaires*')) {
                                 $breadcrumbs = [
                                     ['label' => 'Dashboard', 'url' => route('staff.dashboard')],
-                                    ['label' => 'Set Fee', 'active' => true]
+                                    ['label' => 'Fee Tracking', 'active' => true]
                                 ];
                             } elseif (request()->routeIs('staff.stocks*')) {
                                 $breadcrumbs = [
@@ -1191,7 +1197,7 @@
             const pages = [
                 { label: 'Dashboard', hint: 'Page', url: @json(route('staff.dashboard')), keywords: 'home overview stats charts applications summary' },
                 { label: 'Partnerships', hint: 'Page', url: @json($partnershipsRoute), keywords: 'applications review approve reject recommend loi documents wizard' },
-                { label: 'Set Fee', hint: 'Page', url: @json($concessionairesRoute), keywords: 'concessionaires vendors stores business monthly fee edit contract' },
+                { label: 'Fee Tracking', hint: 'Page', url: @json($concessionairesRoute), keywords: 'concessionaires vendors stores business monthly fee edit contract set fee' },
                 { label: 'Stocks', hint: 'Page', url: @json(route('staff.stocks.index')), keywords: 'uniform inventory sizes quantity add stock items' },
                 { label: 'Item Checkout', hint: 'Page', url: @json(route('staff.uniform-checkout')), keywords: 'uniform sell pos sale student purchase cart' },
                 { label: 'Transaction Logs', hint: 'Page', url: @json(route('staff.transaction-logs')), keywords: 'payments sales records receipts logs' },

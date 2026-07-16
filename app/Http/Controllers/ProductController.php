@@ -107,7 +107,7 @@ class ProductController extends Controller
      */
     public function show(Request $request, Product $product)
     {
-        $product->load('concessionaire');
+        $product->load('concessionaire', 'images');
 
         $activeRating = (int) $request->query('rating', 0);
         if ($activeRating < 1 || $activeRating > 5) {

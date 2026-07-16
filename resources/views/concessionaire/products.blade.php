@@ -226,26 +226,6 @@
     .product-links form {
         margin: 0;
     }
-    .edit-current-image {
-        margin-top: 4px;
-        border: 1px solid var(--line-strong);
-        border-radius: 8px;
-        background: var(--paper);
-        overflow: hidden;
-        width: 100%;
-        max-width: 240px;
-        aspect-ratio: 16 / 10;
-    }
-    .edit-current-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    .edit-image-note {
-        margin: 8px 2px 0;
-        font-size: 12px;
-        color: var(--muted);
-    }
     .is-hidden {
         display: none !important;
     }
@@ -663,19 +643,7 @@
                                         <p class="product-price">PHP {{ number_format($product->price, 2) }}</p>
 
                                         <div class="product-links">
-                                            <button
-                                                type="button"
-                                                class="open-edit-btn btn btn-secondary btn-sm"
-                                                data-id="{{ $product->id }}"
-                                                data-name="{{ e($product->name) }}"
-                                                data-description="{{ e($product->description ?? '') }}"
-                                                data-price="{{ (float) $product->price }}"
-                                                data-category="{{ e($product->category) }}"
-                                                data-image-path="{{ $product->image ? e(asset('storage/' . $product->image)) : '' }}"
-                                                data-is-available="{{ $product->is_available ? '1' : '0' }}"
-                                            >
-                                                Edit
-                                            </button>
+                                            <a href="{{ route('concessionaire.products.edit', $product) }}" class="btn btn-secondary btn-sm">Edit</a>
 
                                             <form method="POST" action="{{ route('concessionaire.products.destroy', $product) }}" class="delete-product-form" data-product-name="{{ e($product->name) }}">
                                                 @csrf
@@ -740,19 +708,19 @@
                     </div>
 
                     <div class="field span-2">
-                        <label for="image">Image (jpg, jpeg, png, webp, max 2MB)</label>
+                        <label for="image">Photos (up to 5 &mdash; jpg, jpeg, png, webp, max 2MB each)</label>
                         <label for="image" class="upload-zone">
                             <span>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V8m0 0-3 3m3-3 3 3" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 16.5a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5a4.5 4.5 0 0 1 4.5-4.5h.179A5.25 5.25 0 0 1 18 10.5h.75A2.25 2.25 0 0 1 21 12.75v3.75Z" />
                                 </svg>
-                                <span class="upload-zone-title">Click to upload image</span>
-                                <span class="upload-zone-subtext">JPG, JPEG, PNG, WEBP - max 2MB</span>
+                                <span class="upload-zone-title">Click to upload photos</span>
+                                <span class="upload-zone-subtext">Up to 5 photos &middot; the first one is the cover</span>
                             </span>
-                            <input id="image" class="upload-input" type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
+                            <input id="image" class="upload-input" type="file" name="images[]" multiple accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
                         </label>
-                        <p class="upload-file-name" id="imageFileName">No file selected</p>
+                        <p class="upload-file-name" id="imageFileName">No files selected</p>
                     </div>
 
                     <div class="field span-2">
@@ -767,86 +735,6 @@
                 <div class="modal-actions">
                     <button class="btn btn-secondary" type="button" id="cancelAddProduct">Cancel</button>
                     <button class="btn btn-primary" type="submit">Save Product</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal-wrap" id="editProductModal">
-        <div class="modal-card">
-            <div class="modal-head">
-                <h3>Edit Product</h3>
-                <button type="button" class="modal-close" id="closeEditProductModal">&times;</button>
-            </div>
-            <p class="modal-sub">Update your product details without leaving this page.</p>
-
-            <form
-                id="editProductForm"
-                method="POST"
-                action="{{ route('concessionaire.products.update', ['product' => 0]) }}"
-                data-action-template="{{ route('concessionaire.products.update', ['product' => '__PRODUCT__']) }}"
-                enctype="multipart/form-data"
-            >
-                @csrf
-                @method('PUT')
-
-                <div class="form-grid">
-                    <div class="field span-2">
-                        <label for="edit_name">Name</label>
-                        <input id="edit_name" type="text" name="name" required maxlength="255">
-                    </div>
-
-                    <div class="field span-2">
-                        <label for="edit_description">Description</label>
-                        <textarea id="edit_description" name="description"></textarea>
-                    </div>
-
-                    <div class="field">
-                        <label for="edit_price">Price</label>
-                        <input id="edit_price" type="number" name="price" min="0" step="0.01" required>
-                    </div>
-
-                    <div class="field">
-                        <label for="edit_category">Category</label>
-                        <input id="edit_category" type="text" name="category" placeholder="e.g. food, beverage, snack" required maxlength="100">
-                    </div>
-
-                    <div class="field span-2">
-                        <label>Current image preview</label>
-                        <div class="edit-current-image is-hidden" id="editImagePreviewWrap">
-                            <img id="editImagePreview" src="" alt="Current product image preview">
-                        </div>
-                        <p class="edit-image-note" id="editImagePreviewEmpty">No image uploaded for this product.</p>
-                    </div>
-
-                    <div class="field span-2">
-                        <label for="edit_image">Upload New Image (jpg, jpeg, png, webp, max 2MB)</label>
-                        <label for="edit_image" class="upload-zone">
-                            <span>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16V8m0 0-3 3m3-3 3 3" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 16.5a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5a4.5 4.5 0 0 1 4.5-4.5h.179A5.25 5.25 0 0 1 18 10.5h.75A2.25 2.25 0 0 1 21 12.75v3.75Z" />
-                                </svg>
-                                <span class="upload-zone-title">Click to upload image</span>
-                                <span class="upload-zone-subtext">JPG, JPEG, PNG, WEBP - max 2MB</span>
-                            </span>
-                            <input id="edit_image" class="upload-input" type="file" name="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
-                        </label>
-                        <p class="upload-file-name" id="editImageFileName">No file selected</p>
-                    </div>
-
-                    <div class="field span-2">
-                        <input type="hidden" name="is_available" value="0">
-                        <label class="checkbox-line">
-                            <input id="edit_is_available" type="checkbox" name="is_available" value="1">
-                            Available
-                        </label>
-                    </div>
-                </div>
-
-                <div class="modal-actions">
-                    <button class="btn btn-secondary" type="button" id="cancelEditProduct">Cancel</button>
-                    <button class="btn btn-primary" type="submit">Update Product</button>
                 </div>
             </form>
         </div>
@@ -887,7 +775,6 @@
     <script>
         (() => {
             const addProductModal = document.getElementById('addProductModal');
-            const editProductModal = document.getElementById('editProductModal');
             const deleteProductModal = document.getElementById('deleteProductModal');
             const productFeedbackModal = document.getElementById('productFeedbackModal');
 
@@ -900,27 +787,9 @@
                 document.getElementById('cancelAddProduct')
             ].filter(Boolean);
 
-            const closeEditButtons = [
-                document.getElementById('closeEditProductModal'),
-                document.getElementById('cancelEditProduct')
-            ].filter(Boolean);
-
             const imageInput = document.getElementById('image');
             const imageFileName = document.getElementById('imageFileName');
-            const editImageInput = document.getElementById('edit_image');
-            const editImageFileName = document.getElementById('editImageFileName');
 
-            const editProductForm = document.getElementById('editProductForm');
-            const editActionTemplate = editProductForm ? editProductForm.dataset.actionTemplate : '';
-            const editOpenButtons = document.querySelectorAll('.open-edit-btn');
-            const editNameInput = document.getElementById('edit_name');
-            const editDescriptionInput = document.getElementById('edit_description');
-            const editPriceInput = document.getElementById('edit_price');
-            const editCategoryInput = document.getElementById('edit_category');
-            const editAvailableInput = document.getElementById('edit_is_available');
-            const editImagePreviewWrap = document.getElementById('editImagePreviewWrap');
-            const editImagePreview = document.getElementById('editImagePreview');
-            const editImagePreviewEmpty = document.getElementById('editImagePreviewEmpty');
             const deleteProductForms = Array.from(document.querySelectorAll('.delete-product-form'));
             const deleteProductName = document.getElementById('deleteProductName');
             const closeDeleteProductModal = document.getElementById('closeDeleteProductModal');
@@ -953,33 +822,17 @@
 
             if (imageInput && imageFileName) {
                 imageInput.addEventListener('change', () => {
-                    imageFileName.textContent = imageInput.files && imageInput.files.length
-                        ? imageInput.files[0].name
-                        : 'No file selected';
-                });
-            }
+                    const files = Array.from(imageInput.files || []);
 
-            if (editImageInput && editImageFileName) {
-                editImageInput.addEventListener('change', () => {
-                    editImageFileName.textContent = editImageInput.files && editImageInput.files.length
-                        ? editImageInput.files[0].name
-                        : 'No file selected';
-                });
-            }
-
-            closeEditButtons.forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    if (editProductModal) {
-                        editProductModal.classList.remove('show');
+                    if (files.length > 5) {
+                        imageInput.value = '';
+                        imageFileName.textContent = 'You can upload at most 5 photos.';
+                        return;
                     }
-                });
-            });
 
-            if (editProductModal) {
-                editProductModal.addEventListener('click', (event) => {
-                    if (event.target === editProductModal) {
-                        editProductModal.classList.remove('show');
-                    }
+                    imageFileName.textContent = files.length
+                        ? files.map((file) => file.name).join(', ')
+                        : 'No files selected';
                 });
             }
 
@@ -1060,64 +913,6 @@
                     }
                 });
             }
-
-            window.openEditModal = (id, name, description, price, category, imagePath, isAvailable) => {
-                if (!editProductModal || !editProductForm || !editActionTemplate) {
-                    return;
-                }
-
-                editProductForm.action = editActionTemplate.replace('__PRODUCT__', String(id));
-
-                if (editNameInput) {
-                    editNameInput.value = name || '';
-                }
-                if (editDescriptionInput) {
-                    editDescriptionInput.value = description || '';
-                }
-                if (editPriceInput) {
-                    editPriceInput.value = price ?? '';
-                }
-                if (editCategoryInput) {
-                    editCategoryInput.value = category || '';
-                }
-                if (editAvailableInput) {
-                    editAvailableInput.checked = Boolean(isAvailable);
-                }
-                if (editImageInput) {
-                    editImageInput.value = '';
-                }
-                if (editImageFileName) {
-                    editImageFileName.textContent = 'No file selected';
-                }
-
-                if (editImagePreviewWrap && editImagePreview && editImagePreviewEmpty) {
-                    if (imagePath) {
-                        editImagePreview.src = imagePath;
-                        editImagePreviewWrap.classList.remove('is-hidden');
-                        editImagePreviewEmpty.classList.add('is-hidden');
-                    } else {
-                        editImagePreview.src = '';
-                        editImagePreviewWrap.classList.add('is-hidden');
-                        editImagePreviewEmpty.classList.remove('is-hidden');
-                    }
-                }
-
-                editProductModal.classList.add('show');
-            };
-
-            editOpenButtons.forEach((btn) => {
-                btn.addEventListener('click', () => {
-                    const id = Number(btn.dataset.id || 0);
-                    const name = btn.dataset.name || '';
-                    const description = btn.dataset.description || '';
-                    const price = btn.dataset.price || '';
-                    const category = btn.dataset.category || '';
-                    const imagePath = btn.dataset.imagePath || '';
-                    const isAvailable = btn.dataset.isAvailable === '1';
-
-                    window.openEditModal(id, name, description, price, category, imagePath, isAvailable);
-                });
-            });
 
             if (addProductModal && document.querySelector('[data-open-add-product-modal="1"]')) {
                 addProductModal.classList.add('show');

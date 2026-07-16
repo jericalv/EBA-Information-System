@@ -1194,6 +1194,12 @@
                         ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
                         ['label' => 'Stocks', 'active' => true]
                     ];
+                } elseif (request()->routeIs('admin.partnerships.show')) {
+                    $breadcrumbs = [
+                        ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
+                        ['label' => 'Partnerships', 'url' => route('admin.partnerships')],
+                        ['label' => 'Review', 'active' => true]
+                    ];
                 } elseif (request()->routeIs('admin.partnerships*')) {
                     $breadcrumbs = [
                         ['label' => 'Dashboard', 'url' => route('admin.dashboard')],
@@ -1329,7 +1335,7 @@
                         <div class="notif-list">
                             @if($unreadApplicationSteps->isNotEmpty())
                                 @foreach($unreadApplicationSteps as $event)
-                                    <a href="{{ route('admin.partnerships', ['search' => $event['search_term']]) }}" class="notif-item {{ ($event['is_unread'] ?? false) ? 'is-unread' : '' }}">
+                                    <a href="{{ route('admin.partnerships.show', $event['application_id']) }}" class="notif-item {{ ($event['is_unread'] ?? false) ? 'is-unread' : '' }}">
                                         <div class="notif-item-icon">
                                             <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
                                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>

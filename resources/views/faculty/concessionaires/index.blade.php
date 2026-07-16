@@ -1,7 +1,7 @@
 @extends('faculty.layout')
 
-@section('title', 'Concessionaires')
-@section('page-title', 'Concessionaires')
+@section('title', 'Fee Tracking')
+@section('page-title', 'Fee Tracking')
 
 @section('extra-css')
 <style>
@@ -18,14 +18,28 @@
     .status-badge-paid { background: var(--hover-2); color: var(--ink); }
     .status-badge-due { background: #fef3c7; color: #92400e; }
     .status-badge-none { background: var(--hover-2); color: var(--muted); }
+    .status-badge-advance { background: #E5F3EA; color: #14532D; }
     html[data-theme="dark"] .status-badge-overdue { background: rgba(227, 106, 106, 0.14); color: #F0A0A0; }
     html[data-theme="dark"] .status-badge-due { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
+    html[data-theme="dark"] .status-badge-advance { background: rgba(30, 149, 96, 0.16); color: #8CD6AF; }
+
+    .period-cell {
+        white-space: nowrap;
+    }
+    .period-cell .status-badge {
+        margin-left: 6px;
+        vertical-align: 1px;
+        font-size: 11px;
+    }
 
     .fee-form {
         display: flex;
         align-items: center;
         gap: 8px;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
+    }
+    .fee-form button {
+        white-space: nowrap;
     }
     .fee-form input {
         width: 120px;
@@ -50,7 +64,7 @@
     .concessionaire-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 980px;
+        min-width: 1140px;
     }
     .concessionaire-table th,
     .concessionaire-table td {
@@ -117,6 +131,7 @@
                             <th>Concessionaire</th>
                             <th>Monthly Fee</th>
                             <th>Status</th>
+                            <th>Paid Through</th>
                             <th>Last Payment</th>
                             <th>Total Paid</th>
                             <th>Set Fee</th>
@@ -126,6 +141,14 @@
                         @foreach ($concessionaires as $concessionaire)
                             @php
                                 $plan = $feePlans[$concessionaire->id] ?? null;
+
+                                $paidThrough = $concessionaire->paid_through_month
+                                    ? \Illuminate\Support\Carbon::parse($concessionaire->paid_through_month)->startOfMonth()
+                                    : null;
+                                $monthsAhead = $paidThrough
+                                    ? now()->startOfMonth()->diffInMonths($paidThrough, false)
+                                    : 0;
+
                                 $statusLabel = $plan['status_label'] ?? '—';
                                 if ($plan && $plan['status'] === 'overdue' && $plan['owed_count'] > 0) {
                                     $statusLabel .= ' · ' . $plan['owed_count'] . ' mo';
@@ -147,6 +170,16 @@
                                 </td>
                                 <td>
                                     <span class="status-badge {{ $statusClass }}">{{ $statusLabel }}</span>
+                                </td>
+                                <td class="period-cell">
+                                    @if ($paidThrough)
+                                        {{ $paidThrough->format('M Y') }}
+                                        @if ($monthsAhead > 0)
+                                            <span class="status-badge status-badge-advance">+{{ $monthsAhead }} mo advance</span>
+                                        @endif
+                                    @else
+                                        —
+                                    @endif
                                 </td>
                                 <td>
                                     {{ $concessionaire->last_payment_date ? \Illuminate\Support\Carbon::parse($concessionaire->last_payment_date)->format('M d, Y') : '—' }}

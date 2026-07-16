@@ -31,7 +31,7 @@
             --red: #B4232A;
             --red-deep: #7C1D22;
             --font-display: 'Inter', 'Manrope', system-ui, sans-serif;
-            --font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
             --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
         }
 
@@ -206,22 +206,18 @@
         /* ===== PRODUCT DETAIL ===== */
         .product-detail {
             display: grid;
-            grid-template-columns: 0.9fr 1.1fr;
+            grid-template-columns: 1.05fr 0.95fr;
             gap: 44px;
             margin-bottom: 52px;
         }
-        .pd-media {
+        .pd-media { display: flex; flex-direction: column; gap: 12px; }
+        .pd-frame {
             position: relative;
             background-color: var(--paper-deep);
-            background-image: radial-gradient(rgba(24, 36, 32, 0.1) 1px, transparent 1px);
-            background-size: 16px 16px;
             border: 1px solid var(--line);
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: hidden;
             aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
         @media (min-width: 901px) {
             .pd-media {
@@ -230,37 +226,116 @@
                 align-self: start;
             }
         }
-        .pd-media img {
+        .pd-track {
+            display: flex;
+            height: 100%;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+        .pd-track::-webkit-scrollbar { display: none; }
+        .pd-slide {
+            flex: 0 0 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+        }
+        .pd-slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
-        .pd-media svg {
+        .pd-slide.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(rgba(24, 36, 32, 0.1) 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+        .pd-slide.empty svg {
             width: 88px;
             height: 88px;
             color: var(--line-strong);
         }
-        .pd-cat {
+        .pd-arrow {
             position: absolute;
-            top: 14px; left: 14px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 1.4px;
-            text-transform: uppercase;
-            background: rgba(255, 255, 255, 0.92);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid var(--line);
-            border-radius: 5px;
-            padding: 6px 10px;
-            color: var(--ink-soft);
+            background: rgba(255, 255, 255, 0.94);
+            color: var(--ink);
+            cursor: pointer;
+            opacity: 0;
+            box-shadow: 0 2px 12px rgba(24, 36, 32, 0.14);
+            transition: opacity .2s ease, background-color .2s ease, color .2s ease;
+            z-index: 2;
+        }
+        .pd-frame:hover .pd-arrow, .pd-arrow:focus-visible { opacity: 1; }
+        .pd-arrow:hover { background: #fff; color: var(--green); }
+        .pd-arrow.prev { left: 14px; }
+        .pd-arrow.next { right: 14px; }
+        .pd-arrow svg { width: 16px; height: 16px; }
+        @media (hover: none) {
+            .pd-arrow { display: none; }
+        }
+
+        .pd-thumbs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .pd-thumb {
+            width: 62px;
+            height: 62px;
+            flex-shrink: 0;
+            padding: 0;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--paper-deep);
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0.65;
+            transition: opacity .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+        .pd-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .pd-thumb:hover { opacity: 1; }
+        .pd-thumb.active {
+            opacity: 1;
+            border-color: var(--green);
+            box-shadow: 0 0 0 1px var(--green);
+        }
+        .pd-thumb-count {
+            margin-left: auto;
+            padding-left: 8px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            color: var(--ink-faint);
+            white-space: nowrap;
         }
 
         .pd-title {
             font-family: var(--font-display);
-            font-weight: 800;
-            font-size: clamp(26px, 3vw, 34px);
-            line-height: 1.14;
-            letter-spacing: -0.5px;
+            font-weight: 900;
+            font-size: clamp(28px, 3.4vw, 40px);
+            line-height: 1.04;
+            letter-spacing: -0.8px;
+            text-transform: uppercase;
             color: var(--ink);
             margin: 12px 0 18px;
         }
@@ -962,7 +1037,7 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             .product-detail { grid-template-columns: 1fr; gap: 26px; }
-            .pd-media { max-height: 380px; }
+            .pd-frame { aspect-ratio: 4 / 3; }
         }
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -1051,16 +1126,44 @@
             @endif
 
             <!-- Product Detail -->
+            @php $gallery = $product->galleryPaths(); @endphp
             <div class="product-detail">
                 <div class="pd-media">
-                    @if($product->image)
-                        <img src="{{ asset('storage/' . $product->image) }}" alt="{{ $product->name }}">
-                    @else
-                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
-                        </svg>
+                    <div class="pd-frame">
+                        <div class="pd-track" id="pdTrack">
+                            @forelse($gallery as $path)
+                                <div class="pd-slide">
+                                    <img src="{{ asset('storage/' . $path) }}" alt="{{ $product->name }} — photo {{ $loop->iteration }}" @if(!$loop->first) loading="lazy" @endif>
+                                </div>
+                            @empty
+                                <div class="pd-slide empty">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+                                    </svg>
+                                </div>
+                            @endforelse
+                        </div>
+
+                        @if(count($gallery) > 1)
+                            <button type="button" class="pd-arrow prev" id="pdPrev" aria-label="Previous photo">
+                                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+                            </button>
+                            <button type="button" class="pd-arrow next" id="pdNext" aria-label="Next photo">
+                                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                            </button>
+                        @endif
+                    </div>
+
+                    @if(count($gallery) > 1)
+                        <div class="pd-thumbs" id="pdThumbs">
+                            @foreach($gallery as $path)
+                                <button type="button" class="pd-thumb {{ $loop->first ? 'active' : '' }}" data-index="{{ $loop->index }}" aria-label="Show photo {{ $loop->iteration }}">
+                                    <img src="{{ asset('storage/' . $path) }}" alt="" loading="lazy">
+                                </button>
+                            @endforeach
+                            <span class="pd-thumb-count" id="pdCount">1 / {{ count($gallery) }}</span>
+                        </div>
                     @endif
-                    <span class="pd-cat">{{ $product->category }}</span>
                 </div>
 
                 <div class="product-content">
@@ -1078,8 +1181,7 @@
                     </div>
 
                     <div class="pd-meta">
-                        <span><strong>ID</strong> #{{ str_pad($product->id, 4, '0', STR_PAD_LEFT) }}</span>
-                        <span>&middot;</span>
+                        <span><strong>Category</strong> {{ $product->category }}</span>
                         <span><strong>Listed</strong> {{ optional($product->created_at)->format('M d, Y') ?? '—' }}</span>
                     </div>
 
@@ -1412,6 +1514,44 @@
         window.addEventListener('scroll', () => {
             navbar.classList.toggle('scrolled', window.scrollY > 20);
         });
+
+        // Product photo gallery
+        (() => {
+            const track = document.getElementById('pdTrack');
+            if (!track) return;
+
+            const slides = track.querySelectorAll('.pd-slide');
+            const prevBtn = document.getElementById('pdPrev');
+            const nextBtn = document.getElementById('pdNext');
+            const counter = document.getElementById('pdCount');
+            const thumbs = document.querySelectorAll('#pdThumbs .pd-thumb');
+
+            const slideWidth = () => slides[0] ? slides[0].getBoundingClientRect().width : track.clientWidth;
+            const currentIndex = () => Math.min(slides.length - 1, Math.max(0, Math.round(track.scrollLeft / slideWidth())));
+
+            const goTo = (index) => {
+                const clamped = Math.min(slides.length - 1, Math.max(0, index));
+                track.scrollTo({ left: clamped * slideWidth(), behavior: 'smooth' });
+            };
+
+            prevBtn?.addEventListener('click', () => goTo(currentIndex() - 1));
+            nextBtn?.addEventListener('click', () => goTo(currentIndex() + 1));
+            thumbs.forEach((thumb) => {
+                thumb.addEventListener('click', () => goTo(Number(thumb.dataset.index || 0)));
+            });
+
+            let ticking = false;
+            track.addEventListener('scroll', () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    const index = currentIndex();
+                    if (counter) counter.textContent = (index + 1) + ' / ' + slides.length;
+                    thumbs.forEach((thumb, i) => thumb.classList.toggle('active', i === index));
+                    ticking = false;
+                });
+            });
+        })();
 
         // Edit Review Modal Functions
         function openEditReviewModal() {

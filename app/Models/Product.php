@@ -41,6 +41,30 @@ class Product extends Model
     }
 
     /**
+     * Gallery images, in display order.
+     */
+    public function images(): HasMany
+    {
+        return $this->hasMany(ProductImage::class)->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Gallery paths for display, falling back to the legacy single image column.
+     *
+     * @return array<int, string>
+     */
+    public function galleryPaths(): array
+    {
+        $paths = $this->images->pluck('path')->all();
+
+        if (empty($paths) && $this->image) {
+            $paths = [$this->image];
+        }
+
+        return array_slice($paths, 0, 5);
+    }
+
+    /**
      * Get the average rating for the product.
      */
     public function getAverageRatingAttribute(): float

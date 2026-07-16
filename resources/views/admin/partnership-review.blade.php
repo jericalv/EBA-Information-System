@@ -1,10 +1,10 @@
-@extends('faculty.layout')
+@extends('admin.layout')
 
 @section('title', 'Review Application #' . $application->id)
 
 @php
-    // ---------- Back link / list state (faculty search is client-side, so only status+page) ----------
-    $listQuery = array_filter(request()->only(['status', 'page']), fn ($v) => $v !== null && $v !== '');
+    // ---------- Back link / list state ----------
+    $listQuery = array_filter(request()->only(['search', 'status', 'page']), fn ($v) => $v !== null && $v !== '');
 
     // ---------- Contact ----------
     $contactNumber = $application->phone_number ?: $application->phone;
@@ -93,7 +93,7 @@
     };
     $docRouteFiles = fn (string $type) => collect($application->documentPaths($type))
         ->map(fn ($path, $i) => [
-            'url' => route('staff.partnerships.document', ['application' => $application, 'type' => $type, 'index' => $i]),
+            'url' => route('admin.partnerships.document', ['application' => $application, 'type' => $type, 'index' => $i]),
             'kind' => $fileKind($path),
         ])->values()->all();
     $storageFiles = fn (string $type) => collect($application->documentPaths($type))
@@ -128,13 +128,14 @@
 
     // ---------- Faculty recommendation ----------
     $facultyRec = $application->faculty_recommendation; // recommend_approval | recommend_rejection | null
-    $canRecommend = ! $application->reviewed_by;
+
+    // ---------- Administration ----------
+    $contractEditable = in_array($application->status, ['pending', 'under_review', 'approved', 'registered'], true);
 @endphp
 
 @section('extra-css')
 <style>
     /* ===== Shared badges (same palette as the index) ===== */
-    .badge { display: inline-flex; align-items: center; border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 700; }
     .badge-pending { background: rgba(245,158,11,0.1); color: #d97706; }
     .badge-approved { background: #E9F6EE; color: #15803D; }
     .badge-rejected { background: rgba(239,68,68,0.1); color: #dc2626; }
@@ -169,7 +170,7 @@
         margin-bottom: 14px;
         transition: color 0.12s ease;
     }
-    .pr-back:hover { color: var(--ink); }
+    .pr-back:hover { color: var(--pine); }
     .pr-back svg { width: 14px; height: 14px; }
 
     /* ===== Page header ===== */
@@ -198,9 +199,9 @@
         font-weight: 800;
         font-size: 15px;
         color: #fff;
-        background: var(--pine);
+        background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+        box-shadow: 0 2px 4px rgba(10,92,47,0.18);
     }
-    html[data-theme="dark"] .pr-avatar { color: #10151B; }
     .pr-title-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .pr-title { margin: 0; font-size: 19px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
     .pr-id-tag {
@@ -234,7 +235,6 @@
         background: rgba(212,168,67,0.12);
         color: #b8860b;
     }
-    html[data-theme="dark"] .pr-business-badge { background: rgba(227, 164, 72, 0.14); color: #E9C288; }
     .pr-header-side { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
     .pr-submitted { text-align: right; }
     .pr-submitted-label {
@@ -301,7 +301,7 @@
     }
     .pr-doc-tab:hover { color: var(--ink); border-color: var(--pine); }
     .pr-doc-tab.is-active { background: var(--pine); border-color: var(--pine); color: #fff; }
-    html[data-theme="dark"] .pr-doc-tab.is-active { color: #10151B; }
+    html[data-theme="dark"] .pr-doc-tab.is-active { color: var(--card); }
     .pr-doc-toolbar {
         display: flex;
         align-items: center;
@@ -333,7 +333,6 @@
         text-decoration: none;
         white-space: nowrap;
     }
-    html[data-theme="dark"] .pr-doc-open { color: var(--ink); }
     .pr-doc-open:hover { text-decoration: underline; }
     .pr-doc-open svg { width: 13px; height: 13px; }
     .pr-doc-stage {
@@ -517,7 +516,7 @@
         background: currentColor;
         flex-shrink: 0;
     }
-    .rv-callout.gray { background: var(--hover-2); color: var(--muted); border-color: var(--line); }
+    .rv-callout.gray { background: var(--hover-2); color: var(--muted); border-color: var(--line-strong); }
     .rv-callout.amber { background: #FFFBEB; color: #B45309; border-color: #FDE68A; }
     .rv-callout.red { background: #FEF2F2; color: #B91C1C; border-color: #FECACA; }
     .rv-callout.violet { background: #F5F3FF; color: #6D28D9; border-color: #DDD6FE; }
@@ -530,6 +529,7 @@
     html[data-theme="dark"] .rv-callout.green { color: #8CD6AF; border-color: rgba(30, 149, 96, 0.35); }
 
     /* ===== Action panel ===== */
+    .pr-action-title { margin: 0 0 10px; font-size: 14px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; }
     .pr-action-subtitle { margin: -4px 0 12px; font-size: 12px; color: var(--muted); }
     .pr-inline-error {
         margin-top: 10px;
@@ -555,7 +555,6 @@
         background: var(--field, var(--card));
         box-sizing: border-box;
     }
-    html[data-theme="dark"] .reject-textarea { border-color: rgba(227, 106, 106, 0.45); }
     .reject-textarea:focus {
         outline: none;
         border-color: #EF4444;
@@ -629,44 +628,16 @@
         line-height: 1.55;
     }
     .pr-rec-meta { margin-top: 8px; font-size: 12px; color: var(--faint); }
-    .pr-rec-choice { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
-    .pr-rec-choice label {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        border: 1px solid var(--line-strong);
-        border-radius: 8px;
-        padding: 9px 12px;
-        font-size: 13px;
-        font-weight: 600;
-        color: var(--ink);
-        cursor: pointer;
-        background: var(--field, var(--card));
-        transition: border-color 0.12s ease, background-color 0.12s ease;
-    }
-    .pr-rec-choice label:hover { border-color: var(--pine); }
-    .pr-rec-choice input[type="radio"] { accent-color: var(--pine); width: 15px; height: 15px; flex-shrink: 0; }
-    .pr-rec-textarea {
-        width: 100%;
-        min-height: 96px;
-        padding: 10px 12px;
-        border-radius: 8px;
-        border: 1px solid var(--line-strong);
-        resize: vertical;
-        font-size: 13px;
-        font-family: inherit;
-        color: var(--ink);
-        background: var(--field, var(--card));
-        box-sizing: border-box;
-    }
-    .pr-rec-textarea:focus {
-        outline: none;
-        border-color: var(--pine);
-        box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
-    }
-    html[data-theme="dark"] .pr-rec-textarea:focus { box-shadow: 0 0 0 3px rgba(169, 180, 196, 0.18); }
 
-    /* ===== Upload document ===== */
+    /* ===== Administration row ===== */
+    .pr-admin-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+        margin-top: 20px;
+        align-items: start;
+    }
+    @media (max-width: 1100px) { .pr-admin-grid { grid-template-columns: 1fr; } }
     .pr-field { margin-bottom: 14px; }
     .pr-field:last-child { margin-bottom: 0; }
     .pr-field > label {
@@ -676,6 +647,7 @@
         color: var(--ink);
         margin-bottom: 6px;
     }
+    .pr-field input[type="date"],
     .pr-field select,
     .pr-field input[type="file"] {
         width: 100%;
@@ -690,18 +662,22 @@
         box-sizing: border-box;
     }
     .pr-field input[type="file"] { padding: 8px 12px; height: auto; }
-    .pr-field select:focus, .pr-field input:focus {
+    .pr-field input:focus, .pr-field select:focus {
         outline: none;
         border-color: var(--pine);
-        box-shadow: 0 0 0 3px rgba(31, 41, 55, 0.12);
+        box-shadow: 0 0 0 3px rgba(10, 92, 47, 0.10);
     }
-    html[data-theme="dark"] .pr-field select:focus,
-    html[data-theme="dark"] .pr-field input:focus { box-shadow: 0 0 0 3px rgba(169, 180, 196, 0.18); }
     .pr-field-error { margin-top: 6px; font-size: 12.5px; font-weight: 600; color: #b91c1c; }
     html[data-theme="dark"] .pr-field-error { color: #F0A0A0; }
     .pr-help { margin-top: 6px; font-size: 12px; color: var(--muted); line-height: 1.45; }
 
+    .pr-danger-card { border-color: rgba(220, 38, 38, 0.35); }
+    .pr-danger-card .pr-card-head { color: #b91c1c; border-bottom-color: rgba(220, 38, 38, 0.25); }
+    html[data-theme="dark"] .pr-danger-card { border-color: rgba(227, 106, 106, 0.4); }
+    html[data-theme="dark"] .pr-danger-card .pr-card-head { color: #F0A0A0; }
+
     .btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+    .btn:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
 
     @media (max-width: 640px) {
         .rv-grid { grid-template-columns: 1fr; }
@@ -715,7 +691,7 @@
 
 @section('content')
 
-    <a href="{{ route('staff.partnerships.index', $listQuery) }}" class="pr-back">
+    <a href="{{ route('admin.partnerships', $listQuery) }}" class="pr-back">
         <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/>
         </svg>
@@ -799,7 +775,7 @@
                                         @else
                                             <div class="pr-doc-no-preview">
                                                 This file type can't be previewed inline.
-                                                <a href="{{ $file['url'] }}" target="_blank" rel="noopener" style="color: var(--ink); font-weight:700;">Open it in a new tab</a> instead.
+                                                <a href="{{ $file['url'] }}" target="_blank" rel="noopener" style="color: var(--pine); font-weight:700;">Open it in a new tab</a> instead.
                                             </div>
                                         @endif
                                     </div>
@@ -830,7 +806,7 @@
                         @endif
                         <div class="rv-field rv-field-span">
                             <div class="rv-field-label">Business Proposal</div>
-                            <div class="rv-proposal">{{ $application->business_proposal ?: ($application->proposal ?: 'No business proposal submitted.') }}</div>
+                            <div class="rv-proposal">{{ $application->business_proposal ?: 'No business proposal submitted.' }}</div>
                         </div>
                     </div>
                 @else
@@ -918,13 +894,13 @@
                     <div class="pr-card-body">
                         <p class="pr-action-subtitle" style="margin-top:0;">The LOI is previewed under Submitted Documents. Approve to unlock the application form, or reject with a reason.</p>
                         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <form method="POST" action="{{ route('staff.partnerships.wizard.approve-loi', $application) }}">
+                            <form method="POST" action="{{ route('admin.partnerships.wizard.approve-loi', $application) }}">
                                 @csrf
                                 <button type="submit" class="btn btn-green btn-sm">Approve LOI</button>
                             </form>
                             <button type="button" class="btn btn-red btn-sm" id="toggleRejectBtn">Reject LOI</button>
                         </div>
-                        <form method="POST" action="{{ route('staff.partnerships.wizard.reject-loi', $application) }}" id="rejectForm" style="{{ $errors->has('reason') ? '' : 'display:none;' }}margin-top:12px;">
+                        <form method="POST" action="{{ route('admin.partnerships.wizard.reject-loi', $application) }}" id="rejectForm" style="{{ $errors->has('reason') ? '' : 'display:none;' }}margin-top:12px;">
                             @csrf
                             <textarea name="reason" class="reject-textarea" placeholder="Enter reason for rejection (min. 10 characters)...">{{ old('reason') }}</textarea>
                             @error('reason')<div class="pr-inline-error">{{ $message }}</div>@enderror
@@ -940,13 +916,13 @@
                     <div class="pr-card-body">
                         <p class="pr-action-subtitle" style="margin-top:0;">Review the form summary and attachments, then approve or reject.</p>
                         <div style="display:flex;gap:8px;flex-wrap:wrap;">
-                            <form method="POST" action="{{ route('staff.partnerships.wizard.approve-form', $application) }}">
+                            <form method="POST" action="{{ route('admin.partnerships.wizard.approve-form', $application) }}">
                                 @csrf
                                 <button type="submit" class="btn btn-green btn-sm">Approve Form</button>
                             </form>
                             <button type="button" class="btn btn-red btn-sm" id="toggleRejectBtn">Reject Form</button>
                         </div>
-                        <form method="POST" action="{{ route('staff.partnerships.wizard.reject-form', $application) }}" id="rejectForm" style="{{ $errors->has('reason') ? '' : 'display:none;' }}margin-top:12px;">
+                        <form method="POST" action="{{ route('admin.partnerships.wizard.reject-form', $application) }}" id="rejectForm" style="{{ $errors->has('reason') ? '' : 'display:none;' }}margin-top:12px;">
                             @csrf
                             <textarea name="reason" class="reject-textarea" placeholder="Enter reason for rejection (min. 10 characters)...">{{ old('reason') }}</textarea>
                             @error('reason')<div class="pr-inline-error">{{ $message }}</div>@enderror
@@ -979,7 +955,7 @@
                         @foreach ($docLabels as $docLabel)
                             <div class="pr-doc-readonly">&#10003; {{ $docLabel }}</div>
                         @endforeach
-                        <form method="POST" action="{{ route('staff.partnerships.wizard.final-approve', $application) }}"
+                        <form method="POST" action="{{ route('admin.partnerships.wizard.final-approve', $application) }}"
                               onsubmit="return confirm('Grant final approval? This activates the concessionaire account and sends the approval email.');">
                             @csrf
                             <button type="submit" class="btn btn-green" style="width:100%;margin-top:10px;font-weight:800;">Grant Final Approval</button>
@@ -1000,11 +976,11 @@
                 </section>
             @endif
 
-            {{-- Faculty recommendation: submit when not yet reviewed, display afterwards --}}
+            {{-- Faculty recommendation --}}
             <section class="pr-card">
                 <div class="pr-card-head">Faculty Recommendation</div>
                 <div class="pr-card-body">
-                    @if ($application->reviewed_by)
+                    @if ($facultyRec)
                         <span class="pr-rec-badge {{ $facultyRec === 'recommend_approval' ? 'approve' : 'reject' }}">
                             {{ $facultyRec === 'recommend_approval' ? 'Recommends Approval' : 'Recommends Rejection' }}
                         </span>
@@ -1015,54 +991,89 @@
                             <div class="pr-rec-meta">Reviewed by {{ $application->reviewer->name }}</div>
                         @endif
                     @else
-                        <p class="pr-action-subtitle" style="margin-top:0;">Give the admin your recommendation for this application. This can only be submitted once.</p>
-                        <form method="POST" action="{{ route('staff.partnerships.recommend', $application->id) }}">
-                            @csrf
-                            <div class="pr-rec-choice">
-                                <label>
-                                    <input type="radio" name="faculty_recommendation" value="recommend_approval" {{ old('faculty_recommendation') === 'recommend_approval' ? 'checked' : '' }} required>
-                                    Recommend Approval
-                                </label>
-                                <label>
-                                    <input type="radio" name="faculty_recommendation" value="recommend_rejection" {{ old('faculty_recommendation') === 'recommend_rejection' ? 'checked' : '' }} required>
-                                    Recommend Rejection
-                                </label>
-                            </div>
-                            @error('faculty_recommendation')<div class="pr-field-error" style="margin:-6px 0 10px;">{{ $message }}</div>@enderror
-                            <textarea name="faculty_notes" class="pr-rec-textarea" placeholder="Add faculty notes for the admin review context...">{{ old('faculty_notes') }}</textarea>
-                            @error('faculty_notes')<div class="pr-field-error">{{ $message }}</div>@enderror
-                            <button type="submit" class="btn btn-green btn-sm" style="margin-top:10px;">Submit Recommendation</button>
-                        </form>
+                        <div class="pr-notice">No faculty recommendation has been submitted for this application yet.</div>
                     @endif
                 </div>
             </section>
-
-            {{-- Upload on behalf --}}
-            <section class="pr-card">
-                <div class="pr-card-head">Upload Document</div>
-                <div class="pr-card-body">
-                    <form method="POST" action="{{ route('staff.partnerships.upload-document', $application->id) }}" enctype="multipart/form-data">
-                        @csrf
-                        <div class="pr-field">
-                            <label for="document_type">Document Type</label>
-                            <select id="document_type" name="document_type" required>
-                                <option value="letter_of_intent">Letter of Intent</option>
-                                <option value="moa">MOA</option>
-                                <option value="contract">Contract</option>
-                            </select>
-                            @error('document_type')<div class="pr-field-error">{{ $message }}</div>@enderror
-                        </div>
-                        <div class="pr-field">
-                            <label for="document">File</label>
-                            <input type="file" id="document" name="document" accept=".pdf,.jpg,.jpeg,.png" required>
-                            <p class="pr-help">PDF, JPG, or PNG — max 10 MB. Replaces the current file of the same type.</p>
-                            @error('document')<div class="pr-field-error">{{ $message }}</div>@enderror
-                        </div>
-                        <button type="submit" class="btn btn-outline btn-sm">Upload on Behalf</button>
-                    </form>
-                </div>
-            </section>
         </div>
+    </div>
+
+    {{-- ================= Administration ================= --}}
+    <div class="pr-admin-grid">
+        {{-- Contract period --}}
+        <section class="pr-card">
+            <div class="pr-card-head">Contract Period</div>
+            <div class="pr-card-body">
+                @if ($contractEditable)
+                    <form method="POST" action="{{ route('admin.partnerships.contract-period', $application) }}">
+                        @csrf
+                        @method('PATCH')
+                        <div class="pr-field">
+                            <label for="contract_period_start">Start Date</label>
+                            <input type="date" id="contract_period_start" name="contract_period_start"
+                                   value="{{ old('contract_period_start', $application->contract_period_start?->format('Y-m-d')) }}" required>
+                            @error('contract_period_start')<div class="pr-field-error">{{ $message }}</div>@enderror
+                        </div>
+                        <div class="pr-field">
+                            <label for="contract_period_end">End Date</label>
+                            <input type="date" id="contract_period_end" name="contract_period_end"
+                                   value="{{ old('contract_period_end', $application->contract_period_end?->format('Y-m-d')) }}" required>
+                            @error('contract_period_end')<div class="pr-field-error">{{ $message }}</div>@enderror
+                        </div>
+                        @error('contract_period')<div class="pr-field-error" style="margin-bottom:10px;">{{ $message }}</div>@enderror
+                        <button type="submit" class="btn btn-outline btn-sm">Save Contract Period</button>
+                    </form>
+                @else
+                    <div class="pr-notice">
+                        @if ($application->contract_period_start && $application->contract_period_end)
+                            {{ $application->contract_period_start->format('M d, Y') }} — {{ $application->contract_period_end->format('M d, Y') }}
+                        @else
+                            The contract period can only be edited for pending, under-review, approved, or registered applications.
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </section>
+
+        {{-- Upload on behalf --}}
+        <section class="pr-card">
+            <div class="pr-card-head">Upload Document</div>
+            <div class="pr-card-body">
+                <form method="POST" action="{{ route('admin.partnerships.upload-document', $application) }}" enctype="multipart/form-data">
+                    @csrf
+                    <div class="pr-field">
+                        <label for="document_type">Document Type</label>
+                        <select id="document_type" name="document_type" required>
+                            <option value="letter_of_intent">Letter of Intent</option>
+                            <option value="moa">MOA</option>
+                            <option value="contract">Contract</option>
+                        </select>
+                        @error('document_type')<div class="pr-field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <div class="pr-field">
+                        <label for="document">File</label>
+                        <input type="file" id="document" name="document" accept=".pdf,.jpg,.jpeg,.png" required>
+                        <p class="pr-help">PDF, JPG, or PNG — max 10 MB. Replaces the current file of the same type.</p>
+                        @error('document')<div class="pr-field-error">{{ $message }}</div>@enderror
+                    </div>
+                    <button type="submit" class="btn btn-outline btn-sm">Upload on Behalf</button>
+                </form>
+            </div>
+        </section>
+
+        {{-- Danger zone --}}
+        <section class="pr-card pr-danger-card">
+            <div class="pr-card-head">Danger Zone</div>
+            <div class="pr-card-body">
+                <p class="pr-help" style="margin:0 0 12px;">Permanently deletes this application and its uploaded documents. This cannot be undone.</p>
+                <form method="POST" action="{{ route('admin.partnerships.destroy', $application) }}"
+                      onsubmit="return confirm('Delete this partnership application permanently? Uploaded documents will also be removed.');">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-red btn-sm">Delete Application</button>
+                </form>
+            </div>
+        </section>
     </div>
 
 @endsection
@@ -1130,7 +1141,7 @@
         if (!checkboxes.length) return;
 
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '{{ csrf_token() }}';
-        const tickUrl = @json(route('staff.partnerships.wizard.tick-doc', $application));
+        const tickUrl = @json(route('admin.partnerships.wizard.tick-doc', $application));
         const initialWizardStatus = @json($wizardStatus);
         const errorEl = document.getElementById('docsPanelError');
         const banner = document.getElementById('docsDoneBanner');

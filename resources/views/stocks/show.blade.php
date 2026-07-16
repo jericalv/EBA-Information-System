@@ -32,7 +32,7 @@
             --red-deep: #7C1D22;
             --amber: #B45309;
             --font-display: 'Inter', 'Manrope', system-ui, sans-serif;
-            --font-body: 'Manrope', system-ui, -apple-system, sans-serif;
+            --font-body: 'Inter', 'Manrope', system-ui, -apple-system, sans-serif;
             --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
         }
 
@@ -193,43 +193,116 @@
             align-items: start;
         }
 
-        .sd-media {
+        .sd-media { display: flex; flex-direction: column; gap: 12px; }
+        .sd-frame {
             position: relative;
             background-color: var(--paper-deep);
-            background-image: radial-gradient(rgba(24, 36, 32, 0.1) 1px, transparent 1px);
-            background-size: 16px 16px;
             border: 1px solid var(--line);
-            border-radius: 14px;
+            border-radius: 16px;
             overflow: hidden;
             aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
-        .sd-media img {
+        .sd-track {
+            display: flex;
+            height: 100%;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            scrollbar-width: none;
+        }
+        .sd-track::-webkit-scrollbar { display: none; }
+        .sd-slide {
+            flex: 0 0 100%;
+            height: 100%;
+            scroll-snap-align: start;
+            scroll-snap-stop: always;
+        }
+        .sd-slide img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
         }
-        .sd-media svg {
+        .sd-slide.empty {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image: radial-gradient(rgba(24, 36, 32, 0.1) 1px, transparent 1px);
+            background-size: 16px 16px;
+        }
+        .sd-slide.empty svg {
             width: 88px;
             height: 88px;
             color: var(--line-strong);
         }
-        .sd-cat {
+        .sd-arrow {
             position: absolute;
-            top: 14px; left: 14px;
-            font-family: var(--font-mono);
-            font-size: 10px;
-            font-weight: 600;
-            letter-spacing: 1.4px;
-            text-transform: uppercase;
-            background: rgba(255, 255, 255, 0.92);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: 1px solid var(--line);
-            border-radius: 5px;
-            padding: 6px 10px;
-            color: var(--ink-soft);
+            background: rgba(255, 255, 255, 0.94);
+            color: var(--ink);
+            cursor: pointer;
+            opacity: 0;
+            box-shadow: 0 2px 12px rgba(24, 36, 32, 0.14);
+            transition: opacity .2s ease, background-color .2s ease, color .2s ease;
             z-index: 2;
+        }
+        .sd-frame:hover .sd-arrow, .sd-arrow:focus-visible { opacity: 1; }
+        .sd-arrow:hover { background: #fff; color: var(--green); }
+        .sd-arrow.prev { left: 14px; }
+        .sd-arrow.next { right: 14px; }
+        .sd-arrow svg { width: 16px; height: 16px; }
+        @media (hover: none) {
+            .sd-arrow { display: none; }
+        }
+
+        .sd-thumbs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+        .sd-thumb {
+            width: 62px;
+            height: 62px;
+            flex-shrink: 0;
+            padding: 0;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            background: var(--paper-deep);
+            overflow: hidden;
+            cursor: pointer;
+            opacity: 0.65;
+            transition: opacity .2s ease, border-color .2s ease, box-shadow .2s ease;
+        }
+        .sd-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .sd-thumb:hover { opacity: 1; }
+        .sd-thumb.active {
+            opacity: 1;
+            border-color: var(--green);
+            box-shadow: 0 0 0 1px var(--green);
+        }
+        .sd-thumb-count {
+            margin-left: auto;
+            padding-left: 8px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1.2px;
+            color: var(--ink-faint);
+            white-space: nowrap;
         }
 
         .sd-title {
@@ -284,44 +357,71 @@
         .status-pill.out-of-stock { color: var(--red); }
         .status-pill.out-of-stock::before { background: var(--red); }
 
-        /* Summary cards */
-        .summary-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 24px;
+        /* Price line (books) */
+        .sd-price-row {
+            display: flex;
+            align-items: baseline;
+            gap: 12px;
+            margin-bottom: 22px;
         }
-        .summary-row.single { grid-template-columns: 1fr; }
-        .summary-card {
-            background: var(--card-soft);
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 16px 18px;
-        }
-        .summary-label {
+        .sd-price {
             font-family: var(--font-mono);
-            font-size: 10px;
+            font-size: 34px;
+            font-weight: 600;
+            color: var(--green);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+        }
+        .sd-price-unit {
+            font-family: var(--font-mono);
+            font-size: 10.5px;
             font-weight: 600;
             letter-spacing: 1.4px;
             text-transform: uppercase;
             color: var(--ink-faint);
-            margin-bottom: 6px;
         }
-        .summary-value {
+
+        /* Registry ledger panel */
+        .ledger-card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 4px 22px;
+            margin-bottom: 22px;
+        }
+        .ledger-row {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 15px 0;
+            border-bottom: 1px solid var(--line);
+        }
+        .ledger-row:last-child { border-bottom: none; }
+        .ledger-label {
             font-family: var(--font-mono);
-            font-size: 28px;
+            font-size: 10.5px;
             font-weight: 600;
-            color: var(--green);
-            line-height: 1.1;
-            font-variant-numeric: tabular-nums;
+            letter-spacing: 1.4px;
+            text-transform: uppercase;
+            color: var(--ink-faint);
         }
-        .summary-value.low-stock { color: var(--amber); }
-        .summary-value.out-of-stock { color: var(--red); }
-        .summary-value small {
-            font-size: 12px;
+        .ledger-value {
+            font-family: var(--font-mono);
+            font-size: 14.5px;
+            font-weight: 600;
+            color: var(--ink);
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+        .ledger-value.available { color: var(--green); }
+        .ledger-value.low-stock { color: var(--amber); }
+        .ledger-value.out-of-stock { color: var(--red); }
+        .ledger-value small {
+            font-size: 11px;
             font-weight: 500;
             color: var(--ink-faint);
-            margin-left: 4px;
+            margin-left: 3px;
         }
 
         /* ===== SIZE RUN BOARD (signature) ===== */
@@ -554,7 +654,7 @@
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
             .stock-detail { grid-template-columns: 1fr; gap: 26px; }
-            .sd-media { max-height: 380px; }
+            .sd-frame { aspect-ratio: 4 / 3; }
         }
         @media (max-width: 768px) {
             .nav-links { display: none; }
@@ -670,17 +770,45 @@
             </div>
 
             <div class="stock-detail">
+                @php $gallery = $stock->galleryPaths(); @endphp
                 <div class="sd-media">
-                    @if($stock->image)
-                        <img src="{{ asset('storage/' . $stock->image) }}" alt="{{ $stock->item_name }}">
-                    @else
-                        <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5 12 3l8.25 4.5L12 12 3.75 7.5Z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12 12 16.5 20.25 12"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 16.5 12 21l8.25-4.5"/>
-                        </svg>
+                    <div class="sd-frame">
+                        <div class="sd-track" id="sdTrack">
+                            @forelse($gallery as $path)
+                                <div class="sd-slide">
+                                    <img src="{{ asset('storage/' . $path) }}" alt="{{ $stock->item_name }} — photo {{ $loop->iteration }}" @if(!$loop->first) loading="lazy" @endif>
+                                </div>
+                            @empty
+                                <div class="sd-slide empty">
+                                    <svg fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5 12 3l8.25 4.5L12 12 3.75 7.5Z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12 12 16.5 20.25 12"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 16.5 12 21l8.25-4.5"/>
+                                    </svg>
+                                </div>
+                            @endforelse
+                        </div>
+
+                        @if(count($gallery) > 1)
+                            <button type="button" class="sd-arrow prev" id="sdPrev" aria-label="Previous photo">
+                                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5"/></svg>
+                            </button>
+                            <button type="button" class="sd-arrow next" id="sdNext" aria-label="Next photo">
+                                <svg fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5"/></svg>
+                            </button>
+                        @endif
+                    </div>
+
+                    @if(count($gallery) > 1)
+                        <div class="sd-thumbs" id="sdThumbs">
+                            @foreach($gallery as $path)
+                                <button type="button" class="sd-thumb {{ $loop->first ? 'active' : '' }}" data-index="{{ $loop->index }}" aria-label="Show photo {{ $loop->iteration }}">
+                                    <img src="{{ asset('storage/' . $path) }}" alt="" loading="lazy">
+                                </button>
+                            @endforeach
+                            <span class="sd-thumb-count" id="sdCount">1 / {{ count($gallery) }}</span>
+                        </div>
                     @endif
-                    <span class="sd-cat">{{ $stock->item_type ?? 'Stock' }}</span>
                 </div>
 
                 <section class="stock-content" aria-label="Stock details">
@@ -689,24 +817,30 @@
 
                     <div class="sd-meta">
                         <span class="status-pill {{ $stockStatusClass }}">{{ $stockStatusLabel }}</span>
-                        <span><strong>REF</strong> #{{ str_pad($stock->id, 4, '0', STR_PAD_LEFT) }}</span>
-                        <span>&middot;</span>
-                        <span><strong>As of</strong> {{ date('F Y') }}</span>
+                        <span><strong>Official campus stock</strong> &mdash; CvSU Trece Martires</span>
                     </div>
 
                     @auth
-                    <div class="summary-row {{ ($stock->item_type ?? null) === 'books' && $stock->unit_price > 0 ? '' : 'single' }}">
-                        <div class="summary-card">
-                            <p class="summary-label">Quantity on hand</p>
-                            <div class="summary-value {{ $stockStatusClass }}">{{ number_format($stockQty) }}<small>pcs</small></div>
+                    @if(($stock->item_type ?? null) === 'books' && $stock->unit_price > 0)
+                        <div class="sd-price-row">
+                            <span class="sd-price">&#8369;{{ number_format($stock->unit_price, 2) }}</span>
+                            <span class="sd-price-unit">per copy</span>
                         </div>
+                    @endif
 
-                        @if(($stock->item_type ?? null) === 'books' && $stock->unit_price > 0)
-                            <div class="summary-card">
-                                <p class="summary-label">Price</p>
-                                <div class="summary-value">&#8369;{{ number_format($stock->unit_price, 2) }}</div>
-                            </div>
-                        @endif
+                    <div class="ledger-card">
+                        <div class="ledger-row">
+                            <span class="ledger-label">Quantity on hand</span>
+                            <span class="ledger-value {{ $stockStatusClass }}">{{ number_format($stockQty) }}<small>pcs</small></span>
+                        </div>
+                        <div class="ledger-row">
+                            <span class="ledger-label">Category</span>
+                            <span class="ledger-value">{{ ucfirst($stock->item_type ?? 'Stock') }}</span>
+                        </div>
+                        <div class="ledger-row">
+                            <span class="ledger-label">Record as of</span>
+                            <span class="ledger-value">{{ date('F Y') }}</span>
+                        </div>
                     </div>
 
                     @if(($stock->item_type ?? null) === 'uniforms' && !empty($sizeRun))
@@ -798,6 +932,44 @@
         function toggleMenu() {
             document.getElementById('navLinks').classList.toggle('active');
         }
+
+        // Stock photo gallery
+        (() => {
+            const track = document.getElementById('sdTrack');
+            if (!track) return;
+
+            const slides = track.querySelectorAll('.sd-slide');
+            const prevBtn = document.getElementById('sdPrev');
+            const nextBtn = document.getElementById('sdNext');
+            const counter = document.getElementById('sdCount');
+            const thumbs = document.querySelectorAll('#sdThumbs .sd-thumb');
+
+            const slideWidth = () => slides[0] ? slides[0].getBoundingClientRect().width : track.clientWidth;
+            const currentIndex = () => Math.min(slides.length - 1, Math.max(0, Math.round(track.scrollLeft / slideWidth())));
+
+            const goTo = (index) => {
+                const clamped = Math.min(slides.length - 1, Math.max(0, index));
+                track.scrollTo({ left: clamped * slideWidth(), behavior: 'smooth' });
+            };
+
+            prevBtn?.addEventListener('click', () => goTo(currentIndex() - 1));
+            nextBtn?.addEventListener('click', () => goTo(currentIndex() + 1));
+            thumbs.forEach((thumb) => {
+                thumb.addEventListener('click', () => goTo(Number(thumb.dataset.index || 0)));
+            });
+
+            let ticking = false;
+            track.addEventListener('scroll', () => {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(() => {
+                    const index = currentIndex();
+                    if (counter) counter.textContent = (index + 1) + ' / ' + slides.length;
+                    thumbs.forEach((thumb, i) => thumb.classList.toggle('active', i === index));
+                    ticking = false;
+                });
+            });
+        })();
 
         // Price / Sizes view switch
         const sizeBoard = document.getElementById('sizeBoard');

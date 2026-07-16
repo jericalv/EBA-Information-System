@@ -9,6 +9,7 @@ use App\Models\ConcessionairePayment;
 use App\Models\ConcessionaireReview;
 use App\Models\PartnershipApplication;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductReview;
 use App\Models\User;
 use App\Services\WordFilterService;
@@ -341,14 +342,15 @@ class ConcessionaireController extends Controller
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'category' => 'required|string|max:100',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_available' => 'nullable|boolean',
         ]);
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('products/' . $user->id, 'public');
-            $imagePath = $this->normalizeStoredImagePath($imagePath);
+        $imagePaths = [];
+        foreach ($request->file('images', []) as $file) {
+            $path = $file->store('products/' . $user->id, 'public');
+            $imagePaths[] = $this->normalizeStoredImagePath($path);
         }
 
         $product = Product::create([
@@ -357,11 +359,19 @@ class ConcessionaireController extends Controller
             'description' => $validated['description'] ?? null,
             'price' => $validated['price'],
             'category' => $validated['category'],
-            'image' => $imagePath,
+            'image' => $imagePaths[0] ?? null,
             'is_available' => array_key_exists('is_available', $validated)
                 ? (bool) $validated['is_available']
                 : true,
         ]);
+
+        foreach ($imagePaths as $order => $path) {
+            ProductImage::create([
+                'product_id' => $product->id,
+                'path' => $path,
+                'sort_order' => $order,
+            ]);
+        }
 
         ActivityLog::log(
             'product_created',
@@ -383,8 +393,25 @@ class ConcessionaireController extends Controller
     public function edit(Product $product)
     {
         $this->authorizeProductOwnership($product);
+        $this->ensureGalleryBackfill($product);
 
         return view('concessionaire.edit-product', compact('product'));
+    }
+
+    /**
+     * Move a legacy single-image product into the gallery table so the
+     * edit form can manage every photo uniformly.
+     */
+    private function ensureGalleryBackfill(Product $product): void
+    {
+        if ($product->image && $product->images()->count() === 0) {
+            ProductImage::create([
+                'product_id' => $product->id,
+                'path' => $this->normalizeStoredImagePath($product->image),
+                'sort_order' => 0,
+            ]);
+            $product->unsetRelation('images');
+        }
     }
 
     /**
@@ -394,30 +421,54 @@ class ConcessionaireController extends Controller
     {
         $this->authorizeProductOwnership($product);
 
+        $this->ensureGalleryBackfill($product);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'price' => 'required|numeric|min:0',
             'category' => 'required|string|max:100',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'integer',
             'is_available' => 'nullable|boolean',
         ]);
 
-        $imagePath = $product->image;
-        if ($request->hasFile('image')) {
-            if ($product->image) {
-                Storage::disk('public')->delete($this->normalizeStoredImagePath($product->image));
-            }
-            $imagePath = $request->file('image')->store('products/' . $product->concessionaire_id, 'public');
-            $imagePath = $this->normalizeStoredImagePath($imagePath);
+        $removeIds = array_map('intval', $validated['remove_images'] ?? []);
+        $toRemove = $product->images()->whereIn('id', $removeIds)->get();
+        $keptCount = $product->images()->count() - $toRemove->count();
+        $newFiles = $request->file('images', []);
+
+        if ($keptCount + count($newFiles) > 5) {
+            return back()
+                ->withErrors(['images' => 'A product can have at most 5 photos. Remove some photos before adding new ones.'])
+                ->withInput();
         }
+
+        foreach ($toRemove as $image) {
+            Storage::disk('public')->delete($this->normalizeStoredImagePath($image->path));
+            $image->delete();
+        }
+
+        $nextOrder = (int) $product->images()->max('sort_order') + 1;
+        foreach ($newFiles as $file) {
+            $path = $file->store('products/' . $product->concessionaire_id, 'public');
+            ProductImage::create([
+                'product_id' => $product->id,
+                'path' => $this->normalizeStoredImagePath($path),
+                'sort_order' => $nextOrder++,
+            ]);
+        }
+
+        $product->unsetRelation('images');
 
         $product->update([
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
             'price' => $validated['price'],
             'category' => $validated['category'],
-            'image' => $imagePath,
+            'image' => $product->images()->orderBy('sort_order')->orderBy('id')->value('path'),
             'is_available' => array_key_exists('is_available', $validated)
                 ? (bool) $validated['is_available']
                 : $product->is_available,
@@ -444,9 +495,14 @@ class ConcessionaireController extends Controller
     {
         $this->authorizeProductOwnership($product);
 
+        $paths = $product->images()->pluck('path')->all();
         if ($product->image) {
-            Storage::disk('public')->delete($this->normalizeStoredImagePath($product->image));
+            $paths[] = $product->image;
         }
+        foreach (array_unique($paths) as $path) {
+            Storage::disk('public')->delete($this->normalizeStoredImagePath($path));
+        }
+        $product->images()->delete();
 
         $productId = $product->id;
         $productName = $product->name;

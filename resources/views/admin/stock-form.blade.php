@@ -43,7 +43,9 @@
         'quantities' => $quantitiesState,
         'bookPrice' => (float) old('book_price', $stock->unit_price ?? 0),
         'bookQty' => (int) old('quantity', $stock->quantity ?? 0),
-        'currentImage' => $isEdit && $stock->image ? asset('storage/' . $stock->image) : '',
+        'currentImages' => $isEdit
+            ? $stock->images->map(fn ($img) => ['id' => $img->id, 'url' => asset('storage/' . $img->path)])->values()->all()
+            : [],
         'sizeKeys' => $sizeKeys,
     ];
 
@@ -238,44 +240,57 @@
         color: var(--muted);
     }
 
-    /* ---------- Image dropzone ---------- */
-    .image-dropzone {
-        border: 2px dashed var(--line-strong);
-        border-radius: 12px;
+    /* ---------- Photo manager ---------- */
+    .photo-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+        gap: 10px;
+    }
+    .photo-tile {
+        position: relative;
+        border: 1px solid var(--line-strong);
+        border-radius: 10px;
+        overflow: hidden;
         background: var(--hover);
-        padding: 24px 20px;
+        aspect-ratio: 1;
+    }
+    .photo-tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: opacity 0.15s ease; }
+    .photo-tile.marked { border-color: #dc2626; }
+    .photo-tile.marked img { opacity: 0.35; }
+    .photo-tile-btn {
+        position: absolute;
+        left: 50%;
+        bottom: 6px;
+        transform: translateX(-50%);
+        border: 1px solid var(--line-strong);
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.92);
+        color: #dc2626;
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 3px 8px;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    html[data-theme="dark"] .photo-tile-btn { background: rgba(20, 25, 32, 0.9); color: #F0A0A0; }
+    .photo-add {
+        border: 2px dashed var(--line-strong);
+        border-radius: 10px;
+        background: var(--hover);
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         text-align: center;
+        font-size: 12.5px;
+        font-weight: 700;
+        color: var(--pine);
         cursor: pointer;
         transition: border-color 0.15s ease;
     }
-    .image-dropzone:hover { border-color: var(--pine); }
-    .image-dropzone-preview {
-        width: 88px;
-        height: 88px;
-        border-radius: 10px;
-        overflow: hidden;
-        margin: 0 auto 12px;
-        border: 1px solid var(--line);
-        background: var(--card);
-    }
-    .image-dropzone-preview img { width: 100%; height: 100%; object-fit: cover; }
-    .image-dropzone-title {
-        font-size: 13.5px;
-        font-weight: 700;
-        color: var(--pine);
-        text-decoration: underline;
-        text-underline-offset: 2px;
-    }
-    .image-dropzone-hint { margin-top: 5px; font-size: 12px; color: var(--faint); }
-    .image-dropzone-remove {
-        margin-top: 8px;
-        display: inline-block;
-        font-size: 12px;
-        font-weight: 700;
-        color: #dc2626;
-        cursor: pointer;
-    }
-    .image-dropzone-remove:hover { text-decoration: underline; }
+    .photo-add:hover { border-color: var(--pine); }
+    .photo-counter { font-weight: 700; color: var(--faint); margin-left: 6px; }
+    .photo-counter.over { color: #dc2626; }
 
     .sform-visible-row {
         display: flex;
@@ -406,22 +421,29 @@
                 </div>
 
                 <div class="sform-field">
-                    <label>Item Image</label>
-                    <div class="image-dropzone" @click="$refs.imageInput.click()">
-                        <template x-if="imagePreview">
-                            <div class="image-dropzone-preview"><img :src="imagePreview" alt="Selected image preview"></div>
+                    <label>Item Photos <span class="photo-counter" :class="{ over: photoOver }" x-text="photoTotal + ' / 5'"></span></label>
+                    <div class="photo-grid">
+                        <template x-for="img in currentImages" :key="'c' + img.id">
+                            <div class="photo-tile" :class="{ marked: removeIds.includes(img.id) }">
+                                <img :src="img.url" alt="Item photo">
+                                <button type="button" class="photo-tile-btn" @click="toggleRemove(img.id)" x-text="removeIds.includes(img.id) ? 'Undo' : 'Remove'"></button>
+                            </div>
                         </template>
-                        <template x-if="!imagePreview && currentImage && !removeImage">
-                            <div class="image-dropzone-preview"><img :src="currentImage" alt="Current item image"></div>
+                        <template x-for="(src, i) in newPreviews" :key="'n' + i">
+                            <div class="photo-tile">
+                                <img :src="src" alt="New photo preview">
+                                <button type="button" class="photo-tile-btn" @click="removeNew(i)">Remove</button>
+                            </div>
                         </template>
-                        <div class="image-dropzone-title" x-text="hasImage ? 'Click to change item image' : 'Click to upload item image'"></div>
-                        <div class="image-dropzone-hint">JPG, PNG, or WebP — max 2 MB</div>
-                        <span class="image-dropzone-remove" x-show="hasImage" x-cloak @click.stop="clearImage($refs.imageInput)">Remove image</span>
+                        <button type="button" class="photo-add" x-show="photoTotal < 5" @click="$refs.imageInput.click()">+ Add photo</button>
                     </div>
-                    <input type="file" x-ref="imageInput" name="image" accept=".jpg,.jpeg,.png,.webp" style="display:none;" @change="handleImage($refs.imageInput)">
-                    <input type="hidden" name="remove_image" :value="removeImage ? '1' : '0'">
-                    <p class="sform-help">Optional. A placeholder is shown on the public page if none is provided.</p>
-                    @error('image')<div class="sform-error">{{ $message }}</div>@enderror
+                    <input type="file" x-ref="imageInput" name="images[]" multiple accept=".jpg,.jpeg,.png,.webp" style="display:none;" @change="addImages($refs.imageInput)">
+                    <template x-for="id in removeIds" :key="'r' + id">
+                        <input type="hidden" name="remove_images[]" :value="id">
+                    </template>
+                    <p class="sform-help">Optional, up to 5 photos (JPG, PNG, or WebP — max 2 MB each). The first photo is the cover shown on listings.</p>
+                    @error('images')<div class="sform-error">{{ $message }}</div>@enderror
+                    @error('images.*')<div class="sform-error">{{ $message }}</div>@enderror
                 </div>
 
                 <div class="sform-field">
@@ -594,15 +616,22 @@
             quantities: state.quantities,
             bookPrice: state.bookPrice,
             bookQty: state.bookQty,
-            currentImage: state.currentImage,
-            imagePreview: '',
-            removeImage: false,
+            currentImages: state.currentImages,
+            removeIds: [],
+            newPreviews: [],
+            dt: new DataTransfer(),
 
             get totalQuantity() {
                 return this.sizesAvailable.reduce((sum, size) => sum + (Number(this.quantities[size]) || 0), 0);
             },
-            get hasImage() {
-                return !!this.imagePreview || (!!this.currentImage && !this.removeImage);
+            get keptCount() {
+                return this.currentImages.length - this.removeIds.length;
+            },
+            get photoTotal() {
+                return this.keptCount + this.newPreviews.length;
+            },
+            get photoOver() {
+                return this.photoTotal > 5;
             },
 
             hasPricingData() {
@@ -637,21 +666,30 @@
                 });
             },
 
-            handleImage(input) {
-                const file = input.files && input.files[0];
-                if (!file) { return; }
-                this.removeImage = false;
-                const reader = new FileReader();
-                reader.onload = (e) => { this.imagePreview = e.target.result; };
-                reader.readAsDataURL(file);
-            },
-            clearImage(input) {
-                if (input) { input.value = ''; }
-                if (this.imagePreview) {
-                    this.imagePreview = '';
+            toggleRemove(id) {
+                const idx = this.removeIds.indexOf(id);
+                if (idx === -1) {
+                    this.removeIds.push(id);
                 } else {
-                    this.removeImage = true;
+                    this.removeIds.splice(idx, 1);
                 }
+            },
+            addImages(input) {
+                for (const file of Array.from(input.files || [])) {
+                    if (this.keptCount + this.dt.items.length >= 5) { break; }
+                    this.dt.items.add(file);
+                    const slot = this.newPreviews.length;
+                    this.newPreviews.push('');
+                    const reader = new FileReader();
+                    reader.onload = (e) => { this.newPreviews[slot] = e.target.result; };
+                    reader.readAsDataURL(file);
+                }
+                input.files = this.dt.files;
+            },
+            removeNew(index) {
+                this.dt.items.remove(index);
+                this.newPreviews.splice(index, 1);
+                this.$refs.imageInput.files = this.dt.files;
             },
         };
     }

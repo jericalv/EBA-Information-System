@@ -15,6 +15,8 @@ class StockController extends Controller
             abort(404);
         }
 
+        $stock->load('images');
+
         return view('stocks.show', compact('stock'));
     }
 }

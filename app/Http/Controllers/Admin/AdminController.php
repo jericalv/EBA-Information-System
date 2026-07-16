@@ -19,6 +19,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\StockMovement;
 use App\Models\UniformStock;
+use App\Models\UniformStockImage;
 use App\Models\User;
 use App\Services\ConcessionaireFeeService;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -90,16 +91,6 @@ class AdminController extends Controller
                 ?: trim(($application->first_name ?? '') . ' ' . ($application->last_name ?? ''))
                 ?: 'Concessionaire';
 
-            // Search term for the notification link. Built from the application's
-            // own name columns (first/middle/last) so it reliably matches the
-            // partnerships search — never from user->name, which may carry a
-            // suffix that isn't stored on the application. Falls back to the id.
-            $searchTerm = trim(implode(' ', array_filter([
-                $application->first_name,
-                $application->middle_name,
-                $application->last_name,
-            ]))) ?: (string) $application->id;
-
             $steps = [
                 ['key' => 'loi_submitted_at', 'label' => 'Submitted Letter of Intent'],
                 ['key' => 'form_submitted_at', 'label' => 'Submitted Application Form'],
@@ -116,7 +107,6 @@ class AdminController extends Controller
                 $events->push([
                     'application_id' => $application->id,
                     'concessionaire_name' => $concessionaireName,
-                    'search_term' => $searchTerm,
                     'step_label' => $step['label'],
                     'submitted_at' => $submittedAt,
                     // "New" until the admin next opens the bell (marks read).
@@ -644,6 +634,19 @@ class AdminController extends Controller
     }
 
     /**
+     * Dedicated review page for a single partnership application.
+     */
+    public function partnershipsShow(PartnershipApplication $application)
+    {
+        $application->load([
+            'user:id,name,email,business_name,is_active_concessionaire,is_approved',
+            'reviewer:id,name',
+        ]);
+
+        return $this->adminView('admin.partnership-review', compact('application'));
+    }
+
+    /**
      * Reject a partnership application.
      */
     public function rejectPartnership(Request $request, $id)
@@ -700,7 +703,7 @@ class AdminController extends Controller
     {
         try {
             if ($application->wizard_status !== 'loi_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is no longer awaiting LOI review.');
             }
 
             $application->update([
@@ -724,25 +727,22 @@ class AdminController extends Controller
                 ));
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Letter of Intent approved. Concessionaire can now fill the application form.',
-            ]);
+            return back()->with('success', 'Letter of Intent approved. The concessionaire can now fill the application form.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Approving the Letter of Intent failed: ' . $e->getMessage());
         }
     }
 
     public function wizardRejectLOI(Request $request, PartnershipApplication $application)
     {
+        $request->validate([
+            'reason' => 'required|string|min:10|max:500',
+        ]);
+
         try {
             if ($application->wizard_status !== 'loi_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is no longer awaiting LOI review.');
             }
-
-            $request->validate([
-                'reason' => 'required|string|min:10|max:500',
-            ]);
 
             $application->update([
                 'wizard_status' => 'loi_rejected',
@@ -759,12 +759,9 @@ class AdminController extends Controller
                 ]
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Letter of Intent rejected.',
-            ]);
+            return back()->with('success', 'Letter of Intent rejected. The applicant will be asked to resubmit.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Rejecting the Letter of Intent failed: ' . $e->getMessage());
         }
     }
 
@@ -772,7 +769,7 @@ class AdminController extends Controller
     {
         try {
             if ($application->wizard_status !== 'form_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is no longer awaiting form review.');
             }
 
             $application->update([
@@ -796,25 +793,22 @@ class AdminController extends Controller
                 ));
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Application form approved. Track physical documents next.',
-            ]);
+            return back()->with('success', 'Application form approved. Track the physical documents next.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Approving the application form failed: ' . $e->getMessage());
         }
     }
 
     public function wizardRejectForm(Request $request, PartnershipApplication $application)
     {
+        $request->validate([
+            'reason' => 'required|string|min:10|max:500',
+        ]);
+
         try {
             if ($application->wizard_status !== 'form_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is no longer awaiting form review.');
             }
-
-            $request->validate([
-                'reason' => 'required|string|min:10|max:500',
-            ]);
 
             $application->update([
                 'wizard_status' => 'form_rejected',
@@ -831,12 +825,9 @@ class AdminController extends Controller
                 ]
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Application form rejected.',
-            ]);
+            return back()->with('success', 'Application form rejected. The applicant will be asked to resubmit.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Rejecting the application form failed: ' . $e->getMessage());
         }
     }
 
@@ -916,7 +907,7 @@ class AdminController extends Controller
     {
         try {
             if ($application->wizard_status !== 'receipt_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is not awaiting final approval.');
             }
 
             $application->update([
@@ -954,12 +945,9 @@ class AdminController extends Controller
                 Log::warning('PartnershipApprovedMail failed: ' . $mailEx->getMessage());
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Application fully approved. Concessionaire can now access their dashboard.',
-            ]);
+            return back()->with('success', 'Application fully approved. The concessionaire can now access their dashboard.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Final approval failed: ' . $e->getMessage());
         }
     }
 
@@ -1115,7 +1103,9 @@ class AdminController extends Controller
 
         $application->delete();
 
-        return back()->with('success', 'Partnership application deleted.');
+        // Redirect to the index rather than back(): the delete now happens from
+        // the application's own review page, which no longer exists.
+        return redirect()->route('admin.partnerships')->with('success', 'Partnership application deleted.');
     }
 
     /**
@@ -1847,9 +1837,26 @@ class AdminController extends Controller
      */
     public function editStock(UniformStock $stock)
     {
+        $this->ensureStockGalleryBackfill($stock);
         $movements = $stock->movements()->with('user:id,name')->latest()->limit(10)->get();
 
         return $this->adminView('admin.stock-form', compact('stock', 'movements'));
+    }
+
+    /**
+     * Move a legacy single-image item into the gallery table so the
+     * edit form can manage every photo uniformly.
+     */
+    private function ensureStockGalleryBackfill(UniformStock $stock): void
+    {
+        if ($stock->image && $stock->images()->count() === 0) {
+            UniformStockImage::create([
+                'uniform_stock_id' => $stock->id,
+                'path' => $stock->image,
+                'sort_order' => 0,
+            ]);
+            $stock->unsetRelation('images');
+        }
     }
 
     /**
@@ -1872,8 +1879,10 @@ class AdminController extends Controller
             'price_mode' => ['nullable', Rule::in(['single', 'per_size'])],
             'uniform_price' => 'nullable|numeric|min:0|max:999999.99',
             'low_stock_threshold' => 'required|integer|min:0|max:10000',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'remove_image' => 'nullable|boolean',
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'integer',
             'is_visible' => 'nullable|boolean',
         ], [
             'sizes_available.required_if' => 'Select at least one size this uniform comes in.',
@@ -1933,15 +1942,15 @@ class AdminController extends Controller
             $unitPrice = max(0, (float) ($validated['book_price'] ?? 0));
         }
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('stocks', 'public');
+        $imagePaths = [];
+        foreach ($request->file('images', []) as $file) {
+            $imagePaths[] = $file->store('stocks', 'public');
         }
 
         $stock = UniformStock::create([
             'item_name' => $validated['item_name'],
             'icon' => null,
-            'image' => $imagePath,
+            'image' => $imagePaths[0] ?? null,
             'item_type' => $itemType,
             'sizes' => $sizes,
             'prices' => $prices,
@@ -1950,6 +1959,14 @@ class AdminController extends Controller
             'low_stock_threshold' => (int) $validated['low_stock_threshold'],
             'is_visible' => (bool) ($validated['is_visible'] ?? false),
         ]);
+
+        foreach ($imagePaths as $order => $path) {
+            UniformStockImage::create([
+                'uniform_stock_id' => $stock->id,
+                'path' => $path,
+                'sort_order' => $order,
+            ]);
+        }
 
         if ($itemType === 'uniforms') {
             foreach ($sizes as $sizeKey => $sizeQuantity) {
@@ -2001,19 +2018,35 @@ class AdminController extends Controller
         $oldSizes = is_array($stock->sizes) ? $stock->sizes : [];
         $oldImage = $stock->image;
 
-        if ($request->hasFile('image')) {
-            if ($stock->image) {
-                Storage::disk('public')->delete($stock->image);
-            }
+        $this->ensureStockGalleryBackfill($stock);
 
-            $stock->image = $request->file('image')->store('stocks', 'public');
-        } elseif ($request->boolean('remove_image')) {
-            if ($stock->image) {
-                Storage::disk('public')->delete($stock->image);
-            }
+        $removeIds = array_map('intval', $validated['remove_images'] ?? []);
+        $toRemove = $stock->images()->whereIn('id', $removeIds)->get();
+        $keptCount = $stock->images()->count() - $toRemove->count();
+        $newFiles = $request->file('images', []);
 
-            $stock->image = null;
+        if ($keptCount + count($newFiles) > 5) {
+            return back()
+                ->withErrors(['images' => 'An item can have at most 5 photos. Remove some photos before adding new ones.'])
+                ->withInput();
         }
+
+        foreach ($toRemove as $image) {
+            Storage::disk('public')->delete($image->path);
+            $image->delete();
+        }
+
+        $nextOrder = (int) $stock->images()->max('sort_order') + 1;
+        foreach ($newFiles as $file) {
+            UniformStockImage::create([
+                'uniform_stock_id' => $stock->id,
+                'path' => $file->store('stocks', 'public'),
+                'sort_order' => $nextOrder++,
+            ]);
+        }
+
+        $stock->unsetRelation('images');
+        $stock->image = $stock->images()->orderBy('sort_order')->orderBy('id')->value('path');
 
         $itemType = $validated['item_type'];
         $prices = null;
@@ -2220,8 +2253,12 @@ class AdminController extends Controller
 
         $stock->salesOrderItems()->delete();
 
+        $paths = $stock->images()->pluck('path')->all();
         if ($imagePath) {
-            Storage::disk('public')->delete($imagePath);
+            $paths[] = $imagePath;
+        }
+        foreach (array_unique($paths) as $path) {
+            Storage::disk('public')->delete($path);
         }
 
         $stock->delete();

@@ -110,6 +110,7 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     
     // Partnership Applications
     Route::get('/partnerships', [AdminController::class, 'partnerships'])->name('partnerships');
+    Route::get('/partnerships/{application}', [AdminController::class, 'partnershipsShow'])->whereNumber('application')->name('partnerships.show');
     Route::post('/partnerships/{id}/reject', [AdminController::class, 'rejectPartnership'])->name('partnerships.reject');
     Route::patch('/partnerships/{application}/contract-period', [AdminController::class, 'saveContractPeriod'])->name('partnerships.contract-period');
     Route::get('/partnerships/{application}/document/{type}', [AdminController::class, 'viewPartnershipDocument'])->name('partnerships.document');

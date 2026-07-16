@@ -13,6 +13,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesOrderItem;
 use App\Models\StockMovement;
 use App\Models\UniformStock;
+use App\Models\UniformStockImage;
 use App\Models\User;
 use App\Services\ConcessionaireFeeService;
 use Illuminate\Database\Eloquent\Collection;
@@ -366,9 +367,26 @@ class FacultyController extends Controller
      */
     public function editStock(UniformStock $stock)
     {
+        $this->ensureStockGalleryBackfill($stock);
         $movements = $stock->movements()->with('user:id,name')->latest()->limit(10)->get();
 
         return $this->facultyView('faculty.stock-form', compact('stock', 'movements'));
+    }
+
+    /**
+     * Move a legacy single-image item into the gallery table so the
+     * edit form can manage every photo uniformly.
+     */
+    private function ensureStockGalleryBackfill(UniformStock $stock): void
+    {
+        if ($stock->image && $stock->images()->count() === 0) {
+            UniformStockImage::create([
+                'uniform_stock_id' => $stock->id,
+                'path' => $stock->image,
+                'sort_order' => 0,
+            ]);
+            $stock->unsetRelation('images');
+        }
     }
 
     /**
@@ -391,8 +409,10 @@ class FacultyController extends Controller
             'price_mode' => ['nullable', Rule::in(['single', 'per_size'])],
             'uniform_price' => 'nullable|numeric|min:0|max:999999.99',
             'low_stock_threshold' => 'required|integer|min:0|max:10000',
-            'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
-            'remove_image' => 'nullable|boolean',
+            'images' => 'nullable|array|max:5',
+            'images.*' => 'image|mimes:jpg,jpeg,png,webp|max:2048',
+            'remove_images' => 'nullable|array',
+            'remove_images.*' => 'integer',
             'is_visible' => 'nullable|boolean',
         ], [
             'sizes_available.required_if' => 'Select at least one size this uniform comes in.',
@@ -449,15 +469,15 @@ class FacultyController extends Controller
             $unitPrice = max(0, (float) ($validated['book_price'] ?? 0));
         }
 
-        $imagePath = null;
-        if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('stocks', 'public');
+        $imagePaths = [];
+        foreach ($request->file('images', []) as $file) {
+            $imagePaths[] = $file->store('stocks', 'public');
         }
 
         $stock = UniformStock::create([
             'item_name' => $validated['item_name'],
             'icon' => null,
-            'image' => $imagePath,
+            'image' => $imagePaths[0] ?? null,
             'item_type' => $itemType,
             'sizes' => $sizes,
             'prices' => $prices,
@@ -466,6 +486,14 @@ class FacultyController extends Controller
             'low_stock_threshold' => (int) $validated['low_stock_threshold'],
             'is_visible' => (bool) ($validated['is_visible'] ?? false),
         ]);
+
+        foreach ($imagePaths as $order => $path) {
+            UniformStockImage::create([
+                'uniform_stock_id' => $stock->id,
+                'path' => $path,
+                'sort_order' => $order,
+            ]);
+        }
 
         if ($itemType === 'uniforms') {
             foreach ($sizes as $sizeKey => $sizeQuantity) {
@@ -517,19 +545,35 @@ class FacultyController extends Controller
         $oldSizes = is_array($stock->sizes) ? $stock->sizes : [];
         $oldImage = $stock->image;
 
-        if ($request->hasFile('image')) {
-            if ($stock->image) {
-                Storage::disk('public')->delete($stock->image);
-            }
+        $this->ensureStockGalleryBackfill($stock);
 
-            $stock->image = $request->file('image')->store('stocks', 'public');
-        } elseif ($request->boolean('remove_image')) {
-            if ($stock->image) {
-                Storage::disk('public')->delete($stock->image);
-            }
+        $removeIds = array_map('intval', $validated['remove_images'] ?? []);
+        $toRemove = $stock->images()->whereIn('id', $removeIds)->get();
+        $keptCount = $stock->images()->count() - $toRemove->count();
+        $newFiles = $request->file('images', []);
 
-            $stock->image = null;
+        if ($keptCount + count($newFiles) > 5) {
+            return back()
+                ->withErrors(['images' => 'An item can have at most 5 photos. Remove some photos before adding new ones.'])
+                ->withInput();
         }
+
+        foreach ($toRemove as $image) {
+            Storage::disk('public')->delete($image->path);
+            $image->delete();
+        }
+
+        $nextOrder = (int) $stock->images()->max('sort_order') + 1;
+        foreach ($newFiles as $file) {
+            UniformStockImage::create([
+                'uniform_stock_id' => $stock->id,
+                'path' => $file->store('stocks', 'public'),
+                'sort_order' => $nextOrder++,
+            ]);
+        }
+
+        $stock->unsetRelation('images');
+        $stock->image = $stock->images()->orderBy('sort_order')->orderBy('id')->value('path');
 
         $itemType = $validated['item_type'];
         $prices = null;
@@ -745,8 +789,12 @@ class FacultyController extends Controller
 
         $stock->salesOrderItems()->delete();
 
+        $paths = $stock->images()->pluck('path')->all();
         if ($imagePath) {
-            Storage::disk('public')->delete($imagePath);
+            $paths[] = $imagePath;
+        }
+        foreach (array_unique($paths) as $path) {
+            Storage::disk('public')->delete($path);
         }
 
         $stock->delete();
@@ -1028,7 +1076,7 @@ class FacultyController extends Controller
     {
         try {
             if ($application->wizard_status !== 'loi_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is no longer awaiting LOI review.');
             }
 
             $application->update([
@@ -1052,25 +1100,22 @@ class FacultyController extends Controller
                 ));
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Letter of Intent approved. Concessionaire can now fill the application form.',
-            ]);
+            return back()->with('success', 'Letter of Intent approved. The concessionaire can now fill the application form.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Approving the Letter of Intent failed: ' . $e->getMessage());
         }
     }
 
     public function wizardRejectLOI(Request $request, PartnershipApplication $application)
     {
+        $request->validate([
+            'reason' => 'required|string|min:10|max:500',
+        ]);
+
         try {
             if ($application->wizard_status !== 'loi_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is no longer awaiting LOI review.');
             }
-
-            $request->validate([
-                'reason' => 'required|string|min:10|max:500',
-            ]);
 
             $application->update([
                 'wizard_status' => 'loi_rejected',
@@ -1087,12 +1132,9 @@ class FacultyController extends Controller
                 ]
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Letter of Intent rejected.',
-            ]);
+            return back()->with('success', 'Letter of Intent rejected. The applicant will be asked to resubmit.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Rejecting the Letter of Intent failed: ' . $e->getMessage());
         }
     }
 
@@ -1100,7 +1142,7 @@ class FacultyController extends Controller
     {
         try {
             if ($application->wizard_status !== 'form_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is no longer awaiting form review.');
             }
 
             $application->update([
@@ -1124,25 +1166,22 @@ class FacultyController extends Controller
                 ));
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Application form approved. Track physical documents next.',
-            ]);
+            return back()->with('success', 'Application form approved. Track the physical documents next.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Approving the application form failed: ' . $e->getMessage());
         }
     }
 
     public function wizardRejectForm(Request $request, PartnershipApplication $application)
     {
+        $request->validate([
+            'reason' => 'required|string|min:10|max:500',
+        ]);
+
         try {
             if ($application->wizard_status !== 'form_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is no longer awaiting form review.');
             }
-
-            $request->validate([
-                'reason' => 'required|string|min:10|max:500',
-            ]);
 
             $application->update([
                 'wizard_status' => 'form_rejected',
@@ -1159,12 +1198,9 @@ class FacultyController extends Controller
                 ]
             );
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Application form rejected.',
-            ]);
+            return back()->with('success', 'Application form rejected. The applicant will be asked to resubmit.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Rejecting the application form failed: ' . $e->getMessage());
         }
     }
 
@@ -1244,7 +1280,7 @@ class FacultyController extends Controller
     {
         try {
             if ($application->wizard_status !== 'receipt_submitted') {
-                return response()->json(['success' => false, 'message' => 'Invalid state.']);
+                return back()->with('error', 'This application is not awaiting final approval.');
             }
 
             $application->update([
@@ -1279,12 +1315,9 @@ class FacultyController extends Controller
                 Log::warning('PartnershipApprovedMail failed: ' . $mailEx->getMessage());
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Application fully approved. Concessionaire can now access their dashboard.',
-            ]);
+            return back()->with('success', 'Application fully approved. The concessionaire can now access their dashboard.');
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return back()->with('error', 'Final approval failed: ' . $e->getMessage());
         }
     }
 
@@ -1329,6 +1362,7 @@ class FacultyController extends Controller
             ->where('is_active_concessionaire', true)
             ->withSum('concessionairePayments as total_paid', 'amount')
             ->withMax('concessionairePayments as last_payment_date', 'payment_date')
+            ->withMax('concessionairePayments as paid_through_month', 'period_month')
             ->orderBy('business_name')
             ->orderBy('name')
             ->get();
