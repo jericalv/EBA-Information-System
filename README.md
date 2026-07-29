@@ -1,6 +1,6 @@
 # EBA Information System
 
-A Laravel-based information system for the External and Business Affairs (EBA) office at Cavite State University – Trece Martires City Campus. It manages campus concessionaire partnerships, product listings, uniform/book stock and point-of-sale, and payment tracking — all in one platform.
+A Laravel-based information system for the External and Business Affairs (EBA) office at Cavite State University – Trece Martires City Campus. It manages campus concessionaire partnerships, product listings, uniform/book stock and point-of-sale, and payment tracking  all in one platform.
 
 **Live:** [eba.cvsutrece.com](https://eba.cvsutrece.com)
 
@@ -118,9 +118,6 @@ This is an active capstone project. A few things worth knowing if you're picking
 - Uniform booklet receipt printer offsets are not yet calibrated against a physical printer (use `?preview=1` on a receipt to check alignment)
 - A concessionaire-facing booklet receipt (mirroring the uniform one) is planned but not yet built
 
-## License
-
-*Add your license here.*
 
 ## Acknowledgments
 
